@@ -1,9 +1,7 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards;
 
-import com.google.inject.Inject;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.ResourceBundle;
+import de.uol.swp.common.util.ResourceManager;
 
 /**
  * A class to store a unique card.
@@ -13,8 +11,6 @@ import java.util.ResourceBundle;
  */
 public class UniqueCard implements IUniqueCard {
 
-    @Inject
-    private static ResourceBundle resourceBundle;
     private final UniqueCardsType type;
     private UserOrDummy owner;
     private int amount;
@@ -75,11 +71,14 @@ public class UniqueCard implements IUniqueCard {
     @Override
     public String toString() {
         String displayOwner = owner == null ? "nobody" : owner.getUsername();
-        if (resourceBundle == null) return type.name() + ": " + displayOwner + ": " + amount;
         if (type == UniqueCardsType.LARGEST_ARMY) {
-            return String.format(resourceBundle.getString("game.resources.whohas.largestarmy"), displayOwner, amount);
+            return ResourceManager
+                    .getIfAvailableElse("Largest Army: %s (%s Knights)", "game.resources.whohas.largestarmy",
+                                        displayOwner, amount);
         } else if (type == UniqueCardsType.LONGEST_ROAD) {
-            return String.format(resourceBundle.getString("game.resources.whohas.longestroad"), displayOwner, amount);
+            return ResourceManager
+                    .getIfAvailableElse("Longest Road: %s (%s Roads)", "game.resources.whohas.longestroad",
+                                        displayOwner, amount);
         }
         return type.name() + ": " + displayOwner + ": " + amount;
     }

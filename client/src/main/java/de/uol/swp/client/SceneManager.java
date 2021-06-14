@@ -12,10 +12,8 @@ import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
-import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
-import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
+import de.uol.swp.client.changeSettings.ChangeSettingsPresenter;
+import de.uol.swp.client.changeSettings.event.*;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -34,7 +32,6 @@ import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.*;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
@@ -44,6 +41,8 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -73,6 +72,9 @@ public class SceneManager {
 
     @Inject
     private static Injector injector;
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
 
     private final Stage primaryStage;
     private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
@@ -85,8 +87,6 @@ public class SceneManager {
     private final ILobbyService lobbyService;
     private final ITradeService tradeService;
     private final ISoundService soundService;
-    private final ResourceBundle resourceBundle;
-    private final String styleSheet;
 
     private Scene loginScene;
     private String lastTitle;
@@ -109,13 +109,12 @@ public class SceneManager {
      * @param soundService   The SoundService this class should use.
      * @param eventBus       The EventBus this class should use.
      * @param primaryStage   The created PrimaryStage.
-     * @param resourceBundle The used ResourceBundle.
      * @param styleSheet     The used StyleSheet.
      */
     @Inject
     public SceneManager(IUserService userService, ILobbyService lobbyService, ITradeService tradeService,
                         ISoundService soundService, EventBus eventBus, @Assisted Stage primaryStage,
-                        ResourceBundle resourceBundle, @Named("styleSheet") String styleSheet) {
+                        @Named("styleSheet") String styleSheet) {
         eventBus.register(this);
         this.userService = userService;
         this.lobbyService = lobbyService;
@@ -123,8 +122,7 @@ public class SceneManager {
         this.soundService = soundService;
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
-        this.resourceBundle = resourceBundle;
-        this.styleSheet = styleSheet;
+        SceneManager.styleSheet = styleSheet;
         initViews();
     }
 
@@ -167,7 +165,7 @@ public class SceneManager {
      * @since 2020-12-19
      */
     public void showChangeAccountDetailsScreen() {
-        showScene(changeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
+        showScene(changeAccountDetailsScene, ResourceManager.get("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
@@ -182,8 +180,8 @@ public class SceneManager {
      * @since 2021-05-22
      */
     public void showChangePropertiesScreen() {
-        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
-                  ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
+        showScene(changePropertiesScene, ResourceManager.get("changeproperties.window.title"),
+                  ChangeSettingsPresenter.MIN_WIDTH, ChangeSettingsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -199,9 +197,9 @@ public class SceneManager {
      */
     public void showError(String message, String e) {
         soundService.popup();
-        String title = resourceBundle.getString("error.title");
-        String headerText = resourceBundle.getString("error.header");
-        String confirmText = resourceBundle.getString("button.confirm");
+        String title = ResourceManager.get("error.title");
+        String headerText = ResourceManager.get("error.header");
+        String confirmText = ResourceManager.get("button.confirm");
         String content = message + internationaliseServerMessage(e);
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -224,7 +222,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showError(String e) {
-        showError(resourceBundle.getString("error.generic") + '\n', e);
+        showError(ResourceManager.get("error.generic") + '\n', e);
     }
 
     /**
@@ -237,8 +235,8 @@ public class SceneManager {
     public void showLoginErrorScreen() {
         // Will we ever use this?
         soundService.popup();
-        String contentText = resourceBundle.getString("login.error");
-        String confirmText = resourceBundle.getString("button.confirm");
+        String contentText = ResourceManager.get("login.error");
+        String confirmText = ResourceManager.get("button.confirm");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, contentText);
             ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
@@ -259,7 +257,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene, resourceBundle.getString("login.window.title"), LoginPresenter.MIN_WIDTH,
+        showScene(loginScene, ResourceManager.get("login.window.title"), LoginPresenter.MIN_WIDTH,
                   LoginPresenter.MIN_HEIGHT);
     }
 
@@ -272,8 +270,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showMainScreen(User currentUser) {
-        showScene(mainScene,
-                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
+        showScene(mainScene, String.format(ResourceManager.get("mainmenu.window.title"), currentUser.getUsername()),
                   MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
         primaryStage.setOnCloseRequest(event -> {
             closeLobbies();
@@ -290,7 +287,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"), RegistrationPresenter.MIN_WIDTH,
+        showScene(registrationScene, ResourceManager.get("register.window.title"), RegistrationPresenter.MIN_WIDTH,
                   RegistrationPresenter.MIN_HEIGHT);
     }
 
@@ -302,7 +299,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
-        showError(resourceBundle.getString("error.server") + '\n', e);
+        showError(ResourceManager.get("error.server") + '\n', e);
     }
 
     /**
@@ -322,7 +319,7 @@ public class SceneManager {
             //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
             userService.logout(false);
             showLoginScreen();
-            cause = resourceBundle.getString("error.server.disrupted");
+            cause = ResourceManager.get("error.server.disrupted");
         }
         showServerError(cause);
     }
@@ -336,9 +333,9 @@ public class SceneManager {
      */
     public void showTimeoutErrorScreen() {
         soundService.popup();
-        String contentText = resourceBundle.getString("error.context.disconnected");
-        String headerText = resourceBundle.getString("error.header.disconnected");
-        String confirmText = resourceBundle.getString("button.confirm");
+        String contentText = ResourceManager.get("error.context.disconnected");
+        String headerText = ResourceManager.get("error.header.disconnected");
+        String confirmText = ResourceManager.get("button.confirm");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, contentText);
             alert.setHeaderText(headerText);
@@ -377,12 +374,12 @@ public class SceneManager {
      * FXML file.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.ChangePropertiesPresenter
+     * @see de.uol.swp.client.changeSettings.ChangeSettingsPresenter
      * @since 2021-05-22
      */
     private void initChangePropertiesView() {
         if (changePropertiesScene == null) {
-            Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
+            Parent rootPane = initPresenter(ChangeSettingsPresenter.fxml);
             changePropertiesScene = new Scene(rootPane, 400, 200);
             changePropertiesScene.getStylesheets().add(styleSheet);
         }
@@ -520,91 +517,89 @@ public class SceneManager {
         switch (e) {
             //Found in ChatService
             case "This lobby doesn't allow the use of commands!":
-                context = resourceBundle.getString("error.context.commandsforbidden");
+                context = ResourceManager.get("error.context.commandsforbidden");
                 break;
             //Found in LobbyService
             case "Game session started already!":
-                context = resourceBundle.getString("error.context.sessionstarted");
+                context = ResourceManager.get("error.context.sessionstarted");
                 break;
             case "You're already in this lobby!":
-                context = resourceBundle.getString("error.context.alreadyin");
+                context = ResourceManager.get("error.context.alreadyin");
                 break;
             case "This lobby is full!":
-                context = resourceBundle.getString("error.context.full");
+                context = ResourceManager.get("error.context.full");
                 break;
             case "This lobby does not exist!":
-                context = resourceBundle.getString("error.context.nonexistant");
+                context = ResourceManager.get("error.context.nonexistant");
                 break;
             //Found in GameService
             case "Can not kick while a game is ongoing":
-                context = resourceBundle.getString("error.context.ongoing");
+                context = ResourceManager.get("error.context.ongoing");
                 break;
             //Found in ServerHandler
             case "Authorisation required. Client not logged in!":
-                context = resourceBundle.getString("error.context.authneeded");
+                context = ResourceManager.get("error.context.authneeded");
                 break;
             //Found in UserManagement
             case "Username already used!":
             case "Username already taken":
-                context = resourceBundle.getString("error.context.nameused");
+                context = ResourceManager.get("error.context.nameused");
                 break;
             case "Username unknown!":
-                context = resourceBundle.getString("error.context.unknown");
+                context = ResourceManager.get("error.context.unknown");
                 break;
             case "User unknown!":
-                context = resourceBundle.getString("error.context.unknownuser");
+                context = ResourceManager.get("error.context.unknownuser");
                 break;
             //Found in UserService
             case "Old Passwords are not equal":
-                context = resourceBundle.getString("error.context.oldpw");
+                context = ResourceManager.get("error.context.oldpw");
                 break;
             case "Old Password was not correct":
-                context = resourceBundle.getString("error.context.oldpwincorrect");
+                context = ResourceManager.get("error.context.oldpwincorrect");
                 break;
         }
         //found in UserManagement
-        if (e.contains("Cannot auth user "))
-            context = String.format(resourceBundle.getString("error.context.cannotauth"), e.substring(17));
-        if (e.contains("already logged in")) context = String
-                .format(resourceBundle.getString("error.context.alreadyloggedin"),
-                        e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')));
+        if (e.contains("Cannot auth user ")) context = ResourceManager.get("error.context.cannotauth", e.substring(17));
+        if (e.contains("already logged in")) context = ResourceManager
+                .get("error.context.alreadyloggedin", e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')));
         //found in UserService
         if (e.contains("Cannot delete user ")) {
-            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+            context = String.format(ResourceManager.get("error.context.cannotdelete"),
                                     e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
-                                    resourceBundle.getString("error.context.unknown"));
+                                    ResourceManager.get("error.context.unknown"));
         }
         if (e.contains("User deletion unsuccessful for user ")) {
-            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+            context = String.format(ResourceManager.get("error.context.cannotdelete"),
                                     e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
-                                    resourceBundle.getString("error.context.wrongpw"));
+                                    ResourceManager.get("error.context.wrongpw"));
         }
         if (e.contains("Cannot create user ")) {
-            context = String.format(resourceBundle.getString("error.context.cannotcreate"),
+            context = String.format(ResourceManager.get("error.context.cannotcreate"),
                                     e.substring(e.indexOf('[') + 2 - 1, e.lastIndexOf(']')),
-                                    resourceBundle.getString("error.context.nameused"));
+                                    ResourceManager.get("error.context.nameused"));
         }
         if (e.contains("Cannot change Password of ")) {
-            context = String.format(resourceBundle.getString("error.context.cannotchangepw"),
+            context = String.format(ResourceManager.get("error.context.cannotchangepw"),
                                     e.substring(e.indexOf('[') + 3 - 2, e.lastIndexOf(']')),
-                                    resourceBundle.getString("error.context.unknown"));
+                                    ResourceManager.get("error.context.unknown"));
         }
         //found in LobbyManagement
         if (e.contains("Lobby") && e.contains(" already exists!")) {
-            context = String.format(resourceBundle.getString("error.context.lobby.alreadyused"),
+            context = String.format(ResourceManager.get("error.context.lobby.alreadyused"),
                                     e.substring(e.indexOf('[') + 4 - 3, e.lastIndexOf(']')));
         }
         if (e.contains("Lobby") && e.contains(" not found!")) {
-            context = String.format(resourceBundle.getString("error.context.lobby.notfound"),
+            context = String.format(ResourceManager.get("error.context.lobby.notfound"),
                                     e.substring(e.indexOf('[') + 5 - 4, e.lastIndexOf(']')));
         }
         //found in GameManagement
         if (e.contains("Game") && e.contains(" already exists!")) {
-            context = String.format(resourceBundle.getString("error.context.game.alreadyexists"),
+            context = String.format(ResourceManager.get("error.context.game.alreadyexists"),
                                     e.substring(e.indexOf('[') + 6 - 5, e.lastIndexOf(']')));
         }
         if (e.contains("Game") && e.contains(" not found!")) {
-            context = String.format(resourceBundle.getString("error.context.game.notfound"),
+            context = String.format(ResourceManager.get("error.context.game.notfound"),
                                     e.substring(e.indexOf('[') + 7 - 6, e.lastIndexOf(']')));
         }
         return context;
@@ -678,17 +673,17 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ChangePropertiesCanceledEvent detected on the EventBus
+     * Handles the ChangeSettingsCanceledEvent detected on the EventBus
      * <p>
-     * If a ChangePropertiesCanceledEvent is detected on the EventBus, this method gets
+     * If a ChangeSettingsCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the main screen.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+    private void onChangePropertiesCanceledEvent(ChangeSettingsCanceledEvent event) {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
@@ -704,7 +699,7 @@ public class SceneManager {
      * @since 2021-05-22
      */
     @Subscribe
-    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
+    private void onChangePropertiesSuccessfulEvent(ChangeSettingsSuccessfulEvent event) {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
@@ -847,7 +842,7 @@ public class SceneManager {
         LOG.debug("Received OpenDevMenuResponse");
         if (devMenuIsOpen) return;
         devMenuIsOpen = true;
-        String title = resourceBundle.getString("devmenu.window.title");
+        String title = ResourceManager.get("devmenu.window.title");
         double xPos = primaryStage.getX() + 100;
         double yPos = primaryStage.getY();
         Platform.runLater(() -> {
@@ -940,6 +935,24 @@ public class SceneManager {
     }
 
     /**
+     * Handles the SetVolumeErrorEvent detected on the EventBus
+     * <p>
+     * If a SetVolumeErrorEvent is detected on the EventBus,
+     * this method gets called. It shows the error message of
+     * the event in a error alert.
+     *
+     * @param event The SetVolumeErrorEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent
+     * @since 2021-06-05
+     */
+    @Subscribe
+    private void onSetVolumeErrorEvent(SetVolumeErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
      * Handles the ShowChangeAccountDetailsViewEvent detected on the EventBus
      * <p>
      * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets
@@ -973,16 +986,13 @@ public class SceneManager {
      * @param event The ShowChangePropertiesViewEvent detected on the EventBus
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @see de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent
      * @since 2021-05-22
      */
     @Subscribe
-    private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
+    private void onShowChangePropertiesViewEvent(ShowChangeSettingsViewEvent event) {
         showChangePropertiesScreen();
-        primaryStage.setOnCloseRequest(windowEvent -> {
-            windowEvent.consume();
-            showMainScreen(userService.getLoggedInUser());
-        });
+        primaryStage.setOnCloseRequest(windowEvent -> showMainScreen(userService.getLoggedInUser()));
     }
 
     /**
@@ -1087,7 +1097,7 @@ public class SceneManager {
         Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
         Scene robberTaxScene = new Scene(rootPane);
         robberTaxScene.getStylesheets().add(styleSheet);
-        String title = resourceBundle.getString("game.robber.tax.title");
+        String title = ResourceManager.get("game.robber.tax.title");
         Platform.runLater(() -> {
             Stage robberTaxStage = new Stage();
             robberTaxStages.put(event.getLobbyName(), robberTaxStage);
@@ -1123,7 +1133,7 @@ public class SceneManager {
     @Subscribe
     private void onShowRulesOverviewViewEvent(ShowRulesOverviewViewEvent event) {
         if (rulesOverviewIsOpen) return;
-        String title = resourceBundle.getString("rules.window.title");
+        String title = ResourceManager.get("rules.window.title");
         Platform.runLater(() -> {
             Stage rulesStage = new Stage();
             rulesOverviewIsOpen = true;
@@ -1164,7 +1174,7 @@ public class SceneManager {
         Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
         Scene bankScene = new Scene(rootPane);
         bankScene.getStylesheets().add(styleSheet);
-        String title = resourceBundle.getString("game.trade.window.bank.title");
+        String title = ResourceManager.get("game.trade.window.bank.title");
         Platform.runLater(() -> {
             Stage bankStage = new Stage();
             bankStage.setTitle(title);
@@ -1205,7 +1215,7 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserRespondViewEvent(ShowTradeWithUserRespondViewEvent event) {
         LobbyName lobbyName = event.getLobbyName();
-        String bundleString = resourceBundle.getString("game.trade.window.receiving.title");
+        String bundleString = ResourceManager.get("game.trade.window.receiving.title");
         String title = String.format(bundleString, event.getOfferingUser());
         Platform.runLater(() -> {
             if (tradingStages.containsKey(lobbyName)) {
@@ -1252,7 +1262,7 @@ public class SceneManager {
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene tradeScene = new Scene(rootPane);
         tradeScene.getStylesheets().add(styleSheet);
-        String bundleString = resourceBundle.getString("game.trade.window.offering.title");
+        String bundleString = ResourceManager.get("game.trade.window.offering.title");
         String title = String.format(bundleString, event.getRespondingUser());
         Platform.runLater(() -> {
             Stage tradingStage = new Stage();

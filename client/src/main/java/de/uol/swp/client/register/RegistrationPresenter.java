@@ -7,6 +7,7 @@ import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -16,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,13 +119,13 @@ public class RegistrationPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
-            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
+            post(new RegistrationErrorEvent(ResourceManager.get("register.error.empty.username")));
         } else if (!checkMailFormat(emailField.getText())) {
-            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
+            post(new RegistrationErrorEvent(ResourceManager.get("register.error.invalid.email")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
-            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.notequalpw")));
+            post(new RegistrationErrorEvent(ResourceManager.get("register.error.notequalpw")));
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
-            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
+            post(new RegistrationErrorEvent(ResourceManager.get("register.error.empty.password")));
         } else {
             userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
                                                emailField.getText()));
@@ -167,9 +167,6 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2021-04-21
      */
     private void prepareLoginFormat() {
-        UnaryOperator<TextFormatter.Change> stringFilter = (s) ->
-                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
-        loginField.setTextFormatter(new TextFormatter<>(stringFilter));
         // EventFilter to let a filtered input handle the ESC hotkey because filtered inputs suppress the Key Combo
         loginField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -188,7 +185,9 @@ public class RegistrationPresenter extends AbstractPresenter {
             },
         loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
         //@formatter:on
-        TextFormatter<String> formatter = new TextFormatter<>(c -> c.getControlNewText().length() <= 20 ? c : null);
+        TextFormatter<String> formatter = new TextFormatter<>(
+                c -> c.getControlNewText().length() <= 20 && c.getText().matches("[A-Za-z0-9_-]+") || c.isDeleted() || c
+                        .getText().equals("") ? c : null);
         loginField.setTextFormatter(formatter);
     }
 }

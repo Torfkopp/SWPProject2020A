@@ -1,12 +1,12 @@
 package de.uol.swp.client.lobby;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,6 +33,11 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
+    public void addAI(LobbyName name, AI ai) {
+        ThreadManager.runNow(() -> syncLobbyService.addAI(name, ai));
+    }
+
+    @Override
     public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
         ThreadManager.runNow(() -> syncLobbyService.changeOwner(lobbyName, newOwner));
     }
@@ -50,11 +55,6 @@ public class AsyncLobbyService implements ILobbyService {
     @Override
     public void joinLobby(LobbyName name) {
         ThreadManager.runNow(() -> syncLobbyService.joinLobby(name));
-    }
-
-    @Override
-    public void addAI(LobbyName name, AI ai) {
-        ThreadManager.runNow(() -> syncLobbyService.addAI(name, ai));
     }
 
     @Override
@@ -83,11 +83,6 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void setColour(LobbyName lobbyName, Colour colour) {
-        ThreadManager.runNow(() -> syncLobbyService.setColour(lobbyName, colour));
-    }
-
-    @Override
     public void retrieveAllLobbies() {
         ThreadManager.runNow(syncLobbyService::retrieveAllLobbies);
     }
@@ -100,6 +95,11 @@ public class AsyncLobbyService implements ILobbyService {
     @Override
     public void returnToPreGameLobby(LobbyName lobbyName) {
         ThreadManager.runNow(() -> syncLobbyService.returnToPreGameLobby(lobbyName));
+    }
+
+    @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        ThreadManager.runNow(() -> syncLobbyService.setColour(lobbyName, colour));
     }
 
     @Override

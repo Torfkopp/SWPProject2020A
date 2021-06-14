@@ -173,7 +173,7 @@ public class UserService implements IUserService {
      * @since 2021-03-23
      */
     @Subscribe
-    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         if (getLoggedInUser().getID() != rsp.getUser().getID()) return;
         LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
         setLoggedInUser(rsp.getUser());
