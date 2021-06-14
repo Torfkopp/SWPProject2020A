@@ -12,6 +12,7 @@ import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeSettings.ChangeGameSettingsPresenter;
 import de.uol.swp.client.changeSettings.ChangeSettingsPresenter;
 import de.uol.swp.client.changeSettings.event.*;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
@@ -92,6 +93,7 @@ public class SceneManager {
     private Scene mainScene;
     private Scene lastScene = null;
     private Scene currentScene = null;
+    private Scene changeGameSettingsScene;
     private Scene changeAccountDetailsScene;
     private Scene changePropertiesScene;
     private Scene rulesScene;
@@ -368,6 +370,25 @@ public class SceneManager {
     }
 
     /**
+     * Initialises the ChangeGameSettingsView
+     * <p>
+     * If the ChangeGameSettingsScene is null, it gets set to a new scene containing the
+     * pane showing the ChangeGameSettingsView as specified by the ChangeGameSettingsView
+     * FXML file.
+     *
+     * @author Marvin Drees
+     * @see de.uol.swp.client.changeSettings.ChangeGameSettingsPresenter
+     * @since 2021-06-14
+     */
+    private void initChangeGameSettingsView() {
+        if (changeGameSettingsScene == null) {
+            Parent rootPane = initPresenter(ChangeGameSettingsPresenter.fxml);
+            changeGameSettingsScene = new Scene(rootPane, 400, 200);
+            changeGameSettingsScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
      * Initialises the ChangePropertiesView
      * <p>
      * If the ChangePropertiesScene is null, it gets set to a new scene containing the
@@ -499,6 +520,7 @@ public class SceneManager {
         initRulesOverviewView();
         initChangeAccountDetailsView();
         initChangePropertiesView();
+        initChangeGameSettingsView();
         eventBus.post(new SetAcceleratorsEvent());
     }
 
@@ -673,6 +695,16 @@ public class SceneManager {
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         LOG.debug("Account Details change was successful.");
         showMainScreen(rsp.getUser());
+    }
+
+    @Subscribe
+    private void onChangeGameSettingsCanceledEvent(ChangeGameSettingsCanceledEvent event) {
+        //TODO no idea how this works
+    }
+
+    @Subscribe
+    private void onChangeGameSettingsSuccessfulEvent(ChangeGameSettingsSuccessfulEvent event) {
+        //TODO no idea how this works
     }
 
     /**
@@ -975,6 +1007,38 @@ public class SceneManager {
         primaryStage.setOnCloseRequest(windowEvent -> {
             windowEvent.consume();
             showMainScreen(userService.getLoggedInUser());
+        });
+    }
+
+    /**
+     * Handles the ShowChangeGameSettingsViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangeGameSettingsViewEvent is detected on the EventBus, this method gets
+     * called. It opens a new PopUp containing the ChangeGameSettingsView.
+     *
+     * @param event The ShowChangeGameSettingsEvent detected on the EventBus
+     *
+     * @author Marvin Drees
+     * @see de.uol.swp.client.changeSettings.event.ShowChangeGameSettingsViewEvent
+     * @since 2021-06-14
+     */
+    @Subscribe
+    private void onShowChangeGameSettingsViewEvent(ShowChangeGameSettingsViewEvent event) {
+        String title = resourceBundle.getString("rules.window.title");
+        Platform.runLater(() -> {
+            Stage changeGameSettingsStage = new Stage();
+            changeGameSettingsStage.setTitle(title);
+            changeGameSettingsStage.setHeight(ChangeGameSettingsPresenter.MIN_HEIGHT);
+            changeGameSettingsStage.setMinHeight(ChangeGameSettingsPresenter.MIN_HEIGHT);
+            changeGameSettingsStage.setWidth(ChangeGameSettingsPresenter.MIN_WIDTH);
+            changeGameSettingsStage.setMinWidth(ChangeGameSettingsPresenter.MIN_WIDTH);
+            changeGameSettingsStage.setResizable(false);
+            changeGameSettingsStage.setScene(changeGameSettingsScene);
+            changeGameSettingsStage.initOwner(primaryStage);
+            changeGameSettingsStage.show();
+            changeGameSettingsStage.toFront();
+            changeGameSettingsStage.setOnCloseRequest(windowEvent -> ThreadManager
+                    .runNow(() -> changeGameSettingsStage.setOnCloseRequest(Event::consume)));
         });
     }
 
@@ -1300,13 +1364,12 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-
-            Platform.runLater(() -> {
-                if (!tradingStages.containsKey(lobby)) return;
-                tradingStages.get(lobby).close();
-                tradingStages.remove(lobby);
-            });
-        }
+        Platform.runLater(() -> {
+            if (!tradingStages.containsKey(lobby)) return;
+            tradingStages.get(lobby).close();
+            tradingStages.remove(lobby);
+        });
+    }
 
     /**
      * Handles the TradeErrorEvent detected on the EventBus

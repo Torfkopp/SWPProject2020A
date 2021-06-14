@@ -73,7 +73,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
         defaultProps
                 .setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
-        defaultProps.setProperty("renderingStyle", preferences.get("renderingStyle", "plain"));
+        defaultProps.setProperty("renderingstyle", preferences.get("renderingstyle", "plain"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.changeSettings.event.ShowChangeGameSettingsViewEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
@@ -269,9 +270,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         helpActivated = !helpActivated;
     }
 
+    /**
+     * Handles a click on the Settings button
+     * <p>
+     * Opens the ChangeGameSettings window by posting an event
+     * onto the bus which the SceneManager is subscribed to.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-14
+     */
     @FXML
     protected void onLobbySettingsButtonPressed() {
         soundService.button();
+        post(new ShowChangeGameSettingsViewEvent());
     }
 
     /**

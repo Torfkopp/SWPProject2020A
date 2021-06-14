@@ -71,7 +71,6 @@ public class GameRendering {
     @Inject
     @Named("renderingStyle")
     private static String renderingStyle;
-
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
@@ -115,20 +114,29 @@ public class GameRendering {
         this.tokenTextFontSize = (20.0 / 750.0) * effectiveWidth;
         this.bottomTextFontSize = (25.0 / 750.0) * effectiveWidth;
         this.centerTextFontSize = (30.0 / 750.0) * effectiveWidth;
-        this.hexTiles.put("water", new Image("images/hexes/" + renderingStyle + "/water.png"));
-        this.hexTiles.put("desert", new Image("images/hexes/" + renderingStyle + "/desert.png"));
-        this.hexTiles.put("fields", new Image("images/hexes/" + renderingStyle + "/fields.png"));
-        this.hexTiles.put("hills", new Image("images/hexes/" + renderingStyle + "/hills.png"));
-        this.hexTiles.put("mountains", new Image("images/hexes/" + renderingStyle + "/mountains.png"));
-        this.hexTiles.put("pasture", new Image("images/hexes/" + renderingStyle + "/pasture.png"));
-        this.hexTiles.put("forest", new Image("images/hexes/" + renderingStyle + "/forest.png"));
-        this.hexTiles.put("robber", new Image("images/hexes/" + renderingStyle + "/robber.png"));
-        this.hexTiles.put("harbour_east", new Image("images/hexes/" + renderingStyle + "/harbour_east.png"));
-        this.hexTiles.put("harbour_northeast", new Image("images/hexes/" + renderingStyle + "/harbour_northeast.png"));
-        this.hexTiles.put("harbour_northwest", new Image("images/hexes/" + renderingStyle + "/harbour_northwest.png"));
-        this.hexTiles.put("harbour_west", new Image("images/hexes/" + renderingStyle + "/harbour_west.png"));
-        this.hexTiles.put("harbour_southwest", new Image("images/hexes/" + renderingStyle + "/harbour_southwest.png"));
-        this.hexTiles.put("harbour_southeast", new Image("images/hexes/" + renderingStyle + "/harbour_southeast.png"));
+        try {
+            this.hexTiles.put("water", new Image("images/hexes/" + renderingStyle + "/water.png"));
+            this.hexTiles.put("desert", new Image("images/hexes/" + renderingStyle + "/desert.png"));
+            this.hexTiles.put("fields", new Image("images/hexes/" + renderingStyle + "/fields.png"));
+            this.hexTiles.put("hills", new Image("images/hexes/" + renderingStyle + "/hills.png"));
+            this.hexTiles.put("mountains", new Image("images/hexes/" + renderingStyle + "/mountains.png"));
+            this.hexTiles.put("pasture", new Image("images/hexes/" + renderingStyle + "/pasture.png"));
+            this.hexTiles.put("forest", new Image("images/hexes/" + renderingStyle + "/forest.png"));
+            this.hexTiles.put("robber", new Image("images/hexes/" + renderingStyle + "/robber.png"));
+            this.hexTiles.put("harbour_east", new Image("images/hexes/" + renderingStyle + "/harbour_east.png"));
+            this.hexTiles
+                    .put("harbour_northeast", new Image("images/hexes/" + renderingStyle + "/harbour_northeast.png"));
+            this.hexTiles
+                    .put("harbour_northwest", new Image("images/hexes/" + renderingStyle + "/harbour_northwest.png"));
+            this.hexTiles.put("harbour_west", new Image("images/hexes/" + renderingStyle + "/harbour_west.png"));
+            this.hexTiles
+                    .put("harbour_southwest", new Image("images/hexes/" + renderingStyle + "/harbour_southwest.png"));
+            this.hexTiles
+                    .put("harbour_southeast", new Image("images/hexes/" + renderingStyle + "/harbour_southeast.png"));
+        } catch (IllegalArgumentException e) {
+            LOG.error(e.getMessage());
+            renderingStyle = "plain";
+        }
     }
 
     /**
@@ -263,7 +271,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawCity(Optional<Player> owner, double currentX, double currentY) {
-        //TODO change this
+        //TODO optionally render images
         if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
         else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
         double halfCitySize = citySize / 2.0;
@@ -428,6 +436,7 @@ public class GameRendering {
      * <p>
      * This Method draws a hexagon at the given coordinates.
      *
+     * @param type     The type of hex to draw
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
      *
@@ -548,7 +557,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
-        //TODO change this
+        //TODO optionally render images
         double x = currentX - (settlementSize / 2.0);
         double y = currentY - (settlementSize / 2.0);
 
@@ -789,7 +798,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
-        //TODO change this
+        //TODO optionally render images
         Platform.runLater(() -> gfxCtx.setLineWidth(roadWidth));
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
