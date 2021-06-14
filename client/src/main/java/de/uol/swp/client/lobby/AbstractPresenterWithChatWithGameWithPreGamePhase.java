@@ -23,6 +23,7 @@ import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -30,9 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -286,6 +285,42 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Updates the lobby's member list according to the list given
+     * <p>
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
+     *
+     * @param userLobbyList A list of User objects including all currently logged in
+     *                      users
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.UserOrDummy
+     * @since 2021-01-05
+     */
+    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+        Platform.runLater(() -> {
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
+    }
+
+    /**
      * Helper method to create a PlayerColourMap from
      * the UserColourMap and the UserOrDummyPlayerMap
      *
@@ -436,6 +471,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             developmentCardTableView.setVisible(false);
             rollDice.setVisible(false);
             autoRoll.setVisible(false);
+            constructionMode.setVisible(false);
             endTurn.setVisible(false);
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
@@ -546,6 +582,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         userColoursMap = msg.getUserOrDummyColourMap();
         gameRendering.setPlayerColours(getPlayerColourMap());
@@ -560,6 +597,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            constructionMode.setVisible(true);
             buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);

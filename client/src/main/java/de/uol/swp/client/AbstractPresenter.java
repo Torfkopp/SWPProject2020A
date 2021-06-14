@@ -19,13 +19,8 @@ import de.uol.swp.common.util.ThreadManager;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenter {
 
-    @Inject
     protected ISoundService soundService;
-
-    @Inject
     protected IUserService userService;
-
-    @Inject
     protected ILobbyService lobbyService;
 
     private EventBus eventBus;
@@ -61,19 +56,27 @@ public abstract class AbstractPresenter {
     }
 
     /**
-     * Sets the field eventBus
+     * Sets the injected fields
      * <p>
-     * This method sets the field EventBus to the EventBus given via parameter.
-     * Afterwards it registers this class to the new EventBus.
+     * This method sets the injected fields via parameters.
+     * It additionally registers this class to the EventBus.
      *
-     * @param eventBus The EventBus this class should use.
+     * @param eventBus       The EventBus this class should use.
+     * @param soundService   The SoundService this class should use.
+     * @param userService    The UserService this class should use.
+     * @param lobbyService   The LobbyService this class should use.
      *
      * @implNote This method does not unregister this class from any EventBus it
      * may already be registered to.
-     * @since 2019-08-29
+     * @author Marvin Drees
+     * @since 2021-06-09
      */
     @Inject
-    public void setEventBus(EventBus eventBus) {
+    private void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
+                            EventBus eventBus) {
+        this.soundService = soundService;
+        this.userService = userService;
+        this.lobbyService = lobbyService;
         this.eventBus = eventBus;
         eventBus.register(this);
     }

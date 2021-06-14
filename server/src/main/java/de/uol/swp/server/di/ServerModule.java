@@ -97,7 +97,6 @@ public class ServerModule extends AbstractModule {
         bind(UserStore.class).toInstance(store);
 
         bindConstant().annotatedWith(Names.named("commandsAllowed")).to(commandsAllowed);
-        requestStaticInjection(ChatService.class);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IChatManagement.class).to(ChatManagement.class).in(Scopes.SINGLETON);

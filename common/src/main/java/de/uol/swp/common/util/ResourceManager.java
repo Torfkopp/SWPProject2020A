@@ -3,6 +3,8 @@ package de.uol.swp.common.util;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -15,6 +17,7 @@ import java.util.*;
 public class ResourceManager {
 
     private static ResourceBundle resourceBundle;
+    private static final Logger LOG = LogManager.getLogger(ResourceManager.class);
     @Inject
     @Named("lang")
     private static String lang;
@@ -57,8 +60,10 @@ public class ResourceManager {
             return resourceBundle.getString(key);
         } catch (NullPointerException | MissingResourceException | ClassCastException error) {
             try {
+                LOG.error("Couldn't find resource \"{}\"", key);
                 return resourceBundle.getString("missingresource");
             } catch (NullPointerException | MissingResourceException | ClassCastException otherError) {
+                LOG.error("---- Also could't find backup resource; using generic text");
                 return "Missing Resource";
             }
         }
@@ -78,8 +83,10 @@ public class ResourceManager {
             return String.format(resourceBundle.getString(key), args);
         } catch (NullPointerException | MissingResourceException | ClassCastException | IllegalFormatException error) {
             try {
+                LOG.error("Couldn't find or format resource \"{}\"", key);
                 return resourceBundle.getString("missingresource");
             } catch (NullPointerException | MissingResourceException | ClassCastException otherError) {
+                LOG.error("---- Also could't find backup resource; using generic text");
                 return "Missing Resource";
             }
         }

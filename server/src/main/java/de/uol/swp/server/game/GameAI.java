@@ -25,8 +25,8 @@ import de.uol.swp.server.lobby.LobbyService;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
@@ -166,7 +166,7 @@ public class GameAI {
                                                                              .getResourceAmount()))) victim = p;
                     break;
             }
-            gameService.robRandomResource(lobby, ai, game.getUserFromPlayer(victim));
+            gameService.robRandomResource(game, ai, game.getUserFromPlayer(victim));
         }
     }
 

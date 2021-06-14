@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
@@ -21,7 +22,6 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
@@ -31,7 +31,6 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.inject.Named;
 import java.util.*;
 
 /**
@@ -53,26 +52,30 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    @Inject
-    @Named("joinLeaveMsgsOn")
-    private boolean joinLeaveMsgsOn;
-    @Inject
-    @Named("ownerReadyNotificationsOn")
-    private boolean ownerReadyNotificationsOn;
-    @Inject
-    @Named("ownerTransferNotificationsOn")
-    private boolean ownerTransferNotificationsOn;
+    private final boolean joinLeaveMsgsOn;
+    private final boolean ownerReadyNotificationsOn;
+    private final boolean ownerTransferNotificationsOn;
 
     /**
      * Constructor
+     *
+     * @param joinLeaveMsgsOn              Boolean whether to show join/leave messages.
+     * @param ownerReadyNotificationsOn    Boolean whether to show ready messages.
+     * @param ownerTransferNotificationsOn Boolean whether to show owner transfer messages.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat
      * @since 2021-01-02
      */
-    public LobbyPresenter() {
+    @Inject
+    public LobbyPresenter(@Named("joinLeaveMsgsOn") boolean joinLeaveMsgsOn,
+                          @Named("ownerReadyNotificationsOn") boolean ownerReadyNotificationsOn,
+                          @Named("ownerTransferNotificationsOn") boolean ownerTransferNotificationsOn) {
         super.init(LogManager.getLogger(LobbyPresenter.class));
+        this.joinLeaveMsgsOn = joinLeaveMsgsOn;
+        this.ownerReadyNotificationsOn = ownerReadyNotificationsOn;
+        this.ownerTransferNotificationsOn = ownerTransferNotificationsOn;
     }
 
     /**
@@ -489,37 +492,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", name));
                 tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade", name));
             }
-        });
-    }
-
-    /**
-     * Updates the lobby's member list according to the list given
-     * <p>
-     * This method clears the entire member list and then adds the name of each user
-     * in the list given to the lobby's member list.
-     * If there is no member list, it creates one.
-     * <p>
-     * If a user is marked as ready in the readyUsers Set, their name is prepended
-     * with a checkmark.
-     * If the owner is found amongst the users, their username is appended with a
-     * crown symbol.
-     *
-     * @param userLobbyList A list of User objects including all currently logged in
-     *                      users
-     *
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserOrDummy
-     * @since 2021-01-05
-     */
-    private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
-            }
-            lobbyMembers.clear();
-            lobbyMembers.addAll(userLobbyList);
         });
     }
 }
