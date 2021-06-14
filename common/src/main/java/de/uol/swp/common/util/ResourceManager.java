@@ -14,16 +14,16 @@ import java.util.*;
  */
 public class ResourceManager {
 
-    private static final ResourceBundle resourceBundle;
+    private static ResourceBundle resourceBundle;
     @Inject
     @Named("lang")
     private static String lang;
 
     static {
-        if (Strings.isNullOrEmpty(lang)) resourceBundle = null;
+        Locale locale;
+        if (Strings.isNullOrEmpty(lang)) locale = Locale.UK;
         else {
             String[] splitLang = lang.split("_");
-            Locale locale;
             switch (splitLang.length) {
                 case 1:
                     locale = new Locale(splitLang[0]);
@@ -37,7 +37,11 @@ public class ResourceManager {
                 default:
                     locale = Locale.UK;
             }
+        }
+        try {
             resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
+        } catch (NullPointerException | MissingResourceException e) {
+            resourceBundle = null;
         }
     }
 
@@ -109,6 +113,18 @@ public class ResourceManager {
      */
     public static String getIfAvailableElse(String alternative, String key) {
         return isAvailable() ? get(key) : alternative;
+    }
+
+    /**
+     * Gets the resource bundle.
+     * This method should not be used, it's only needed to allow I18n in fxml files
+     *
+     * @return The resource bundle
+     *
+     * @author Temmo Junkhoff
+     */
+    public static ResourceBundle getResourceBundle() {
+        return resourceBundle;
     }
 
     /**

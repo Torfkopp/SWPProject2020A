@@ -23,6 +23,7 @@ import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.AsyncUserService;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.fxml.FXMLLoader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -169,6 +170,7 @@ public class ClientModule extends AbstractModule {
         bind(SoundService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(SceneManager.class);
+        requestStaticInjection(ResourceManager.class);
         requestStaticInjection(MainMenuPresenter.class);
         requestStaticInjection(AbstractPresenterWithChat.class);
         requestStaticInjection(AbstractPresenterWithChatWithGame.class);
