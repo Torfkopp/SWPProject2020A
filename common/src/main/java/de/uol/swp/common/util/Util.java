@@ -9,7 +9,7 @@ package de.uol.swp.common.util;
 public class Util {
 
     /**
-     * Compares to objects and returns if they are equals.
+     * Compares two objects and returns if they are equals.
      * This method is null-safe and returns false if the first object is null
      *
      * @param a The first object that should be compared
