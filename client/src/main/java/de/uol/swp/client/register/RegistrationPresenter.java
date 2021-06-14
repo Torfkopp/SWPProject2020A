@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -167,9 +166,6 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2021-04-21
      */
     private void prepareLoginFormat() {
-        UnaryOperator<TextFormatter.Change> stringFilter = (s) ->
-                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
-        loginField.setTextFormatter(new TextFormatter<>(stringFilter));
         // EventFilter to let a filtered input handle the ESC hotkey because filtered inputs suppress the Key Combo
         loginField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -188,7 +184,9 @@ public class RegistrationPresenter extends AbstractPresenter {
             },
         loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
         //@formatter:on
-        TextFormatter<String> formatter = new TextFormatter<>(c -> c.getControlNewText().length() <= 20 ? c : null);
+        TextFormatter<String> formatter = new TextFormatter<>(
+                c -> c.getControlNewText().length() <= 20 && c.getText().matches("[A-Za-z0-9_-]+") || c.isDeleted() || c
+                        .getText().equals("") ? c : null);
         loginField.setTextFormatter(formatter);
     }
 }
