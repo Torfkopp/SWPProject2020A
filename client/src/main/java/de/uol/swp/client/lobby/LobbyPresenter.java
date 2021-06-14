@@ -158,11 +158,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         soundService.button();
         //Create new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(resourceBundle.getString("lobby.leave.confirmation.window"));
-        alert.setHeaderText(resourceBundle.getString("lobby.leave.confirmation.question"));
+        alert.setTitle(ResourceManager.get("lobby.leave.confirmation.window"));
+        alert.setHeaderText(ResourceManager.get("lobby.leave.confirmation.question"));
+        alert.getDialogPane().getStylesheets().add(styleSheet);
         //Create the buttons
-        ButtonType lConfirm = new ButtonType(resourceBundle.getString("button.confirm"));
-        ButtonType lCancel = new ButtonType(resourceBundle.getString("button.cancel"));
+        ButtonType lConfirm = new ButtonType(ResourceManager.get("button.confirm"));
+        ButtonType lCancel = new ButtonType(ResourceManager.get("button.cancel"));
         //Show the dialogue and get the result
         alert.getButtonTypes().setAll(lConfirm, lCancel);
         Optional<ButtonType> result = alert.showAndWait();
@@ -247,7 +248,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getScene().getAccelerators().putAll(accelerators);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
-        this.window.setOnCloseRequest(WindowEvent -> lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser())));
+        this.window.setOnCloseRequest(WindowEvent -> lobbyService
+                .replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser())));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         lobbyService.setColour(lobbyName, null);
 
