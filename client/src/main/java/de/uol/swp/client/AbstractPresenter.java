@@ -26,7 +26,7 @@ public abstract class AbstractPresenter {
     protected ILobbyService lobbyService;
     protected ResourceBundle resourceBundle;
 
-    private EventBus eventBus;
+    protected EventBus eventBus;
 
     /**
      * Clears the field EventBus
