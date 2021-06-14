@@ -27,17 +27,9 @@ class ShowTradeWithUserRespondViewEventTest {
                                                                                                   tradeWithUserOfferResponse);
 
     @Test
-    void getLobbyName() {
+    void testShowTradeWithUserRespondViewEvent() {
         assertEquals(defaultLobby, event.getLobbyName());
-    }
-
-    @Test
-    void getOfferingUser() {
         assertEquals(defaultUser, event.getOfferingUser());
-    }
-
-    @Test
-    void getRsp() {
         assertEquals(tradeWithUserOfferResponse, event.getRsp());
         assertEquals(resourceList, event.getRsp().getResourceList());
         assertEquals(resourceList1, event.getRsp().getOfferedResources());

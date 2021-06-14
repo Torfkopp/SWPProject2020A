@@ -111,7 +111,7 @@ class AsyncTradeServiceTest {
 
         tradeService.offerTrade(defaultLobby, otherUser, offered, demanded, false);
 
-        verify(syncTradeService).offerTrade(defaultLobby, otherUser, offered, demanded, false);
+        verify(syncTradeService, after(DURATION)).offerTrade(defaultLobby, otherUser, offered, demanded, false);
     }
 
     @Test

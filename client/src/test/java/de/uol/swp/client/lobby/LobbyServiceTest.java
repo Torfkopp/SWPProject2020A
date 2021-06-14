@@ -7,6 +7,7 @@ import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -396,6 +397,22 @@ class LobbyServiceTest {
         ReturnToPreGameLobbyRequest request = (ReturnToPreGameLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getLobbyName());
+    }
+
+    @Test
+    void setColour() throws InterruptedException {
+        Colour colour = Colour.AQUA;
+        lobbyService.setColour(defaultLobbyName, colour);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof SetColourRequest);
+
+        SetColourRequest request = (SetColourRequest) event;
+
+        assertEquals(defaultLobbyName, request.getName());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(colour, request.getColour());
     }
 
     @Test
