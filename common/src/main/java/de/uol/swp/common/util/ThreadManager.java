@@ -1,4 +1,4 @@
-package de.uol.swp.client.util;
+package de.uol.swp.common.util;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 

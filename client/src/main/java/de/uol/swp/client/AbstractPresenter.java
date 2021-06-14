@@ -5,9 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
-
-import java.util.ResourceBundle;
+import de.uol.swp.common.util.ThreadManager;
 
 /**
  * This class is the base for creating a new Presenter.
@@ -24,7 +22,6 @@ public abstract class AbstractPresenter {
     protected ISoundService soundService;
     protected IUserService userService;
     protected ILobbyService lobbyService;
-    protected ResourceBundle resourceBundle;
 
     protected EventBus eventBus;
 
@@ -68,7 +65,6 @@ public abstract class AbstractPresenter {
      * @param soundService   The SoundService this class should use.
      * @param userService    The UserService this class should use.
      * @param lobbyService   The LobbyService this class should use.
-     * @param resourceBundle The ResourceBundle this class should use.
      *
      * @implNote This method does not unregister this class from any EventBus it
      * may already be registered to.
@@ -77,11 +73,10 @@ public abstract class AbstractPresenter {
      */
     @Inject
     private void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
-                            ResourceBundle resourceBundle, EventBus eventBus) {
+                            EventBus eventBus) {
         this.soundService = soundService;
         this.userService = userService;
         this.lobbyService = lobbyService;
-        this.resourceBundle = resourceBundle;
         this.eventBus = eventBus;
         eventBus.register(this);
     }
