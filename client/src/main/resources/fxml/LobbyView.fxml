@@ -117,6 +117,15 @@
                 <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0"
                         text="%lobby.buttons.addai"/>
             </VBox>
+            <Label fx:id="maxTradeDiffLabel" prefHeight="17.0" prefWidth="234.0" text="%game.trade.change.select.diff"/>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                <children>
+                    <TextField fx:id="maxTradeDiffTextField" prefHeight="25.0" prefWidth="131.0"
+                               promptText="%game.trade.change.max.diff"/>
+                    <Button fx:id="maxTradeChangeButton" onAction="#prepareLobbyUpdate" prefHeight="25.0"
+                            prefWidth="98.0" text="%game.trade.change.max.diff.button"/>
+                </children>
+            </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                 <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
                 <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
@@ -177,6 +186,8 @@
                 prefWidth="230.0" text="%lobby.game.buttons.banktrade" visible="false"/>
         <Button fx:id="playCard" disable="true" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0"
                 text="%lobby.game.buttons.playcard" visible="false"/>
+        <CheckBox fx:id="constructionMode" onAction="#onConstructionModeCheckBoxPressed" prefHeight="50.0"
+                  prefWidth="115.0" text="%lobby.game.constructionmode" visible="false" wrapText="true"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true"/>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>

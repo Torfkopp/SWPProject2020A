@@ -37,13 +37,10 @@ public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
-    @Inject
-    @Named("commandsAllowed")
-    private static boolean commandsAllowed;
-
     private final IChatManagement chatManagement;
     private final ILobbyManagement lobbyManagement;
     private final LobbyService lobbyService;
+    private final boolean commandsAllowed;
 
     /**
      * Constructor
@@ -52,16 +49,18 @@ public class ChatService extends AbstractService {
      * @param chatManagement  The ChatManagement to use (injected)
      * @param lobbyManagement The LobbyManagement to use (injected)
      * @param lobbyService    The LobbyService to use (injected)
+     * @param commandsAllowed Boolean whether commands are allowed.
      *
      * @since 2020-12-30
      */
     @Inject
     public ChatService(EventBus bus, IChatManagement chatManagement, ILobbyManagement lobbyManagement,
-                       LobbyService lobbyService) {
+                       LobbyService lobbyService, @Named("commandsAllowed") boolean commandsAllowed) {
         super(bus);
         this.chatManagement = chatManagement;
         this.lobbyManagement = lobbyManagement;
         this.lobbyService = lobbyService;
+        this.commandsAllowed = commandsAllowed;
         LOG.debug("ChatService started");
     }
 

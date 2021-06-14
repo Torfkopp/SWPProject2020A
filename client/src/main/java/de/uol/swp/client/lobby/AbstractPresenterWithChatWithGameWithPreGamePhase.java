@@ -21,6 +21,7 @@ import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -68,6 +69,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected Label timerLabel;
     @FXML
+    protected Label maxTradeDiffLabel;
+    @FXML
     private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
@@ -88,6 +91,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private VBox preGameSettingBox;
     @FXML
+    private TextField maxTradeDiffTextField;
+    @FXML
+    private Button maxTradeChangeButton;
+    @FXML
     private ComboBox<Colour> colourComboBox;
 
     @FXML
@@ -95,6 +102,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        prepareMaxTradeDiffTextfield();
         prepareColourComboBox();
         LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
@@ -241,6 +249,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
         moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -268,6 +280,42 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Updates the lobby's member list according to the list given
+     * <p>
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
+     *
+     * @param userLobbyList A list of User objects including all currently logged in
+     *                      users
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.UserOrDummy
+     * @since 2021-01-05
+     */
+    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+        Platform.runLater(() -> {
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
     }
 
     /**
@@ -421,6 +469,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             developmentCardTableView.setVisible(false);
             rollDice.setVisible(false);
             autoRoll.setVisible(false);
+            constructionMode.setVisible(false);
             endTurn.setVisible(false);
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
@@ -531,6 +580,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         userColoursMap = msg.getUserOrDummyColourMap();
         gameRendering.setPlayerColours(getPlayerColourMap());
@@ -545,6 +595,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            constructionMode.setVisible(true);
             buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
@@ -696,17 +747,34 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
                            this.moveTime;
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+            int newMaxTradeDiff =
+                    !maxTradeDiffTextField.getText().equals("") ? Integer.parseInt(maxTradeDiffTextField.getText()) :
+                    this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
-                                                 randomPlayFieldCheckbox.isSelected());
+                                                 randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
             post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
+    }
+
+    /**
+     * Prepare the MaxTradeTextfield
+     * <p>
+     * Lets the maxTradeTextfield only accept positive numbers.
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-08
+     */
+    private void prepareMaxTradeDiffTextfield() {
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("^[0-9]\\d*(\\.\\d+)?$") || s.isDeleted() || s.getText().equals("") ? s : null;
+        maxTradeDiffTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 
     /**

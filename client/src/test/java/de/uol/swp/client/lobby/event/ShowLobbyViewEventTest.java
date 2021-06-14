@@ -24,7 +24,7 @@ class ShowLobbyViewEventTest {
     private static final LobbyName defaultLobbyName = new LobbyName("Test");
     private static final User owner = new UserDTO(1, "test", "test123", "test@test.test");
     private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, owner, 4, 120, false,
-                                                                     false, false, new HashSet<>(), new HashSet<>());
+                                                                     false, false, new HashSet<>(), new HashSet<>(), 2);
 
     /**
      * Test for the creation of ShowLobbyViewEvents

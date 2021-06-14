@@ -12,10 +12,8 @@ import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
-import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
-import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
+import de.uol.swp.client.changeSettings.ChangeSettingsPresenter;
+import de.uol.swp.client.changeSettings.event.*;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -73,11 +71,6 @@ public class SceneManager {
 
     @Inject
     private static Injector injector;
-    @Inject
-    private static ResourceBundle resourceBundle;
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
 
     private final Stage primaryStage;
     private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
@@ -86,18 +79,12 @@ public class SceneManager {
     private final Map<LobbyName, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
-
-    @Inject
-    private IUserService userService;
-
-    @Inject
-    private ILobbyService lobbyService;
-
-    @Inject
-    private ITradeService tradeService;
-
-    @Inject
-    private ISoundService soundService;
+    private final IUserService userService;
+    private final ILobbyService lobbyService;
+    private final ITradeService tradeService;
+    private final ISoundService soundService;
+    private final ResourceBundle resourceBundle;
+    private final String styleSheet;
 
     private Scene loginScene;
     private String lastTitle;
@@ -114,14 +101,28 @@ public class SceneManager {
     /**
      * Constructor
      *
-     * @param eventBus     The EventBus
-     * @param primaryStage The primary Stage
+     * @param userService    The UserService this class should use.
+     * @param lobbyService   The LobbyService this class should use.
+     * @param tradeService   The TradeService this class should use.
+     * @param soundService   The SoundService this class should use.
+     * @param eventBus       The EventBus this class should use.
+     * @param primaryStage   The created PrimaryStage.
+     * @param resourceBundle The used ResourceBundle.
+     * @param styleSheet     The used StyleSheet.
      */
     @Inject
-    public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
+    public SceneManager(IUserService userService, ILobbyService lobbyService, ITradeService tradeService,
+                        ISoundService soundService, EventBus eventBus, @Assisted Stage primaryStage,
+                        ResourceBundle resourceBundle, @Named("styleSheet") String styleSheet) {
         eventBus.register(this);
+        this.userService = userService;
+        this.lobbyService = lobbyService;
+        this.tradeService = tradeService;
+        this.soundService = soundService;
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
+        this.resourceBundle = resourceBundle;
+        this.styleSheet = styleSheet;
         initViews();
     }
 
@@ -179,8 +180,8 @@ public class SceneManager {
      * @since 2021-05-22
      */
     public void showChangePropertiesScreen() {
-        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
-                  ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
+        showScene(changePropertiesScene, resourceBundle.getString("changesettings.window.title"),
+                  ChangeSettingsPresenter.MIN_WIDTH, ChangeSettingsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -374,12 +375,12 @@ public class SceneManager {
      * FXML file.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.ChangePropertiesPresenter
+     * @see de.uol.swp.client.changeSettings.ChangeSettingsPresenter
      * @since 2021-05-22
      */
     private void initChangePropertiesView() {
         if (changePropertiesScene == null) {
-            Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
+            Parent rootPane = initPresenter(ChangeSettingsPresenter.fxml);
             changePropertiesScene = new Scene(rootPane, 400, 200);
             changePropertiesScene.getStylesheets().add(styleSheet);
         }
@@ -675,17 +676,17 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ChangePropertiesCanceledEvent detected on the EventBus
+     * Handles the ChangeSettingsCanceledEvent detected on the EventBus
      * <p>
-     * If a ChangePropertiesCanceledEvent is detected on the EventBus, this method gets
+     * If a ChangeSettingsCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the main screen.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+    private void onChangePropertiesCanceledEvent(ChangeSettingsCanceledEvent event) {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
@@ -701,7 +702,7 @@ public class SceneManager {
      * @since 2021-05-22
      */
     @Subscribe
-    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
+    private void onChangePropertiesSuccessfulEvent(ChangeSettingsSuccessfulEvent event) {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
@@ -937,6 +938,24 @@ public class SceneManager {
     }
 
     /**
+     * Handles the SetVolumeErrorEvent detected on the EventBus
+     * <p>
+     * If a SetVolumeErrorEvent is detected on the EventBus,
+     * this method gets called. It shows the error message of
+     * the event in a error alert.
+     *
+     * @param event The SetVolumeErrorEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent
+     * @since 2021-06-05
+     */
+    @Subscribe
+    private void onSetVolumeErrorEvent(SetVolumeErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
      * Handles the ShowChangeAccountDetailsViewEvent detected on the EventBus
      * <p>
      * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets
@@ -970,16 +989,13 @@ public class SceneManager {
      * @param event The ShowChangePropertiesViewEvent detected on the EventBus
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @see de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent
      * @since 2021-05-22
      */
     @Subscribe
-    private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
+    private void onShowChangePropertiesViewEvent(ShowChangeSettingsViewEvent event) {
         showChangePropertiesScreen();
-        primaryStage.setOnCloseRequest(windowEvent -> {
-            windowEvent.consume();
-            showMainScreen(userService.getLoggedInUser());
-        });
+        primaryStage.setOnCloseRequest(windowEvent -> showMainScreen(userService.getLoggedInUser()));
     }
 
     /**
@@ -1284,13 +1300,13 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
+
             Platform.runLater(() -> {
+                if (!tradingStages.containsKey(lobby)) return;
                 tradingStages.get(lobby).close();
                 tradingStages.remove(lobby);
             });
         }
-    }
 
     /**
      * Handles the TradeErrorEvent detected on the EventBus

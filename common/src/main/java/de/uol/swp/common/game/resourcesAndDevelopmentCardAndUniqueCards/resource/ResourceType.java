@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
+
 import java.io.Serializable;
 import java.util.ResourceBundle;
 
@@ -20,17 +21,17 @@ public enum ResourceType implements Serializable {
     @Inject
     private static ResourceBundle resourceBundle;
 
-    private final String InternationalizationPropertyName;
+    private final String internationalizationPropertyName;
 
     /**
      * Constructor.
      *
-     * @param InternationalizationPropertyName The internationalization property name
+     * @param internationalizationPropertyName The internationalization property name
      *
      * @author Temmo Junkhoff
      */
-    ResourceType(String InternationalizationPropertyName) {
-        this.InternationalizationPropertyName = InternationalizationPropertyName;
+    ResourceType(String internationalizationPropertyName) {
+        this.internationalizationPropertyName = internationalizationPropertyName;
     }
 
     @Override
@@ -49,6 +50,6 @@ public enum ResourceType implements Serializable {
      * @author Temmo Junkhoff
      */
     public String getInternationalizationPropertyName() {
-        return InternationalizationPropertyName;
+        return internationalizationPropertyName;
     }
 }

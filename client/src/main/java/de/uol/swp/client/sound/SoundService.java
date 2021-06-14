@@ -18,17 +18,24 @@ public class SoundService implements ISoundService {
 
     private static final Logger LOG = LogManager.getLogger(SoundService.class);
 
-    @Inject
-    @Named("soundPack")
-    private static String soundPack;
+    private final String soundPack;
+    private final double volume;
+    private final double backgroundVolume;
 
+    /**
+     * Constructor
+     *
+     * @param soundPack        The soundPack this class should use.
+     * @param volume           The volume this class should use.
+     * @param backgroundVolume the backgroundVolume this class should use.
+     */
     @Inject
-    @Named("volume")
-    private static double volume;
-
-    @Inject
-    @Named("backgroundVolume")
-    private static double backgroundVolume;
+    public SoundService(@Named("soundPack") String soundPack, @Named("volume") double volume,
+                        @Named("backgroundVolume") double backgroundVolume) {
+        this.soundPack = soundPack;
+        this.volume = volume;
+        this.backgroundVolume = backgroundVolume;
+    }
 
     @Override
     public void background() {
