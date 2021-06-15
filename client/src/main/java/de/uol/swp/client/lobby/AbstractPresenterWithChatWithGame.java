@@ -247,10 +247,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
         LineChart<Number, Number> victoryPointChart = new LineChart<>(xAxis, yAxis);
-        victoryPointChart.setTitle(resourceBundle.getString("game.won.victorypointchart.title"));
+        victoryPointChart.setTitle(ResourceManager.get("game.won.victorypointchart.title"));
         victoryPointChart.setLegendVisible(false);
-        xAxis.setLabel(resourceBundle.getString("game.won.victorypointchart.xaxis"));
-        yAxis.setLabel(resourceBundle.getString("game.won.victorypointchart.yaxis"));
+        xAxis.setLabel(ResourceManager.get("game.won.victorypointchart.xaxis"));
+        yAxis.setLabel(ResourceManager.get("game.won.victorypointchart.yaxis"));
         yAxis.setAutoRanging(true);
         xAxis.setAutoRanging(true);
         yAxis.setTickUnit(1.0);
