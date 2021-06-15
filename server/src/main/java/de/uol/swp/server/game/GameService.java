@@ -157,8 +157,8 @@ public class GameService extends AbstractService {
                                                                  game.getCardAmounts());
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
                 updateVictoryPoints(req.getOriginLobby());
+                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
@@ -227,6 +227,12 @@ public class GameService extends AbstractService {
             if (player instanceof User) {
                 victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
             }
+            Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = game.getVictoryPointsOverTimeMap();
+            Map<Integer, Integer> integerIntegerMap = victoryPointsOverTimeMap.get(player);
+            int round = game.getRound();
+            Player player1 = game.getPlayer(player);
+            int victoryPoints = game.calculateVictoryPoints(player1);
+            integerIntegerMap.put(round, victoryPoints);
         }
         ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
         lobbyService.sendToAllInLobby(originLobby, msg);
@@ -345,7 +351,7 @@ public class GameService extends AbstractService {
     private void endGameIfPlayerWon(Game game, LobbyName originLobby, UserOrDummy user) {
         int vicPoints = game.calculateVictoryPoints(game.getPlayer(user));
         if (vicPoints >= 10) {
-            ServerMessage message = new PlayerWonGameMessage(originLobby, user);
+            ServerMessage message = new PlayerWonGameMessage(originLobby, user, game.getVictoryPointsOverTimeMap());
             lobbyService.sendToAllInLobby(originLobby, message);
             game.setBuildingAllowed(false);
             for (UserOrDummy ai : game.getPlayers())
@@ -489,6 +495,8 @@ public class GameService extends AbstractService {
         BiConsumer<LobbyName, BuildingSuccessfulMessage> sendSuccess = (lobbyName, message) -> {
             LOG.debug("Sending BuildingSuccessfulMessage");
             lobbyService.sendToAllInLobby(lobbyName, message);
+            updateVictoryPoints(req.getOriginLobby());
+            endGameIfPlayerWon(game, lobbyName, req.getUser());
         };
 
         if (!game.isBuildingAllowed() && currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
@@ -754,8 +762,8 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
         updateVictoryPoints(req.getOriginLobby());
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -1133,8 +1141,8 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
         updateVictoryPoints(req.getOriginLobby());
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -1278,8 +1286,8 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
         updateVictoryPoints(req.getOriginLobby());
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -1752,8 +1760,8 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
         updateVictoryPoints(req.getOriginLobby());
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**

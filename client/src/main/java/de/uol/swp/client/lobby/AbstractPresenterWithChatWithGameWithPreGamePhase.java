@@ -458,6 +458,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
+        victoryPointsOverTimeMap = msg.getVictoryPointMap();
         winner = msg.getUser();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
@@ -496,6 +497,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setVisible(false);
             roundCounter = 0;
             this.elapsedTimer.stop();
+            displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setPrefHeight(30);
+            displayVictoryPointChartButton.setPrefWidth(230);
             if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
                 returnToLobby.setPrefHeight(30);
