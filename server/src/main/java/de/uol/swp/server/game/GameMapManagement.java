@@ -186,6 +186,25 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public MapPoint getEdgeMapPoint(IEdge edge) {
+        EndpointPair<IIntersection> pair = intersectionEdgeNetwork.incidentNodes(edge);
+        return MapPoint.EdgeMapPoint(getIntersectionMapPoint(pair.nodeU()), getIntersectionMapPoint(pair.nodeV()));
+    }
+
+    @Override
+    public Set<IEdge> getEdgesAroundIntersection(IIntersection intersection) {
+        return intersectionEdgeNetwork.incidentEdges(intersection);
+    }
+
+    @Override
+    public Set<IEdge> getEdgesAroundIntersection(MapPoint mapPoint) {
+        if (mapPoint.getType() != Type.INTERSECTION) {
+            return new HashSet<>();
+        }
+        return getEdgesAroundIntersection(getIntersection(mapPoint));
+    }
+
+    @Override
     public Set<IEdge> getEdgesFromHex(MapPoint mapPoint) {
         return hexEdgeNetwork.incidentEdges(hexMap[mapPoint.getY()][mapPoint.getX()]);
     }
@@ -259,6 +278,20 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public MapPoint getIntersectionMapPoint(IIntersection intersection) {
+        MapPoint mp;
+        for (int i = 0; i <= 5; i++)
+            for (int j = 0; j <= 10; j++) {
+                //Why? see GameMapManagement.createIntersectionEdgeNetwork
+                if ((i == 0 || i == 5) && j >= 7) break;
+                else if ((i == 1 || i == 4) && j >= 9) break;
+                mp = MapPoint.IntersectionMapPoint(i, j);
+                if (intersection == getIntersection(mp)) return mp;
+            }
+        return null;
+    }
+
+    @Override
     public IIntersection[][] getIntersectionsAsJaggedArray() {
         return intersectionMap;
     }
@@ -290,9 +323,24 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public MapPoint getEdgeMapPoint(IEdge edge) {
-        EndpointPair<IIntersection> pair = intersectionEdgeNetwork.incidentNodes(edge);
-        return MapPoint.EdgeMapPoint(getIntersectionMapPoint(pair.nodeU()), getIntersectionMapPoint(pair.nodeV()));
+    public Set<Player> getPlayersAroundHex(MapPoint mapPoint) {
+        Set<Player> players = new HashSet<>();
+        for (IIntersection i : getIntersectionsFromHex(mapPoint)) if (i.getOwner() != null) players.add(i.getOwner());
+        return players;
+    }
+
+    @Override
+    public MapPoint getRandomFreeIntersection(Game game, Player nextPlayer) {
+        int randomYCoordinate = 0;
+        int randomXCoordinate = 0;
+        while (true) {
+            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
+            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
+            if (settlementPlaceableInFoundingPhase(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
+                                                                                             randomXCoordinate))) {
+                return MapPoint.IntersectionMapPoint(randomYCoordinate, randomXCoordinate);
+            }
+        }
     }
 
     @Override
@@ -632,22 +680,39 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public Set<IEdge> getEdgesAroundIntersection(IIntersection intersection) {
-        return intersectionEdgeNetwork.incidentEdges(intersection);
+    public boolean settlementPlaceable(Player player, MapPoint position) {
+        boolean hasRoad = false;
+        boolean neighbouringIntersectionsFree = true;
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
+        for (IEdge edge : intersectionEdgeNetwork.incidentEdges(intersectionMap[position.getY()][position.getX()]))
+            if (edge.getOwner() == player) {
+                hasRoad = true;
+                break;
+            }
+        for (IIntersection intersection : intersectionEdgeNetwork
+                .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
+            if (intersection.getState() != IIntersection.IntersectionState.FREE) {
+                neighbouringIntersectionsFree = false;
+                break;
+            }
+
+        return intersectionMap[position.getY()][position.getX()].getState()
+                                                                .equals(IIntersection.IntersectionState.FREE) && hasRoad && neighbouringIntersectionsFree;
     }
 
     @Override
-    public MapPoint getIntersectionMapPoint(IIntersection intersection) {
-        MapPoint mp;
-        for (int i = 0; i <= 5; i++)
-            for (int j = 0; j <= 10; j++) {
-                //Why? see GameMapManagement.createIntersectionEdgeNetwork
-                if ((i == 0 || i == 5) && j >= 7) break;
-                else if ((i == 1 || i == 4) && j >= 9) break;
-                mp = MapPoint.IntersectionMapPoint(i, j);
-                if (intersection == getIntersection(mp)) return mp;
+    public boolean settlementPlaceableInFoundingPhase(Player player, MapPoint position) {
+        boolean neighbouringIntersectionsFree = true;
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
+        for (IIntersection intersection : intersectionEdgeNetwork
+                .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
+            if (intersection.getState() != IIntersection.IntersectionState.FREE) {
+                neighbouringIntersectionsFree = false;
+                break;
             }
-        return null;
+
+        return intersectionMap[position.getY()][position.getX()].getState()
+                                                                .equals(IIntersection.IntersectionState.FREE) && neighbouringIntersectionsFree;
     }
 
     @Override
@@ -855,13 +920,6 @@ public class GameMapManagement implements IGameMapManagement {
         return position.getType() == MapPoint.Type.HEX ? hexMap[position.getY()][position.getX()] : null;
     }
 
-    @Override
-    public Set<Player> getPlayersAroundHex(MapPoint mapPoint) {
-        Set<Player> players = new HashSet<>();
-        for (IIntersection i : getIntersectionsFromHex(mapPoint)) if (i.getOwner() != null) players.add(i.getOwner());
-        return players;
-    }
-
     /**
      * Helper method to get a Pair of Intersections between 2 Hexes
      *
@@ -897,27 +955,6 @@ public class GameMapManagement implements IGameMapManagement {
             }
         }
         return intersectionSet;
-    }
-
-    @Override
-    public boolean settlementPlaceable(Player player, MapPoint position) {
-        boolean hasRoad = false;
-        boolean neighbouringIntersectionsFree = true;
-        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
-        for (IEdge edge : intersectionEdgeNetwork.incidentEdges(intersectionMap[position.getY()][position.getX()]))
-            if (edge.getOwner() == player) {
-                hasRoad = true;
-                break;
-            }
-        for (IIntersection intersection : intersectionEdgeNetwork
-                .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
-            if (intersection.getState() != IIntersection.IntersectionState.FREE) {
-                neighbouringIntersectionsFree = false;
-                break;
-            }
-
-        return intersectionMap[position.getY()][position.getX()].getState()
-                                                                .equals(IIntersection.IntersectionState.FREE) && hasRoad && neighbouringIntersectionsFree;
     }
 
     /**

@@ -6,6 +6,7 @@ import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -258,5 +259,24 @@ class ChatMessageDTOTest {
     void messageNotEqualDifferentIds() {
         ChatMessage chatMessage = new ChatMessageDTO(42, defaultUser, defaultTimestamp, defaultContent);
         assertNotEquals(defaultMessage, chatMessage);
+    }
+
+    /**
+     * Tests if the toString method outputs the expected string
+     * <p>
+     * This test fails if the assembled String is different from the result of the
+     * ChatMessage's toString method.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-06-05
+     */
+    @Test
+    void testToString() {
+        Instant now = Instant.now();
+        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, now, defaultContent);
+        String timestampString = String.format("%02d", now.atZone(ZoneOffset.systemDefault()).getHour()) + ":" + String
+                .format("%02d", now.atZone(ZoneOffset.systemDefault()).getMinute());
+        String expectedToString = defaultContent + " - " + defaultUser + " - " + timestampString;
+        assertEquals(expectedToString, chatMessage.toString());
     }
 }

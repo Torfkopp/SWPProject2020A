@@ -19,8 +19,9 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
@@ -115,7 +116,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
-        if (!Objects.equals(lobbyName, rsp.getLobbyName())) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received AllLobbyMembersResponse");
         LOG.debug("---- Update of Lobby member list");
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
@@ -241,13 +242,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
         Platform.runLater(() -> {
-            kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-            changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-            tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
-            moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
+            kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+            changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
+            tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
+            moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
-            maxTradeDiffLabel
-                    .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
+            maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
         });
         setPreGameSettings();
     }
@@ -310,7 +310,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
-        if (!Objects.equals(owner, msg.getLobby().getOwner())) {
+        if (!Util.equals(owner, msg.getLobby().getOwner())) {
             if (ownerTransferNotificationsOn) {
                 if (userService.getLoggedInUser().equals(owner)) {
                     I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
@@ -334,10 +334,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         maxTradeDiff = msg.getLobby().getMaxTradeDiff();
-        Platform.runLater(() -> moveTimeLabel
-                .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime)));
-        maxTradeDiffLabel
-                .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
+        Platform.runLater(() -> moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime)));
+        maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
     }
 
     /**
@@ -401,7 +399,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
         UserOrDummy user = msg.getUser();
-        if (Objects.equals(user, owner)) {
+        if (Util.equals(user, owner)) {
             LOG.debug("---- Owner {} left", user.getUsername());
         } else LOG.debug("---- User {} left", user.getUsername());
         Platform.runLater(() -> {
@@ -451,10 +449,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                     if (empty || user == null) setText("");
                     else {
                         String name = user.getUsername();
-                        if (readyUsers.contains(user))
-                            name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.equals(owner))
-                            name = String.format(resourceBundle.getString("lobby.members.owner"), name);
+                        if (readyUsers.contains(user)) name = ResourceManager.get("lobby.members.ready", name);
+                        if (user.equals(owner)) name = ResourceManager.get("lobby.members.owner", name);
                         if (inGame) {
                             if (cardAmountsList == null) {
                                 cardAmountsList = new ArrayList<>();
@@ -462,10 +458,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                                 for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
-                                if (Objects.equals(cardsAmount.getUser(), user)) {
-                                    name = String.format(resourceBundle.getString("lobby.members.amount"), name,
-                                                         cardsAmount.getResourceCardsAmount(),
-                                                         cardsAmount.getDevelopmentCardsAmount());
+                                if (Util.equals(cardsAmount.getUser(), user)) {
+                                    name = ResourceManager
+                                            .get("lobby.members.amount", name, cardsAmount.getResourceCardsAmount(),
+                                                 cardsAmount.getDevelopmentCardsAmount());
                                     break;
                                 }
                             }
@@ -478,8 +474,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
                 return;
             }
             String name = newValue.getUsername();
@@ -488,46 +484,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             changeOwnerButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf || !tradingCurrentlyAllowed);
             if (isSelf) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
+                tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
             } else {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), name));
-                tradeWithUserButton
-                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", name));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", name));
+                tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade", name));
             }
-        });
-    }
-
-    /**
-     * Updates the lobby's member list according to the list given
-     * <p>
-     * This method clears the entire member list and then adds the name of each user
-     * in the list given to the lobby's member list.
-     * If there is no member list, it creates one.
-     * <p>
-     * If a user is marked as ready in the readyUsers Set, their name is prepended
-     * with a checkmark.
-     * If the owner is found amongst the users, their username is appended with a
-     * crown symbol.
-     *
-     * @param userLobbyList A list of User objects including all currently logged in
-     *                      users
-     *
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserOrDummy
-     * @since 2021-01-05
-     */
-    private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
-            }
-            lobbyMembers.clear();
-            lobbyMembers.addAll(userLobbyList);
         });
     }
 }

@@ -19,8 +19,12 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.ThreadManager;
+import de.uol.swp.common.util.Util;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -138,10 +142,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyService.leaveLobby(lobbyName);
         }
         if (moveTimeTimer != null) moveTimeTimer.cancel();
-        ((Stage) window).close();
-        post(new TradeCancelEvent(lobbyName));
-        post(new CloseTradeResponseEvent(lobbyName));
-        clearEventBus();
+        window.hide();
+        ThreadManager.runNow(() -> {
+            eventBus.post(new TradeCancelEvent(lobbyName));
+            eventBus.post(new CloseTradeResponseEvent(lobbyName));
+            clearEventBus();
+        });
     }
 
     /**
@@ -282,6 +288,42 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Updates the lobby's member list according to the list given
+     * <p>
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
+     *
+     * @param userLobbyList A list of User objects including all currently logged in
+     *                      users
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.UserOrDummy
+     * @since 2021-01-05
+     */
+    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+        Platform.runLater(() -> {
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
+    }
+
+    /**
      * Helper method to create a PlayerColourMap from
      * the UserColourMap and the UserOrDummyPlayerMap
      *
@@ -416,6 +458,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
+        victoryPointsOverTimeMap = msg.getVictoryPointMap();
         winner = msg.getUser();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
@@ -454,15 +497,18 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setVisible(false);
             roundCounter = 0;
             this.elapsedTimer.stop();
-            if (Objects.equals(owner, userService.getLoggedInUser())) {
+            displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setPrefHeight(30);
+            displayVictoryPointChartButton.setPrefWidth(230);
+            if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
             }
             gameMapDescription.clear();
             gameMapDescription.setCenterText(
-                    winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
-                    String.format(resourceBundle.getString("game.won.info"), winner));
+                    winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
+                    ResourceManager.get("game.won.info", winner));
         });
         fitCanvasToSize();
         soundService.victory();
@@ -543,6 +589,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         userColoursMap = msg.getUserOrDummyColourMap();
         gameRendering.setPlayerColours(getPlayerColourMap());
@@ -551,7 +598,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         Platform.runLater(() -> {
             if (startUpPhaseEnabled) {
                 notice.setVisible(true);
-                notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+                notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
             }
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
@@ -566,7 +613,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(true);
             victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
-            currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
+            currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
@@ -632,7 +679,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     protected void updateItem(Colour item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item != null) {
-                            setText(resourceBundle.getString("colours." + item));
+                            setText(ResourceManager.get("colours." + item));
                             int[] colourCode = item.getColourCode();
                             setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
                             setDisable(userColoursMap.containsValue(item));
@@ -645,7 +692,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             @Override
             protected void updateItem(Colour item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item != null) setText(resourceBundle.getString("colours." + item));
+                if (item != null) setText(ResourceManager.get("colours." + item));
                 else setText(null);
             }
         });
@@ -714,14 +761,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
         }
     }
 

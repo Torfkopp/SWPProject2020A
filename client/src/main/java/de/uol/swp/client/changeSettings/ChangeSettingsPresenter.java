@@ -5,6 +5,7 @@ import de.uol.swp.client.ClientApp;
 import de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent;
 import de.uol.swp.client.changeSettings.event.ChangeSettingsSuccessfulEvent;
 import de.uol.swp.client.changeSettings.event.SetVolumeErrorEvent;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -137,12 +138,12 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
             try {
                 int volume = Integer.parseInt(volumeField.getText());
                 if (volume < 0 || volume > 100) {
-                    post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.volume")));
+                    post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.volume")));
                 } else {
                     preferences.put("volume", Integer.toString(volume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.volume")));
+                post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.volume")));
                 return;
             }
         }
@@ -150,12 +151,12 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
             try {
                 int backgroundVolume = Integer.parseInt(backgroundVolumeField.getText());
                 if (backgroundVolume < 0 || backgroundVolume > 100) {
-                    post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.backgroundvolume")));
+                    post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.backgroundvolume")));
                 } else {
                     preferences.put("backgroundvolume", Integer.toString(backgroundVolume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.backgroundvolume")));
+                post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.backgroundvolume")));
                 return;
             }
         }

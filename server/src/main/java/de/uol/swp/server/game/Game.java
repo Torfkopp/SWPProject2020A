@@ -40,8 +40,10 @@ public class Game {
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
+    private final Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = new HashMap<>();
     private final UserOrDummy first;
     private final int maxTradeDiff;
+    private final List<UserOrDummy> playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -78,6 +80,8 @@ public class Game {
         {
             List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
             preparePausedMembers();
+            victoryPointsOverTimeMap.put(first, new HashMap<>());
+            victoryPointsOverTimeMap.get(first).put(0, 0);
             startUpPlayerOrder.addLast(first);
             playersStartUpBuiltMap.put(first, StartUpPhaseBuiltStructures.NONE_BUILT);
             players.put(first, Player.PLAYER_1, new Inventory());
@@ -86,6 +90,8 @@ public class Game {
             while (playerList.size() > 0) {
                 int randomNumber = (int) (Math.random() * playerList.size());
                 UserOrDummy randomUser = playerList.get(randomNumber);
+                victoryPointsOverTimeMap.put(randomUser, new HashMap<>());
+                victoryPointsOverTimeMap.get(randomUser).put(0, 0);
                 startUpPlayerOrder.addLast(randomUser);
                 playersStartUpBuiltMap.put(randomUser, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(randomUser, counterPlayer, new Inventory());
@@ -97,6 +103,7 @@ public class Game {
         startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         bankInventory = new BankInventory();
+        playerList = createPlayerList();
     }
 
     /**
@@ -154,6 +161,26 @@ public class Game {
      */
     public void changePauseStatus(UserOrDummy user) {
         pauseGameMap.replace(user, !pauseGameMap.get(user));
+    }
+
+    /**
+     * Prepares a ordered list of players in the game
+     *
+     * @return An ordered list of the players
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> createPlayerList() {
+        List<UserOrDummy> playerList = new ArrayList<>();
+        UserOrDummy player = activePlayer;
+        playerList.add(activePlayer);
+        for (int i = 0; i < players.size() - 1; i++) {
+            player = players
+                    .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(player).nextPlayer(players.size()));
+            playerList.add(player);
+        }
+        return playerList;
     }
 
     /**
@@ -376,6 +403,18 @@ public class Game {
      */
     public Player getPlayer(UserOrDummy user) {
         return players.getPlayerFromUserOrDummy(user);
+    }
+
+    /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> getPlayerList() {
+        return playerList;
     }
 
     /**
@@ -605,6 +644,18 @@ public class Game {
      */
     public Map<UserOrDummy, Player> getUserToPlayerMap() {
         return players.getUserToPlayerMap();
+    }
+
+    /**
+     * Gets a map of users or dummies and their corresponding players
+     *
+     * @return A map containing users or dummies and their corresponding players
+     *
+     * @since 2021-05-20
+     * @author Aldin Dervisi
+     */
+    public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
+        return victoryPointsOverTimeMap;
     }
 
     /**
