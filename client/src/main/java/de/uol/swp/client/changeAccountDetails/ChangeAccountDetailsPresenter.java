@@ -8,6 +8,7 @@ import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceled
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -184,7 +185,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.changepw")));
+            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.changepw")));
         }
 
         User user = userService.getLoggedInUser();
@@ -198,18 +199,18 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                     .isNullOrEmpty(newPasswordField2.getText())) {
             post(new ChangeAccountDetailsErrorEvent(
-                    resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
+                    ResourceManager.get("changeaccdetails.error.empty.changeaccdetails")));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
-            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
+            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("register.error.invalid.email")));
         } else if (Strings.isNullOrEmpty(newPasswordField.getText()) && !Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.newpw")));
         } else if (!Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.newpw")));
         } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
             post(new ChangeAccountDetailsErrorEvent(
-                    resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm")));
+                    ResourceManager.get("changeaccdetails.error.empty.newpasswordconfirm")));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
                 newPassword = userService.hash(newPasswordField.getText());

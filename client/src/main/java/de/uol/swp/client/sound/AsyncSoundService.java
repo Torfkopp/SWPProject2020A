@@ -1,7 +1,7 @@
 package de.uol.swp.client.sound;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
+import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

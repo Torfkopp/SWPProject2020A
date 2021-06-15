@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class IntersectionWithBuildable extends Intersection implements IIntersectionWithBuildable {
 
-    private List<UserOrDummy> buildable;
+    private final List<UserOrDummy> buildable;
 
     /**
      * Instantiates a new Intersection.

@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -87,7 +88,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             public void run() {
                 if (!paused) {
                     int i = moveTimeToDecrement.getAndDecrement();
-                    String moveTimeText = String.format(resourceBundle.getString("game.labels.movetime"), i);
+                    String moveTimeText = String.format(ResourceManager.get("game.labels.movetime"), i);
                     Platform.runLater(() -> acceptTradeTimerLabel.setText(moveTimeText));
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
@@ -125,7 +126,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
         LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
-        String invalid = String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser());
+        String invalid = String.format(ResourceManager.get("game.trade.status.invalid"), rsp.getOfferingUser());
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
             tradeNotPossibleLabel.setText(invalid);
@@ -241,7 +242,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void setOfferLabel() {
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
-        String bundleString = resourceBundle.getString("game.trade.offer.proposed");
+        String bundleString = ResourceManager.get("game.trade.offer.proposed");
         String text = String.format(bundleString, offeringUser, offered, demanded);
         Platform.runLater(() -> tradeResponseLabel.setText(text));
     }
@@ -269,7 +270,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
                 content.append(entry.getAmount()).append(" ").append(entry.getType()).append(", ");
             }
         }
-        if (nothing) content.append(resourceBundle.getString("game.trade.offer.nothing"));
+        if (nothing) content.append(ResourceManager.get("game.trade.offer.nothing"));
         if (content.substring(content.length() - 2, content.length()).equals(", "))
             content.delete(content.length() - 2, content.length());
         return content.toString();

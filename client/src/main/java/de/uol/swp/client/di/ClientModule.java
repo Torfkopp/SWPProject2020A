@@ -24,10 +24,7 @@ import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.AsyncUserService;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.fxml.FXMLLoader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -35,9 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 /**
@@ -93,23 +88,8 @@ public class ClientModule extends AbstractModule {
 
         LOG.debug("Selected Language in config File: {}", properties.getProperty("lang"));
 
-        //Reading the language property into a locale
-        String[] lang = properties.getProperty("lang").split("_");
-        Locale locale;
-        switch (lang.length) {
-            case 1:
-                locale = new Locale(lang[0]);
-                break;
-            case 2:
-                locale = new Locale(lang[0], lang[1]);
-                break;
-            case 3:
-                locale = new Locale(lang[0], lang[1], lang[2]);
-                break;
-            default:
-                System.out.println("Invalid Argument in config option \"lang\"" + "\n----Using UK english");
-                locale = Locale.UK;
-        }
+        //Reading the language property
+        String lang = properties.getProperty("lang");
 
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
@@ -135,9 +115,6 @@ public class ClientModule extends AbstractModule {
             volume = 1.0;
             backgroundVolume = 0.5;
         }
-
-        //Setting the language
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
 
         //Setting the drawHitboxGrid value
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
@@ -167,7 +144,6 @@ public class ClientModule extends AbstractModule {
         bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
         bind(EventBus.class).toInstance(eventBus);
         bind(Properties.class).toInstance(properties);
-        bind(ResourceBundle.class).toInstance(resourceBundle);
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
         bindConstant().annotatedWith(Names.named("joinLeaveMsgsOn")).to(joinLeaveMsgsOn);
         bindConstant().annotatedWith(Names.named("ownerReadyNotificationsOn")).to(ownerReadyNotificationsOn);
@@ -179,6 +155,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
         bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
         bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
+        bindConstant().annotatedWith(Names.named("lang")).to(lang);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(AsyncUserService.class).in(Scopes.SINGLETON);
@@ -194,10 +171,7 @@ public class ClientModule extends AbstractModule {
         bind(ISoundService.class).to(AsyncSoundService.class).in(Scopes.SINGLETON);
         bind(SoundService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
-        requestStaticInjection(I18nWrapper.class);
-        requestStaticInjection(ResourceType.class);
-        requestStaticInjection(DevelopmentCardType.class);
-        requestStaticInjection(UniqueCard.class);
         requestStaticInjection(SceneManager.class);
+        requestStaticInjection(ResourceManager.class);
     }
 }
