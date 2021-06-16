@@ -4,9 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import de.uol.swp.server.chat.ChatManagement;
-import de.uol.swp.server.chat.ChatService;
-import de.uol.swp.server.chat.IChatManagement;
+import de.uol.swp.server.chat.*;
 import de.uol.swp.server.chat.store.IChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.game.GameManagement;
@@ -89,14 +87,14 @@ public class ServerModule extends AbstractModule {
 
         // Set permission of elevated commands according to server config
         LOG.debug("Server allows elevated commands: {}", serverProperties.getProperty("debug.commands"));
-        final boolean devCommandsAllowed = Boolean.parseBoolean(serverProperties.getProperty("debug.commands"));
+        final boolean commandsAllowed = Boolean.parseBoolean(serverProperties.getProperty("debug.commands"));
 
         bind(IChatMessageStore.class).toInstance(chatMessageStore);
         bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
         bind(UserStore.class).toInstance(store);
 
-        bindConstant().annotatedWith(Names.named("devCommandsAllowed")).to(devCommandsAllowed);
+        bindConstant().annotatedWith(Names.named("commandsAllowed")).to(commandsAllowed);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IChatManagement.class).to(ChatManagement.class).in(Scopes.SINGLETON);
@@ -106,6 +104,7 @@ public class ServerModule extends AbstractModule {
         bind(IUserManagement.class).to(UserManagement.class).in(Scopes.SINGLETON);
         bind(AuthenticationService.class).in(Scopes.SINGLETON);
         bind(ChatService.class).in(Scopes.SINGLETON);
+        bind(CommandChatService.class).in(Scopes.SINGLETON);
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(SessionService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);

@@ -24,6 +24,7 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.chat.CommandChatService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobby;
@@ -53,23 +54,27 @@ public class CommandService extends AbstractService {
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement;
     private final ILobbyManagement lobbyManagement;
+    private final CommandChatService commandChatService;
     private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
 
     /**
      * Constructor
      *
-     * @param eventBus        The {@link com.google.common.eventbus.EventBus} (injected)
-     * @param lobbyManagement The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
-     * @param userManagement  The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param eventBus           The {@link com.google.common.eventbus.EventBus} (injected)
+     * @param lobbyManagement    The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
+     * @param userManagement     The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param commandChatService The {@link de.uol.swp.server.chat.CommandChatService} (injected)
      *
      * @see de.uol.swp.server.lobby.ILobbyManagement
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     @Inject
-    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
+    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
+                          CommandChatService commandChatService) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.userManagement = userManagement;
+        this.commandChatService = commandChatService;
         getAllClasses();
         commandMap.put("devmenu", this::command_DevMenu);
         commandMap.put("forceendturn", this::command_ForceEndTurn);
@@ -82,8 +87,11 @@ public class CommandService extends AbstractService {
         commandMap.put("addai", this::command_AddAI);
         commandMap.put("ai", this::command_AddAI);
         commandMap.put("kick", this::command_Kick);
+        commandChatService.addGameCommand("/kick");
         commandMap.put("changeowner", this::command_ChangeOwner);
+        commandChatService.addGameCommand("/changeowner");
         commandMap.put("pause", this::command_pause);
+        commandChatService.addGameCommand("/pause");
         LOG.debug("CommandService started");
     }
 
@@ -177,7 +185,7 @@ public class CommandService extends AbstractService {
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        *                        used to invoke the command
+     *                        used to invoke the command
      *
      * @author Sven Ahrens
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
@@ -362,7 +370,7 @@ public class CommandService extends AbstractService {
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        *                        used to invoke the command
+     *                        used to invoke the command
      *
      * @author Sven Ahrens
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
@@ -449,7 +457,7 @@ public class CommandService extends AbstractService {
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        *                        used to invoke the command
+     *                        used to invoke the command
      *
      * @author Sven Ahrens
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest

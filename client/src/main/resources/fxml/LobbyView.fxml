@@ -35,10 +35,6 @@
             <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage"/>
         </VBox>
         <VBox minHeight="150.0" spacing="5.0">
-            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0" prefWidth="150.0"
-                    text="%lobby.buttons.kickuser" visible="false"/>
-            <Button fx:id="changeOwnerButton" onAction="#onChangeOwnerButtonPressed" prefWidth="150.0"
-                    text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false" wrapText="true"/>
             <Button onAction="#onLeaveLobbyButtonPressed" prefHeight="25.0" prefWidth="150.0"
                     text="%lobby.buttons.leavelobby"/>
         </VBox>
@@ -53,7 +49,8 @@
             <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
                     text="%game.won.button.returnPreLobby" visible="false"/>
-            <Button fx:id="displayVictoryPointChartButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            <Button fx:id="displayVictoryPointChartButton" maxHeight="-Infinity" maxWidth="-Infinity"
+                    minHeight="-Infinity"
                     minWidth="-Infinity" onAction="#onDisplayVictoryPointChartPressed" prefHeight="0" prefWidth="0"
                     text="%game.won.victorypointchart.button" visible="false"/>
         </HBox>
