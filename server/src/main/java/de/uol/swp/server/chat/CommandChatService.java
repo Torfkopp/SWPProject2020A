@@ -39,6 +39,14 @@ public class CommandChatService extends AbstractService {
         LOG.debug("CommandChatService started");
     }
 
+    /**
+     * Adds a gameCommand to the gameCommands List
+     *
+     * @param gameCommand The gameCommand to be added to the gameCommands List
+     *
+     * @author Sven Ahrens
+     * @since 2021-06-12
+     */
     public void addGameCommand(String gameCommand) {
         gameCommands.add(gameCommand.substring(0, 5));
     }

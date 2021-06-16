@@ -48,7 +48,7 @@ public class ChatService extends AbstractService {
      * @param bus                The EventBus used throughout the entire server (injected)
      * @param chatManagement     The ChatManagement to use (injected)
      * @param lobbyManagement    The LobbyManagement to use (injected)
-     * @param commandChatService
+     * @param commandChatService The commandChatService to use (injected)
      * @param lobbyService       The LobbyService to use (injected)
      * @param commandsAllowed    Boolean whether Commands are allowed.
      *
