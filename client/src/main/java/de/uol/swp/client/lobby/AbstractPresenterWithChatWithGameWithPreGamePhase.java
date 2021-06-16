@@ -425,7 +425,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
             turnIndicator.setVisible(false);
-            pauseButton.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
             helpCheckBox.setDisable(true);
@@ -647,7 +646,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
-        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);

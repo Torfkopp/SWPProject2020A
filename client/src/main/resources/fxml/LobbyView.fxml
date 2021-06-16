@@ -203,7 +203,6 @@
         <Button onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
             <MenuItem text="%lobby.menu.rules.overview"/>
         </Button>
-        <Button fx:id="pauseButton" onAction="#onPauseButtonPressed" text="%game.menu.pause" visible="false"/>
         <Button fx:id="helpCheckBox" disable="true" onAction="#onHelpButtonPressed" text="%game.help.checkbox"
                 visible="false"/>
         <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>

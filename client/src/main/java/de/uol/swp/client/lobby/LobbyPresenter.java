@@ -167,14 +167,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Additionally, this method sets the accelerators for the LobbyPresenter, namely
      * <ul>
      *     <li> CTRL/META + S = Start Session button
-     *     <li> CTRL/META + K = Kick User button
+     *     <li> CTRL/META + K = Kick User Function
      *     <li> CTRL/META + E = End Turn button
      *     <li> CTRL/META + R = Roll Dice button
      *     <li> CTRL/META + T = Make Offer to User button
      *     <li> CTRL/META + B = Trade with Bank button
      *     <li> CTRL/META + C = Play a Card button
      *     <li> CTRL/META + H = Return to Lobby button
-     *     <li> CTRL/META + P = Pause button
+     *     <li> CTRL/META + P = Pause Function
      *     <li> F1            = Toggle help action list
      *     <li> F2            = Open Rules menu
      *
