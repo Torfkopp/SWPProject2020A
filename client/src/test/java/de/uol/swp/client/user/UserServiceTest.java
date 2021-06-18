@@ -7,6 +7,8 @@ import com.google.common.hash.Hashing;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.request.*;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
+import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -200,6 +202,28 @@ class UserServiceTest {
         LogoutRequest request = (LogoutRequest) event;
 
         assertTrue(request.authorisationNeeded());
+    }
+
+    @Test
+    void onChangeAccountDetailsSuccessfulResponseTest() throws InterruptedException {
+        User secondUser = new UserDTO(1, "second", "s2", "mail@mail.second");
+        userService.setLoggedInUser(defaultUser);
+
+        bus.post(new ChangeAccountDetailsSuccessfulResponse(secondUser));
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+        assertEquals(secondUser, userService.getLoggedInUser());
+    }
+
+    @Test
+    void onLoginSuccessfulResponseTest() throws InterruptedException {
+        assertNull(userService.getLoggedInUser());
+        bus.post(new LoginSuccessfulResponse(defaultUser));
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertNotNull(userService.getLoggedInUser());
+        assertEquals(defaultUser, userService.getLoggedInUser());
     }
 
     /**

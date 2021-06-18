@@ -3,13 +3,17 @@ package de.uol.swp.client.game;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
+import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
+import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.user.User;
@@ -28,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GameServiceTest {
 
     private static final User defaultUser = new UserDTO(42, "test", "test123", "test@test.test");
+    private static final User secondUser = new UserDTO(69, "Har Ald", "aldhar96", "har.ald@ald.har");
     private static final LobbyName defaultLobbyName = new LobbyName("Test lobby");
     private static final ResourceType defaultResource = ResourceType.BRICK;
     private static final ResourceType secondResource = ResourceType.GRAIN;
@@ -38,6 +43,7 @@ class GameServiceTest {
     private IGameService gameService;
     private IUserService userService;
     private Object event;
+    private Object event2;
 
     @BeforeEach
     protected void setUp() {
@@ -50,9 +56,50 @@ class GameServiceTest {
     @AfterEach
     protected void tearDown() {
         event = null;
+        event2 = null;
         gameService = null;
         userService = null;
         eventBus.unregister(this);
+    }
+
+    @Test
+    void buildRequest() throws InterruptedException {
+        MapPoint hexMapPointL = MapPoint.HexMapPoint(1, 1);
+        MapPoint hexMapPointR = MapPoint.HexMapPoint(1, 2);
+        MapPoint edgeMapPoint = MapPoint.EdgeMapPoint(hexMapPointL, hexMapPointR);
+        gameService.buildRequest(defaultLobbyName, edgeMapPoint);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof BuildRequest);
+
+        BuildRequest request = (BuildRequest) event;
+
+        assertEquals(defaultLobbyName, request.getOriginLobby());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser.getID(), request.getUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(edgeMapPoint, request.getMapPoint());
+        assertEquals(MapPoint.Type.EDGE, request.getMapPoint().getType());
+        assertEquals(hexMapPointL, request.getMapPoint().getL());
+        assertEquals(hexMapPointR, request.getMapPoint().getR());
+    }
+
+    @Test
+    void changeAutoRollState() throws InterruptedException {
+        gameService.changeAutoRollState(defaultLobbyName, true);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof ChangeAutoRollStateRequest);
+
+        ChangeAutoRollStateRequest request = (ChangeAutoRollStateRequest) event;
+
+        assertEquals(defaultLobbyName, request.getOriginLobby());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser.getID(), request.getUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertTrue(request.isAutoRollEnabled());
     }
 
     @Test
@@ -69,6 +116,20 @@ class GameServiceTest {
         assertEquals(defaultUser, request.getUser());
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+    }
+
+    @Test
+    void pauseGame() throws InterruptedException {
+        gameService.pauseGame(defaultLobbyName);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof PauseGameRequest);
+
+        PauseGameRequest request = (PauseGameRequest) event;
+
+        assertEquals(defaultLobbyName, request.getOriginLobby());
+        assertEquals(defaultUser, request.getUserOrDummy());
     }
 
     @Test
@@ -139,6 +200,46 @@ class GameServiceTest {
     }
 
     @Test
+    void robberChooseVictim() throws InterruptedException {
+        gameService.robberChooseVictim(defaultLobbyName, secondUser);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof RobberChosenVictimRequest);
+
+        RobberChosenVictimRequest request = (RobberChosenVictimRequest) event;
+
+        assertEquals(defaultLobbyName, request.getLobby());
+        assertEquals(defaultUser, request.getPlayer());
+        assertEquals(defaultUser.getID(), request.getPlayer().getID());
+        assertEquals(defaultUser.getUsername(), request.getPlayer().getUsername());
+        assertEquals(secondUser, request.getVictim());
+        assertEquals(secondUser.getID(), request.getVictim().getID());
+        assertEquals(secondUser.getUsername(), request.getVictim().getUsername());
+    }
+
+    @Test
+    void robberNewPosition() throws InterruptedException {
+        MapPoint newRobberHex = MapPoint.HexMapPoint(1, 1);
+        gameService.robberNewPosition(defaultLobbyName, newRobberHex);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof RobberNewPositionChosenRequest);
+
+        RobberNewPositionChosenRequest request = (RobberNewPositionChosenRequest) event;
+
+        assertEquals(defaultLobbyName, request.getLobby());
+        assertEquals(defaultUser, request.getPlayer());
+        assertEquals(defaultUser.getID(), request.getPlayer().getID());
+        assertEquals(defaultUser.getUsername(), request.getPlayer().getUsername());
+        assertEquals(newRobberHex, request.getPosition());
+        assertEquals(MapPoint.Type.HEX, request.getPosition().getType());
+        assertEquals(newRobberHex.getX(), request.getPosition().getX());
+        assertEquals(newRobberHex.getY(), request.getPosition().getY());
+    }
+
+    @Test
     void rollDice() throws InterruptedException {
         gameService.rollDice(defaultLobbyName);
 
@@ -171,6 +272,43 @@ class GameServiceTest {
     }
 
     @Test
+    void taxPayed() throws InterruptedException {
+        ResourceList resources = new ResourceList();
+        gameService.taxPayed(defaultLobbyName, resources);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof RobberTaxChosenRequest);
+
+        RobberTaxChosenRequest request = (RobberTaxChosenRequest) event;
+
+        assertEquals(defaultLobbyName, request.getLobby());
+        assertEquals(defaultUser, request.getPlayer());
+        assertEquals(defaultUser.getID(), request.getPlayer().getID());
+        assertEquals(defaultUser.getUsername(), request.getPlayer().getUsername());
+        assertEquals(resources, request.getResources());
+
+        assertTrue(event2 instanceof CloseRobberTaxViewEvent);
+
+        CloseRobberTaxViewEvent viewEvent = (CloseRobberTaxViewEvent) event2;
+
+        assertEquals(defaultLobbyName, viewEvent.getLobbyName());
+    }
+
+    @Test
+    void updateGameMap() throws InterruptedException {
+        gameService.updateGameMap(defaultLobbyName);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof UpdateGameMapRequest);
+
+        UpdateGameMapRequest request = (UpdateGameMapRequest) event;
+
+        assertEquals(defaultLobbyName, request.getOriginLobby());
+    }
+
+    @Test
     void updateInventory() throws InterruptedException {
         gameService.updateInventory(defaultLobbyName);
 
@@ -188,7 +326,11 @@ class GameServiceTest {
 
     @Subscribe
     private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
+        if (this.event == null) {
+            this.event = e.getEvent();
+        } else {
+            this.event2 = e.getEvent();
+        }
         System.out.print(e.getEvent());
         lock.countDown();
     }

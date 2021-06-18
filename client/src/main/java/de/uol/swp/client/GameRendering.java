@@ -11,6 +11,7 @@ import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -61,8 +62,6 @@ public class GameRendering {
     public static Color PLAYER_3_COLOUR = Color.BLACK;
     public static Color PLAYER_4_COLOUR = Color.BLACK;
 
-    @Inject
-    private static ResourceBundle resourceBundle;
     @Inject
     private static IUserService userService;
     @Inject
@@ -391,22 +390,22 @@ public class GameRendering {
         String text = "";
         switch (hex.getResource()) {
             case BRICK:
-                text = resourceBundle.getString("game.resources.brick");
+                text = ResourceManager.get("game.resources.brick");
                 break;
             case LUMBER:
-                text = resourceBundle.getString("game.resources.lumber");
+                text = ResourceManager.get("game.resources.lumber");
                 break;
             case ORE:
-                text = resourceBundle.getString("game.resources.ore");
+                text = ResourceManager.get("game.resources.ore");
                 break;
             case GRAIN:
-                text = resourceBundle.getString("game.resources.grain");
+                text = ResourceManager.get("game.resources.grain");
                 break;
             case WOOL:
-                text = resourceBundle.getString("game.resources.wool");
+                text = ResourceManager.get("game.resources.wool");
                 break;
             case ANY:
-                text = resourceBundle.getString("game.resources.any");
+                text = ResourceManager.get("game.resources.any");
                 break;
         }
         String finalText = text;
@@ -582,7 +581,7 @@ public class GameRendering {
         double x = currentX + hexWidth / 2.0;
         double y = currentY + hexWidth / 1.75;
         double maxWidth = tokenSize * (7.0 / 8.0);
-        String tokenLabel = resourceBundle.getString("game.token." + token);
+        String tokenLabel = ResourceManager.get("game.token." + token);
         Font tokenFont = Font.font(tokenTextFontSize);
 
         Platform.runLater(() -> {

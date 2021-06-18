@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -209,14 +210,14 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         IResource giveResource;
         ownResourcesToTradeWith.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourcesToTradeWith.getSelectionModel().isEmpty()) {
-            tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));
+            tradeService.showTradeError(ResourceManager.get("game.error.trade.noplayerresource"));
             return;
         }
         giveResource = ownResourcesToTradeWith.getSelectionModel().getSelectedItem();
         bankResourcesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         bankResource = bankResourcesView.getSelectionModel().getSelectedItem();
         if (bankResourcesView.getSelectionModel().isEmpty()) {
-            tradeService.showTradeError(resourceBundle.getString("game.error.trade.nobankresource"));
+            tradeService.showTradeError(ResourceManager.get("game.error.trade.nobankresource"));
             return;
         }
         if (bankResource != null && giveResource != null) {

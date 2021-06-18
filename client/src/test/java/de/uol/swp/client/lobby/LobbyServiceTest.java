@@ -3,16 +3,18 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.lobby.request.*;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.*;
+import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +79,55 @@ class LobbyServiceTest {
         eventBus.unregister(this);
     }
 
+    @Test
+    void addAI() throws InterruptedException {
+        AI ai = new AIDTO("DIO");
+        lobbyService.addAI(defaultLobbyName, ai);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof AddAIRequest);
+
+        AddAIRequest request = (AddAIRequest) event;
+
+        assertEquals(defaultLobbyName, request.getName());
+        assertEquals(ai, request.getUser());
+    }
+
+    @Test
+    void changeOwner() throws InterruptedException {
+        lobbyService.changeOwner(defaultLobbyName, secondUser);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof ChangeOwnerRequest);
+
+        ChangeOwnerRequest request = (ChangeOwnerRequest) event;
+
+        assertEquals(defaultLobbyName, request.getName());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser.getID(), request.getUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(secondUser, request.getNewOwner());
+        assertEquals(secondUser.getID(), request.getNewOwner().getID());
+        assertEquals(secondUser.getUsername(), request.getNewOwner().getUsername());
+    }
+
+    @Test
+    void checkUserInLobby() throws InterruptedException {
+        lobbyService.checkUserInLobby();
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof CheckUserInLobbyRequest);
+
+        CheckUserInLobbyRequest request = (CheckUserInLobbyRequest) event;
+
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser.getID(), request.getUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+    }
+
     /**
      * Test for the createNewLobby routine
      * <p>
@@ -132,6 +183,22 @@ class LobbyServiceTest {
         JoinLobbyRequest request = (JoinLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser.getID(), request.getUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+    }
+
+    @Test
+    void joinRandomLobby() throws InterruptedException {
+        lobbyService.joinRandomLobby();
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof JoinRandomLobbyRequest);
+
+        JoinRandomLobbyRequest request = (JoinRandomLobbyRequest) event;
+
+        assertEquals(new LobbyName(""), request.getName());
         assertEquals(defaultUser, request.getUser());
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
@@ -244,7 +311,7 @@ class LobbyServiceTest {
      * @since 2021-04-10
      */
     @Test
-    void removeFromLobbies() throws InterruptedException {
+    void removeFromAllLobbies() throws InterruptedException {
         lobbyService.removeFromAllLobbies();
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -330,6 +397,36 @@ class LobbyServiceTest {
         ReturnToPreGameLobbyRequest request = (ReturnToPreGameLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getLobbyName());
+    }
+
+    @Test
+    void setColour() throws InterruptedException {
+        Colour colour = Colour.AQUA;
+        lobbyService.setColour(defaultLobbyName, colour);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof SetColourRequest);
+
+        SetColourRequest request = (SetColourRequest) event;
+
+        assertEquals(defaultLobbyName, request.getName());
+        assertEquals(defaultUser, request.getUser());
+        assertEquals(colour, request.getColour());
+    }
+
+    @Test
+    void showLobbyError() throws InterruptedException {
+        String message = "test";
+        lobbyService.showLobbyError(message);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof LobbyErrorEvent);
+
+        LobbyErrorEvent eve = (LobbyErrorEvent) event;
+
+        assertEquals(message, eve.getMessage());
     }
 
     /**

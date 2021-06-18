@@ -9,9 +9,12 @@ import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -87,7 +90,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             selectedPartnersResourceMapCounter += entry.getAmount();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.demandtoohigh"));
+            tradeService.showTradeError(ResourceManager.get("game.trade.error.demandtoohigh"));
         }
         //@formatter:off
         return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0)
@@ -154,10 +157,10 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
             setSliders(resourceList);
-            String status = String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser);
+            String status = ResourceManager.get("game.trade.status.makingoffer", respondingUser);
             Platform.runLater(() -> statusLabel.setText(status));
         } else {
-            String text = String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser);
+            String text = ResourceManager.get("game.trade.error.noresources", respondingUser);
             Platform.runLater(() -> {
                 offerTradeButton.setDisable(true);
                 tradingHBox.setVisible(false);
@@ -194,7 +197,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
         if (tradeIsFair()) {
             offerTradeButton.setDisable(true);
-            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
+            statusLabel.setText(ResourceManager.get("game.trade.status.waiting", respondingUser));
             tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                     counterOffer);
             tradeService.closeTradeResponseWindow(lobbyName);
@@ -221,7 +224,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             closeWindow();
             return;
         }
-        String text = String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser);
+        String text = ResourceManager.get("game.trade.status.rejected", respondingUser);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
             statusLabel.setText(text);
@@ -332,10 +335,9 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * will not send the offer
      */
     private boolean tradeIsFair() {
-        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
+        statusLabel.setText(ResourceManager.get("game.trade.status.toomanyresources"));
         int counterOwnResource = selectedOwnResourceList.getTotal();
         int counterPartnersResource = selectedPartnersResourceList.getTotal();
-        if (Math.abs(counterOwnResource - counterPartnersResource) > maxTradeDiff) return false;
-        else return true;
+        return Math.abs(counterOwnResource - counterPartnersResource) <= maxTradeDiff;
     }
 }
