@@ -12,15 +12,15 @@ public class LobbyStageMapTest {
     @Test
     void test() {
         LobbyStageMap map = new LobbyStageMap();
-        Stage stage = new Stage();
+        Stage stage = null;
         LobbyName name = new LobbyName("test");
 
         map.put(name, stage);
         assertFalse(map.isEmpty());
-        map.close(name);
+        map.remove(name, stage);
         assertTrue(map.isEmpty());
         map.put(name, stage);
-        map.closeWindow(name);
+        map.clear();
         assertTrue(map.isEmpty());
     }
 }

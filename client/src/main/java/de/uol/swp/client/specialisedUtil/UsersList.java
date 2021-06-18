@@ -20,7 +20,7 @@ public class UsersList {
     /**
      * Constructor
      */
-    public UsersList() {users = FXCollections.observableArrayList();}
+    public UsersList() { users = FXCollections.observableArrayList(); }
 
     /**
      * Add a User to the list
@@ -37,6 +37,15 @@ public class UsersList {
      * @return If the removal was successful
      */
     public boolean remove(String s) { return users.remove(s);}
+
+    /**
+     * Gets the list
+     *
+     * @return ObservableList of strings
+     */
+    public ObservableList<String> get() {
+        return users;
+    }
 
     /**
      * Clears the list and puts every

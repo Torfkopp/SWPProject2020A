@@ -29,6 +29,7 @@ public class AIHarbourMapTest {
         assertEquals(map.tradeGet(ai, 0), ResourceType.LUMBER);
         assertEquals(map.tradeGet(ai, 15), ResourceType.GRAIN);
         list.add(BRICK);
+        list.remove(LUMBER);
         list.add(ORE);
         map.put(ai, list);
         assertEquals(map.tradeGet(ai, 0), ResourceType.BRICK);

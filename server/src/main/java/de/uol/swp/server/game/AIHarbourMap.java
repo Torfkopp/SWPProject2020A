@@ -31,8 +31,8 @@ public class AIHarbourMap extends HashMap<AI, List<HarbourResource>> {
             if (get(ai).contains(HarbourResource.LUMBER)) return LUMBER;
             if (get(ai).contains(HarbourResource.BRICK)) return BRICK;
         } else {
-            if (get(ai).contains(HarbourResource.GRAIN)) return GRAIN;
             if (get(ai).contains(HarbourResource.ORE)) return ORE;
+            if (get(ai).contains(HarbourResource.GRAIN)) return GRAIN;
         }
         if (get(ai).contains(HarbourResource.WOOL)) return WOOL;
         else return null;

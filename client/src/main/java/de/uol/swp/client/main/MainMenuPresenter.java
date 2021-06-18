@@ -911,6 +911,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2019-08-29
      */
     private void updateUsersList(List<User> userList) {
-        Platform.runLater(() -> users.update(userList));
+        Platform.runLater(() -> {
+            usersView.setItems(users.get());
+            users.update(userList);
+        });
     }
 }
