@@ -1,13 +1,11 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.Colour;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
+import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Message sent by the server when a game session was started.
@@ -20,11 +18,11 @@ import java.util.Map;
  */
 public class StartSessionMessage extends AbstractLobbyMessage {
 
-    private final Map<UserOrDummy, Player> userOrDummyPlayerMap;
-    private final Map<UserOrDummy, Colour> userOrDummyColourMap;
+    private final UserOrDummyPlayerMap userOrDummyPlayerMap;
+    private final UserOrDummyColourMap userOrDummyColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
-    private final List<UserOrDummy> playerList;
+    private final UserOrDummyList playerList;
 
     /**
      * Constructor
@@ -38,8 +36,8 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param playerList           List of the players order
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
-                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap,
-                               Map<UserOrDummy, Colour> userOrDummyColourMap, List<UserOrDummy> playerList) {
+                               boolean startUpPhaseEnabled, UserOrDummyPlayerMap userOrDummyPlayerMap,
+                               UserOrDummyColourMap userOrDummyColourMap, UserOrDummyList playerList) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
@@ -72,21 +70,21 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<UserOrDummy> getPlayerList() {
+    public UserOrDummyList getPlayerList() {
         return playerList;
     }
 
     /**
      * Gets the Map of UserOrDummies and Colours
      */
-    public Map<UserOrDummy, Colour> getUserOrDummyColourMap() {
+    public UserOrDummyColourMap getUserOrDummyColourMap() {
         return userOrDummyColourMap;
     }
 
     /**
      * Gets the Map of UserOrDummies and Players
      */
-    public Map<UserOrDummy, Player> getUserOrDummyPlayerMap() {
+    public UserOrDummyPlayerMap getUserOrDummyPlayerMap() {
         return userOrDummyPlayerMap;
     }
 

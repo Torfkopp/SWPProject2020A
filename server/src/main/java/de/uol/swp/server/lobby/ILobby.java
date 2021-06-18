@@ -3,11 +3,12 @@ package de.uol.swp.server.lobby;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
+import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -140,7 +141,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    Set<UserOrDummy> getReadyUsers();
+    UserOrDummySet getReadyUsers();
 
     /**
      * Gets all real users in the lobby
@@ -161,7 +162,7 @@ public interface ILobby extends Serializable {
      * @author Mario Fokken
      * @since 2021-06-02
      */
-    Map<UserOrDummy, Colour> getUserColourMap();
+    UserOrDummyColourMap getUserColourMap();
 
     /**
      * Gets all users and dummies in the lobby
@@ -172,7 +173,7 @@ public interface ILobby extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-03-13
      */
-    Set<UserOrDummy> getUserOrDummies();
+    UserOrDummySet getUserOrDummies();
 
     /**
      * Gets whether the Lobby has a password or not

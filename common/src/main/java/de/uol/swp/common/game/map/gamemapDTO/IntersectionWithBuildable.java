@@ -2,9 +2,8 @@ package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.Intersection;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
 
 /**
  * The type Intersection with buildable.
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public class IntersectionWithBuildable extends Intersection implements IIntersectionWithBuildable {
 
-    private final List<UserOrDummy> buildable;
+    private final UserOrDummyList buildable;
 
     /**
      * Instantiates a new Intersection.
@@ -26,7 +25,7 @@ public class IntersectionWithBuildable extends Intersection implements IIntersec
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    public IntersectionWithBuildable(Player owner, IntersectionState state, List<UserOrDummy> buildable) {
+    public IntersectionWithBuildable(Player owner, IntersectionState state, UserOrDummyList buildable) {
         this.buildable = buildable;
         super.setOwnerAndState(owner, state);
     }

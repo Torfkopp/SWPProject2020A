@@ -1,9 +1,7 @@
 package de.uol.swp.common.lobby;
 
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Set;
 
 /**
  * The class Simple lobby.
@@ -15,8 +13,8 @@ import java.util.Set;
 public class SimpleLobby implements ISimpleLobby {
 
     private final LobbyName name;
-    private final Set<UserOrDummy> users;
-    private final Set<UserOrDummy> readyUsers;
+    private final UserOrDummySet users;
+    private final UserOrDummySet readyUsers;
     private final boolean inGame;
     private final User owner;
     private final int maxPlayers;
@@ -24,7 +22,7 @@ public class SimpleLobby implements ISimpleLobby {
     private final boolean startUpPhaseEnabled;
     private final boolean randomPlayFieldEnabled;
     private final boolean hasPassword;
-    private int maxTradeDiff;
+    private final int maxTradeDiff;
 
     /**
      * Constructor.
@@ -42,7 +40,7 @@ public class SimpleLobby implements ISimpleLobby {
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, int maxPlayers, int moveTime,
                        boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
-                       Set<UserOrDummy> users, Set<UserOrDummy> readyUsers, int maxTradeDiff) {
+                       UserOrDummySet users, UserOrDummySet readyUsers, int maxTradeDiff) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -54,7 +52,6 @@ public class SimpleLobby implements ISimpleLobby {
         this.users = users;
         this.readyUsers = readyUsers;
         this.maxTradeDiff = maxTradeDiff;
-
     }
 
     @Override
@@ -78,12 +75,12 @@ public class SimpleLobby implements ISimpleLobby {
     }
 
     @Override
-    public Set<UserOrDummy> getReadyUsers() {
+    public UserOrDummySet getReadyUsers() {
         return readyUsers;
     }
 
     @Override
-    public Set<UserOrDummy> getUserOrDummies() {
+    public UserOrDummySet getUserOrDummies() {
         return users;
     }
 

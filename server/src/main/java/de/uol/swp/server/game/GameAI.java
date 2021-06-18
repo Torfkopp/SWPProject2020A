@@ -1,6 +1,5 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
@@ -18,8 +17,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.UserOrDummyStartUpBuildMap;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
@@ -28,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -44,8 +42,8 @@ public class GameAI {
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
 
-    private final Map<AI, List<IHarbourHex.HarbourResource>> harbours = new HashMap<>();
-    private final Map<Game, Map<MapPoint, Integer>> aiBuildPriority = new HashMap<>();
+    private final AIHarbourMap harbours = new AIHarbourMap();
+    private final AIBuildPriorityMap aiBuildPriority = new AIBuildPriorityMap();
 
     /**
      * Constructor
@@ -300,9 +298,8 @@ public class GameAI {
                 startUpPhaseAIHard(game, ai);
                 break;
         }
-        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-        if (startUpBuiltMap.get(ai) == NONE_BUILT) startUpBuiltMap.put(ai, FIRST_BOTH_BUILT);
-        else startUpBuiltMap.put(ai, ALL_BUILT);
+        UserOrDummyStartUpBuildMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        startUpBuiltMap.nextPhase(ai);
 
         gameService.turnEndAI(game, ai);
     }
@@ -1076,15 +1073,7 @@ public class GameAI {
             }
         if (tradeGive == null) return;
         //Early Game Brick/ Lumber focus, Later Ore/ Grain focus
-        if (game.getRound() < 6) {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.LUMBER)) tradeGet = LUMBER;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.BRICK)) tradeGet = BRICK;
-        } else {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.GRAIN)) tradeGet = GRAIN;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.ORE)) tradeGet = ORE;
-        }
-        //Wool
-        if (tradeGet == null && harbours.get(ai).contains(IHarbourHex.HarbourResource.WOOL)) tradeGet = WOOL;
+        tradeGet = harbours.tradeGet(ai, game.getRound());
         //Use harbour
         if (tradeGet != null) {
             inv.decrease(tradeGive, 2);

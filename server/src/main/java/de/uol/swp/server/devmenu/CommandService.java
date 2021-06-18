@@ -22,6 +22,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.specialisedUtil.CommandMap;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
@@ -53,7 +54,7 @@ public class CommandService extends AbstractService {
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement;
     private final ILobbyManagement lobbyManagement;
-    private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
+    private final CommandMap commandMap = new CommandMap();
 
     /**
      * Constructor

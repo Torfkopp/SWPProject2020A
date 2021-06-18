@@ -16,6 +16,9 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
+import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -32,7 +35,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -66,7 +68,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected Set<UserOrDummy> readyUsers;
+    protected UserOrDummySet readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -307,7 +309,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @see de.uol.swp.common.user.UserOrDummy
      * @since 2021-01-05
      */
-    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+    protected void updateUsersList(UserOrDummyList userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
@@ -321,22 +323,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyMembers.clear();
             lobbyMembers.addAll(userLobbyList);
         });
-    }
-
-    /**
-     * Helper method to create a PlayerColourMap from
-     * the UserColourMap and the UserOrDummyPlayerMap
-     *
-     * @return PlayerColourMap
-     *
-     * @author Mario Fokken
-     * @since 2021-06-02
-     */
-    private Map<Player, Colour> getPlayerColourMap() {
-        Map<Player, Colour> map = new HashMap<>();
-        for (UserOrDummy u : userColoursMap.keySet())
-            map.put(userOrDummyPlayerMap.get(u), userColoursMap.get(u));
-        return map;
     }
 
     /**
@@ -407,13 +393,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
-        Map<UserOrDummy, Player> map = new HashMap<>();
+        UserOrDummyPlayerMap map = new UserOrDummyPlayerMap();
         int i = 0;
         for (UserOrDummy u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
         userOrDummyPlayerMap = map;
         userColoursMap = msg.getUserColours();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(userOrDummyPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
         Platform.runLater(this::prepareColourComboBox);
     }
@@ -592,7 +578,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         userColoursMap = msg.getUserOrDummyColourMap();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(userOrDummyPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {

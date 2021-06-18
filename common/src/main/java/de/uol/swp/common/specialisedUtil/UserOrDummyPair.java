@@ -9,7 +9,7 @@ import de.uol.swp.common.user.UserOrDummy;
  * @author Mario Fokken
  * @since 2021-06-11
  */
-public class userOrDummyPair {
+public class UserOrDummyPair {
 
     private final UserOrDummy user1;
     private final UserOrDummy user2;
@@ -20,7 +20,7 @@ public class userOrDummyPair {
      * @param user1 The pair's first UserOrDummy
      * @param user2 The pair's second UserOrDummy
      */
-    public userOrDummyPair(UserOrDummy user1, UserOrDummy user2) {
+    public UserOrDummyPair(UserOrDummy user1, UserOrDummy user2) {
         this.user1 = user1;
         this.user2 = user2;
     }

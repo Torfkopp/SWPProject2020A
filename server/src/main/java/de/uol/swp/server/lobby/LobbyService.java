@@ -8,7 +8,6 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -16,6 +15,8 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
@@ -28,7 +29,9 @@ import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles the lobby requests sent by the users
@@ -122,7 +125,8 @@ public class LobbyService extends AbstractService {
         if (lobby.get().getUserOrDummies().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
-                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(), req.getMaxTradeDiff());
+                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(),
+                                            req.getMaxTradeDiff());
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<ILobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
@@ -167,25 +171,22 @@ public class LobbyService extends AbstractService {
 
     /**
      * Handles a CheckUserInLobbyRequest found on the EventBus
+     * <p>
      * If a CheckUserInLobbyRequest is detected on the EventBus, this method is
      * called. It checks if the logged in user is currently in a lobby.
      *
      * @param req The CheckUserInLobbyRequest on the EventBus
      *
      * @author Alwin Bossert
-     * @author Finn Haase
+     * @author Mario Fokken
      * @see de.uol.swp.common.user.request.CheckUserInLobbyRequest
      * @since 2021-04-09
      */
     @Subscribe
     private void onCheckUserInLobbyRequest(CheckUserInLobbyRequest req) {
         LOG.debug("Received CheckUserInLobbyRequest");
-        boolean isInLobby = false;
         User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            isInLobby = entry.getValue().getUserOrDummies().contains(user);
-        }
+        boolean isInLobby = lobbyManagement.getLobbies().isInALobby(user);
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
         post(responseMessage);
@@ -398,7 +399,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onLobbyJoinRandomUserRequest(JoinRandomLobbyRequest req) {
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
+        LobbyMap lobbies = lobbyManagement.getLobbies();
         List<ILobby> filteredLobbies = new ArrayList<>();
 
         lobbies.forEach((String, lobby) -> {
@@ -476,23 +477,23 @@ public class LobbyService extends AbstractService {
     private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest req) {
         LOG.debug("Received RemoveFromLobbiesRequest");
         User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        Map<LobbyName, ISimpleLobby> lobbiesWithUser = new HashMap<>();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                ILobby lobby = entry.getValue();
-                LobbyName lobbyName = entry.getKey();
-                lobbiesWithUser.put(entry.getKey(), ILobby.getSimpleLobby(lobby));
+        LobbyMap lobbies = lobbyManagement.getLobbies();
+        SimpleLobbyMap lobbiesWithUser = new SimpleLobbyMap();
+        for (ILobby lobby : lobbies.values()) {
+            if (lobby.getUserOrDummies().contains(user)) {
+                LobbyName name = lobby.getName();
+                lobbiesWithUser.put(name, ILobby.getSimpleLobby(lobby));
+
                 try {
                     lobby.leaveUser(user);
-                    sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, user));
+                    sendToAllInLobby(name, new UserLeftLobbyMessage(name, user));
                 } catch (IllegalArgumentException exception) {
-                    lobbyManagement.dropLobby(lobbyName);
-                    sendToAll(new LobbyDeletedMessage(lobbyName));
+                    lobbyManagement.dropLobby(name);
+                    sendToAll(new LobbyDeletedMessage(name));
                 }
             }
         }
-        Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
+        Message response = new RemoveFromLobbiesResponse(lobbiesWithUser);
         post(response);
         post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
@@ -534,7 +535,7 @@ public class LobbyService extends AbstractService {
         LobbyName lobbyName = req.getLobbyName();
         Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
-            Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();
+            UserOrDummySet lobbyMembers = lobby.get().getUserOrDummies();
             int maxPlayers = lobby.get().getMaxPlayers();
             Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
                                                            lobby.get().getReadyUsers(), maxPlayers);

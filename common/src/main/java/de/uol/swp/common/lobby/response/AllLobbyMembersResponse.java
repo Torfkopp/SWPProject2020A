@@ -3,11 +3,11 @@ package de.uol.swp.common.lobby.response;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.*;
 
 /**
  * Response to the AllLobbyMembersRequest
@@ -21,8 +21,8 @@ import java.util.*;
  */
 public class AllLobbyMembersResponse extends AbstractLobbyResponse {
 
-    private final List<UserOrDummy> users = new ArrayList<>();
-    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final UserOrDummyList users = new UserOrDummyList();
+    private final UserOrDummySet readyUsers = new UserOrDummySet();
     private final UserOrDummy owner;
     private final ReadySystemMessageDTO ownerNotice;
 
@@ -44,8 +44,8 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(LobbyName lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
-                                   Set<UserOrDummy> readyUsers, int maxPlayers) {
+    public AllLobbyMembersResponse(LobbyName lobbyName, UserOrDummySet users, UserOrDummy owner,
+                                   UserOrDummySet readyUsers, int maxPlayers) {
         super(lobbyName);
         for (UserOrDummy user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
@@ -103,7 +103,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    public Set<UserOrDummy> getReadyUsers() {
+    public UserOrDummySet getReadyUsers() {
         return this.readyUsers;
     }
 
@@ -114,7 +114,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2020-12-21
      */
-    public List<UserOrDummy> getUsers() {
+    public UserOrDummyList getUsers() {
         return users;
     }
 }

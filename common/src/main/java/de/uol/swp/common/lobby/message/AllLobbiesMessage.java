@@ -1,12 +1,11 @@
 package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.lobby.ISimpleLobby;
-import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Message that contains a list of all lobbies
@@ -25,7 +24,7 @@ public class AllLobbiesMessage extends AbstractServerMessage {
      *
      * @param lobbies Map of lobby's name and the lobby itself
      */
-    public AllLobbiesMessage(Map<LobbyName, ISimpleLobby> lobbies) {
+    public AllLobbiesMessage(SimpleLobbyMap lobbies) {
         lobbies.forEach((lobbyName, lobby) -> this.lobbies.add(lobby));
     }
 

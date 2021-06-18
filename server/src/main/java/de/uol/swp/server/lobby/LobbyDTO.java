@@ -2,11 +2,15 @@ package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.NPC;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Object to transfer the information of a game lobby
@@ -23,10 +27,10 @@ import java.util.*;
 public class LobbyDTO implements ILobby {
 
     private final LobbyName name;
-    private final Set<UserOrDummy> users = new TreeSet<>();
-    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final UserOrDummySet users = new UserOrDummySet();
+    private final UserOrDummySet readyUsers = new UserOrDummySet();
     private final String password;
-    private final Map<UserOrDummy, Colour> userColours = new LinkedHashMap<>();
+    private final UserOrDummyColourMap userColours = new UserOrDummyColourMap();
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -55,7 +59,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
-        userColours.put(creator, Colour.values()[(int) (Math.random() * (Colour.values().length - 1))]);
+        userColours.put(creator);
         this.maxTradeDiff = 2;
     }
 
@@ -153,7 +157,7 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Set<UserOrDummy> getReadyUsers() {
+    public UserOrDummySet getReadyUsers() {
         return readyUsers;
     }
 
@@ -169,7 +173,7 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Map<UserOrDummy, Colour> getUserColourMap() {
+    public UserOrDummyColourMap getUserColourMap() {
         return userColours;
     }
 
@@ -179,8 +183,7 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Set<UserOrDummy> getUserOrDummies() {
-        return Collections.unmodifiableSet(users);
+    public UserOrDummySet getUserOrDummies() { return users;
     }
 
     @Override

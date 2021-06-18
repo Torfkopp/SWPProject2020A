@@ -1,9 +1,9 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -185,7 +185,7 @@ public class GameTest {
 
     @Test
     void getUserColoursMapTest() {
-        Map<UserOrDummy, Colour> userColoursMap = game.getUserColoursMap();
+        UserOrDummyColourMap userColoursMap = game.getUserColoursMap();
         // values are random, so just check all users have an associated Colour
         assertTrue(userColoursMap.containsKey(user));
         assertTrue(userColoursMap.containsKey(user2));

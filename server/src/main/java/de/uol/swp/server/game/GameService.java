@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.message.SystemMessageMessage;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
@@ -38,6 +37,7 @@ import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
@@ -193,7 +193,7 @@ public class GameService extends AbstractService {
      * @since 2021-06-11
      */
     void robRandomResource(Game game, UserOrDummy receiver, UserOrDummy victim) {
-        game.setRobResourceReceiverVictimPair(new userOrDummyPair(receiver, victim));
+        game.setRobResourceReceiverVictimPair(new UserOrDummyPair(receiver, victim));
         robRandomResource(game);
     }
 
@@ -222,12 +222,12 @@ public class GameService extends AbstractService {
     void updateVictoryPoints(LobbyName originLobby) {
         Game game = gameManagement.getGame(originLobby);
         UserOrDummy[] players = game.getPlayers();
-        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
+        UserOrDummyIntegerMap victoryPointsMap = new UserOrDummyIntegerMap();
         for (UserOrDummy player : players) {
             if (player instanceof User) {
                 victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
             }
-            Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = game.getVictoryPointsOverTimeMap();
+            VictoryPointOverTimeMap victoryPointsOverTimeMap = game.getVictoryPointsOverTimeMap();
             Map<Integer, Integer> integerIntegerMap = victoryPointsOverTimeMap.get(player);
             int round = game.getRound();
             Player player1 = game.getPlayer(player);
@@ -541,7 +541,7 @@ public class GameService extends AbstractService {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                    Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                    UserOrDummyStartUpBuildMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                     StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                     if (built == NONE_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
                         boolean success = gameMap.placeFoundingSettlement(player, mapPoint);
@@ -605,7 +605,7 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
                     } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game
+                        UserOrDummyStartUpBuildMap startUpBuiltMap = game
                                 .getPlayersStartUpBuiltMap();
                         StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                         if (built == FIRST_SETTLEMENT_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
@@ -699,7 +699,7 @@ public class GameService extends AbstractService {
             if (!msg.getLobby().isStartUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
-            Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
+            UserOrDummySet users = msg.getLobby().getUserOrDummies();
             int randomNbr = (int) (Math.random() * users.size());
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
@@ -816,7 +816,7 @@ public class GameService extends AbstractService {
                     nextPlayer = user;
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
-                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
+                if (game.getPlayersStartUpBuiltMap().finished(game.getFirst())) {
                     nextPlayer = game.getFirst();
                     game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
                 } else {
@@ -869,7 +869,7 @@ public class GameService extends AbstractService {
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
         Player player = game.getPlayer(req.getUser());
-        List<IHarbourHex.HarbourResource> harbourTradingList = new ArrayList<>();
+        List<HarbourResource> harbourTradingList = new ArrayList<>();
         if (settlementsAndCities.containsKey(player)) {
             List<MapPoint> ownSettlementsAndCities = settlementsAndCities.get(player);
             for (MapPoint ownSettlementsAndCity : ownSettlementsAndCities) {
@@ -880,10 +880,10 @@ public class GameService extends AbstractService {
         //preparing a map with the tradingRatios according to the harbours
         Map<HarbourResource, Integer> tradingRatio = new HashMap<>();
         int prepareTradingRatio = 4;
-        if (harbourTradingList.contains(IHarbourHex.HarbourResource.ANY)) prepareTradingRatio = 3;
-        tradingRatio.put(IHarbourHex.HarbourResource.BRICK, prepareTradingRatio);
+        if (harbourTradingList.contains(HarbourResource.ANY)) prepareTradingRatio = 3;
+        tradingRatio.put(HarbourResource.BRICK, prepareTradingRatio);
         tradingRatio.put(HarbourResource.ORE, prepareTradingRatio);
-        tradingRatio.put(IHarbourHex.HarbourResource.GRAIN, prepareTradingRatio);
+        tradingRatio.put(HarbourResource.GRAIN, prepareTradingRatio);
         tradingRatio.put(HarbourResource.WOOL, prepareTradingRatio);
         tradingRatio.put(HarbourResource.LUMBER, prepareTradingRatio);
         for (HarbourResource resource : harbourTradingList)
@@ -1438,11 +1438,11 @@ public class GameService extends AbstractService {
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
         Set<Player> players = map.getPlayersAroundHex(msg.getPosition());
-        Set<UserOrDummy> victims = new HashSet<>();
+        UserOrDummySet victims = new UserOrDummySet();
         for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
-            ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
+            ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), new UserOrDummyList(victims));
             rcvm.initWithMessage(msg);
             post(rcvm);
         } else if (players.size() == 1) {
@@ -1509,7 +1509,7 @@ public class GameService extends AbstractService {
         if (numberOfPips == 7) {
             //Robber things
             LOG.debug("---- Robber things");
-            Map<User, Integer> players = new HashMap<>();
+            UserOrDummyIntegerMap players = new UserOrDummyIntegerMap();
             Game g = gameManagement.getGame(req.getOriginLobby());
             for (UserOrDummy p : g.getPlayers()) {
                 if (g.getInventory(p).getResourceAmount() > 7) {
@@ -1518,19 +1518,19 @@ public class GameService extends AbstractService {
                     } else if (p instanceof AI) {
                         gameAI.taxPayAI(g, (AI) p);
                     } else {
-                        players.put((User) p, g.getInventory(p).getResourceAmount() / 2);
+                        players.put(p, g.getInventory(p).getResourceAmount() / 2);
                     }
                 }
             }
-            Map<User, ResourceList> inventories = new HashMap<>();
-            for (User user : players.keySet()) {
+            UserOrDummyResourceListMap inventories = new UserOrDummyResourceListMap();
+            for (UserOrDummy user : players.keySet()) {
                 ResourceList resourceMap = new ResourceList();
                 Inventory inv = game.getInventory(user);
                 for (ResourceType resource : ResourceType.values())
                     resourceMap.set(resource, inv.get(resource));
                 inventories.put(user, resourceMap);
 
-                game.addTaxPayer(user);
+                game.addTaxPayer((User) user);
             }
             RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventories);
             LOG.debug("Sending RobberTaxMessage for Lobby {}", req.getOriginLobby());
@@ -1776,7 +1776,7 @@ public class GameService extends AbstractService {
      * @since 2021-06-11
      */
     private void robRandomResource(Game game) {
-        userOrDummyPair pair = game.getRobResourceReceiverVictimPair();
+        UserOrDummyPair pair = game.getRobResourceReceiverVictimPair();
         if (pair == null || !game.getTaxPayers().isEmpty()) return;
         robRandomResourceExecutive(game.getLobby().getName(), pair.getUser1(), pair.getUser2());
         game.setRobResourceReceiverVictimPair(null);
@@ -1916,14 +1916,9 @@ public class GameService extends AbstractService {
             if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
                 onRollDiceRequest(new RollDiceRequest(npc, game.getLobby().getName()));
             else {
-                Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-                if (startUpBuiltMap.get(npc) == NONE_BUILT) {
-                    dummyTurnInFoundingPhase(game, npc);
-                    startUpBuiltMap.put(npc, FIRST_BOTH_BUILT);
-                } else {
-                    dummyTurnInFoundingPhase(game, npc);
-                    startUpBuiltMap.put(npc, ALL_BUILT);
-                }
+                UserOrDummyStartUpBuildMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                dummyTurnInFoundingPhase(game, npc);
+                startUpBuiltMap.nextPhase(npc);
             }
             turnEndDummy(game, (Dummy) npc);
         }

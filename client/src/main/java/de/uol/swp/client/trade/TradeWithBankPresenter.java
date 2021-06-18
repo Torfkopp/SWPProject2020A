@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
@@ -74,10 +75,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    private static ResourceList setupHarbourRatios(List<IHarbourHex.HarbourResource> harbourMap) {
+    private static ResourceList setupHarbourRatios(List<HarbourResource> harbourMap) {
         ResourceList tradingRatio = new ResourceList();
         int prepareTradingRatio = 4;
-        if (harbourMap.contains(IHarbourHex.HarbourResource.ANY)) {
+        if (harbourMap.contains(HarbourResource.ANY)) {
             prepareTradingRatio = 3;
         }
         for (ResourceType resourceType : ResourceType.values()) {

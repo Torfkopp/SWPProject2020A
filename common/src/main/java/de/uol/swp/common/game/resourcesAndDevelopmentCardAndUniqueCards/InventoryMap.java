@@ -1,10 +1,14 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
+import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A class to store the mapping of UserOrDummy, Player and Inventory
@@ -74,7 +78,7 @@ public class InventoryMap implements Serializable {
      * @return The array of UserOrDummy objects
      */
     public UserOrDummy[] getUserOrDummyArray() {
-        List<UserOrDummy> returnArray = new LinkedList<>();
+        UserOrDummyList returnArray = new UserOrDummyList();
         map.forEach((key -> returnArray.add(key.getUser())));
         return returnArray.toArray(new UserOrDummy[0]);
     }
@@ -99,8 +103,8 @@ public class InventoryMap implements Serializable {
      *
      * @since 2021-05-20
      */
-    public Map<UserOrDummy, Player> getUserToPlayerMap() {
-        Map<UserOrDummy, Player> temp = new HashMap<>();
+    public UserOrDummyPlayerMap getUserToPlayerMap() {
+        UserOrDummyPlayerMap temp = new UserOrDummyPlayerMap();
         for (UserPlayerInventoryMapping entry : map)
             temp.put(entry.getUser(), entry.getPlayer());
         return temp;

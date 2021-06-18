@@ -1,10 +1,7 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.Colour;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
 import de.uol.swp.common.game.map.management.IIntersection;
@@ -15,6 +12,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventor
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
+import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
@@ -36,14 +34,14 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
     private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
-    private final Set<User> taxPayers = new HashSet<>();
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
-    private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
-    private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
-    private final Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = new HashMap<>();
+    private final UserOrDummySet taxPayers = new UserOrDummySet();
+    private final UserOrDummyBooleanMap autoRollEnabled;
+    private final UserOrDummyBooleanMap pauseGameMap = new UserOrDummyBooleanMap(); //true if the user wants to change the current pause status of the game
+    private final UserOrDummyStartUpBuildMap playersStartUpBuiltMap;
+    private final VictoryPointOverTimeMap victoryPointsOverTimeMap = new VictoryPointOverTimeMap();
     private final UserOrDummy first;
     private final int maxTradeDiff;
-    private final List<UserOrDummy> playerList;
+    private final UserOrDummyList playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -55,7 +53,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private userOrDummyPair robResourceReceiverVictimPair = null;
+    private UserOrDummyPair robResourceReceiverVictimPair = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -75,15 +73,15 @@ public class Game {
         this.map = gameMap;
         this.first = first;
         this.maxTradeDiff = getLobby().getMaxTradeDiff();
-        playersStartUpBuiltMap = new HashMap<>();
-        autoRollEnabled = new HashMap<>();
+        playersStartUpBuiltMap = new UserOrDummyStartUpBuildMap();
+        autoRollEnabled = new UserOrDummyBooleanMap();
         {
-            List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+            UserOrDummyList playerList = new UserOrDummyList(lobby.getUserOrDummies());
             preparePausedMembers();
             victoryPointsOverTimeMap.put(first, new HashMap<>());
             victoryPointsOverTimeMap.get(first).put(0, 0);
             startUpPlayerOrder.addLast(first);
-            playersStartUpBuiltMap.put(first, StartUpPhaseBuiltStructures.NONE_BUILT);
+            playersStartUpBuiltMap.put(first);
             players.put(first, Player.PLAYER_1, new Inventory());
             playerList.remove(first);
             Player counterPlayer = Player.PLAYER_2;
@@ -93,7 +91,7 @@ public class Game {
                 victoryPointsOverTimeMap.put(randomUser, new HashMap<>());
                 victoryPointsOverTimeMap.get(randomUser).put(0, 0);
                 startUpPlayerOrder.addLast(randomUser);
-                playersStartUpBuiltMap.put(randomUser, StartUpPhaseBuiltStructures.NONE_BUILT);
+                playersStartUpBuiltMap.put(randomUser);
                 players.put(randomUser, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 playerList.remove(randomUser);
@@ -171,8 +169,8 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<UserOrDummy> createPlayerList() {
-        List<UserOrDummy> playerList = new ArrayList<>();
+    public UserOrDummyList createPlayerList() {
+        UserOrDummyList playerList = new UserOrDummyList();
         UserOrDummy player = activePlayer;
         playerList.add(activePlayer);
         for (int i = 0; i < players.size() - 1; i++) {
@@ -387,11 +385,11 @@ public class Game {
      * @since 2021-05-21
      */
     public int getPausedMembers() {
-        int pausedMemebers = 0;
+        int pausedMembers = 0;
         for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
-            if (entry.getValue()) pausedMemebers++;
+            if (entry.getValue()) pausedMembers++;
         }
-        return pausedMemebers;
+        return pausedMembers;
     }
 
     /**
@@ -413,7 +411,7 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<UserOrDummy> getPlayerList() {
+    public UserOrDummyList getPlayerList() {
         return playerList;
     }
 
@@ -483,7 +481,7 @@ public class Game {
      * @author Sven Ahrens
      * @since 2021-05-03
      */
-    public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
+    public UserOrDummyStartUpBuildMap getPlayersStartUpBuiltMap() {
         return playersStartUpBuiltMap;
     }
 
@@ -514,24 +512,24 @@ public class Game {
     /**
      * Gets the robResourceReceiverVictimPair
      *
-     * @return userOrDummyPair of receiver and victim
+     * @return UserOrDummyPair of receiver and victim
      *
      * @author Mario Fokken
      * @since 2021-06-11
      */
-    public userOrDummyPair getRobResourceReceiverVictimPair() {
+    public UserOrDummyPair getRobResourceReceiverVictimPair() {
         return robResourceReceiverVictimPair;
     }
 
     /**
      * Sets the robResourceReceiverVictimPair
      *
-     * @param robResourceReceiverVictimPair userOrDummyPair of receiver and victim
+     * @param robResourceReceiverVictimPair UserOrDummyPair of receiver and victim
      *
      * @author Mario Fokken
      * @since 2021-06-11
      */
-    public void setRobResourceReceiverVictimPair(userOrDummyPair robResourceReceiverVictimPair) {
+    public void setRobResourceReceiverVictimPair(UserOrDummyPair robResourceReceiverVictimPair) {
         this.robResourceReceiverVictimPair = robResourceReceiverVictimPair;
     }
 
@@ -588,7 +586,7 @@ public class Game {
      * @author Mario Fokken
      * @since 2021-04-11
      */
-    public Set<User> getTaxPayers() {
+    public UserOrDummySet getTaxPayers() {
         return taxPayers;
     }
 
@@ -620,7 +618,7 @@ public class Game {
      * @author Mario Fokken
      * @since 2021-06-02
      */
-    public Map<UserOrDummy, Colour> getUserColoursMap() {
+    public UserOrDummyColourMap getUserColoursMap() {
         return lobby.getUserColourMap();
     }
 
@@ -642,7 +640,7 @@ public class Game {
      *
      * @since 2021-05-20
      */
-    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+    public UserOrDummyPlayerMap getUserToPlayerMap() {
         return players.getUserToPlayerMap();
     }
 
@@ -654,7 +652,7 @@ public class Game {
      * @since 2021-05-20
      * @author Aldin Dervisi
      */
-    public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
+    public VictoryPointOverTimeMap getVictoryPointsOverTimeMap() {
         return victoryPointsOverTimeMap;
     }
 
@@ -794,7 +792,7 @@ public class Game {
      * @since 2021-05-21
      */
     private void preparePausedMembers() {
-        List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+        UserOrDummyList playerList = new UserOrDummyList(lobby.getUserOrDummies());
         for (UserOrDummy userOrDummy : playerList) {
             if (userOrDummy instanceof User) pauseGameMap.put(userOrDummy, false);
             else pauseGameMap.put(userOrDummy, true);
