@@ -393,28 +393,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles a CreateLobbyWithPasswordResponse found on the EventBus
-     * <p>
-     * If a new CreateLobbyWithPasswordResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent onto the EventBus the SceneManager is
-     * subscribed to. Then it calls the LobbyService to retrieve
-     * all members of that new lobby enabling the lobby window to
-     * display all members from the beginning.
-     *
-     * @param rsp The CreateLobbyWithPasswordResponse object found on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
-     * @since 2021-04-22
-     */
-    @Subscribe
-    private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
-        LOG.debug("Received CreateLobbyWithPasswordResponse");
-        post(new ShowLobbyViewEvent(rsp.getLobby()));
-    }
-
-    /**
      * Method called when the DeleteUserButton is pressed
      * <p>
      * This method is called when the DeleteUserButton is pressed. It first asks
