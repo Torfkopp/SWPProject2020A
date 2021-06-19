@@ -129,7 +129,7 @@ class GameServiceTest {
         PauseGameRequest request = (PauseGameRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUserOrDummy());
+        assertEquals(defaultUser, request.getActor());
     }
 
     @Test

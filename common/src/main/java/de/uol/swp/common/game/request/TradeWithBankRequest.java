@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request is sent to the Server to get the Inventory
@@ -21,7 +21,7 @@ public class TradeWithBankRequest extends AbstractLobbyRequest {
      * @param name The Name of the lobby
      * @param user The User who wants to start a game session
      */
-    public TradeWithBankRequest(LobbyName name, UserOrDummy user) {
+    public TradeWithBankRequest(LobbyName name, Actor user) {
         super(name, user);
     }
 }

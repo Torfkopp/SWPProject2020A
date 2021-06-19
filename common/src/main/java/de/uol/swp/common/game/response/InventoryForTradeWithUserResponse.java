@@ -3,7 +3,7 @@ package de.uol.swp.common.game.response;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * This Response has up-to-date info about the resources in the inventory
@@ -17,10 +17,10 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final ResourceList resourceList;
     private final int tradingUsersInventorySize;
-    private final UserOrDummy tradingUser;
+    private final Actor tradingUser;
     private final boolean counterOffer;
     private final int maxTradeDiff;
 
@@ -35,9 +35,9 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param counterOffer              Whether the offer is a counter offer or not
      * @param maxTradeDiff              Maximum Resource difference for a trade
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
-                                             int tradingUsersInventorySize, UserOrDummy tradingUser,
-                                             boolean counterOffer, int maxTradeDiff) {
+    public InventoryForTradeWithUserResponse(Actor user, LobbyName lobbyName, ResourceList resourceList,
+                                             int tradingUsersInventorySize, Actor tradingUser, boolean counterOffer,
+                                             int maxTradeDiff) {
         super(lobbyName);
         this.user = user;
         this.resourceList = resourceList;
@@ -76,7 +76,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The User being traded with
      */
-    public UserOrDummy getTradingUser() {
+    public Actor getTradingUser() {
         return tradingUser;
     }
 
@@ -94,7 +94,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The User wanting to create a trade offer
      */
-    public UserOrDummy getUser() {
+    public Actor getUser() {
         return user;
     }
 

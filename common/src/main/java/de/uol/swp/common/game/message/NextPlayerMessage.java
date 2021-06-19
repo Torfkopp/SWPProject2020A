@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message used to state the next player
@@ -18,7 +18,7 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @param lobbyName    The lobby name
      * @param activePlayer The active player
      */
-    public NextPlayerMessage(LobbyName lobbyName, UserOrDummy activePlayer, int currentRound) {
+    public NextPlayerMessage(LobbyName lobbyName, Actor activePlayer, int currentRound) {
         super(lobbyName, activePlayer);
         this.currentRound = currentRound;
     }
@@ -28,7 +28,7 @@ public class NextPlayerMessage extends AbstractGameMessage {
      *
      * @return User
      */
-    public UserOrDummy getActivePlayer() {
+    public Actor getActivePlayer() {
         return super.getUser();
     }
 

@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,12 +110,12 @@ class AsyncGameServiceTest {
 
     @Test
     void robberChooseVictim() {
-        UserOrDummy userOrDummy = mock(UserOrDummy.class);
-        doNothing().when(syncGameService).robberChooseVictim(isA(LobbyName.class), isA(UserOrDummy.class));
+        Actor actor = mock(Actor.class);
+        doNothing().when(syncGameService).robberChooseVictim(isA(LobbyName.class), isA(Actor.class));
 
-        gameService.robberChooseVictim(defaultLobby, userOrDummy);
+        gameService.robberChooseVictim(defaultLobby, actor);
 
-        verify(syncGameService, after(DURATION)).robberChooseVictim(defaultLobby, userOrDummy);
+        verify(syncGameService, after(DURATION)).robberChooseVictim(defaultLobby, actor);
     }
 
     @Test

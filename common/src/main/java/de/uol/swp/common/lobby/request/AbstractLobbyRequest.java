@@ -2,7 +2,7 @@ package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ import java.util.Objects;
 public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
 
     private final LobbyName name;
-    private final UserOrDummy user;
+    private final Actor user;
 
     /**
      * Constructor
@@ -27,7 +27,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      *
      * @since 2019-10-08
      */
-    public AbstractLobbyRequest(LobbyName name, UserOrDummy user) {
+    public AbstractLobbyRequest(LobbyName name, Actor user) {
         this.name = name;
         this.user = user;
     }
@@ -63,7 +63,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      *
      * @since 2019-10-08
      */
-    public UserOrDummy getUser() {
+    public Actor getUser() {
         return user;
     }
 }

@@ -19,7 +19,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
@@ -300,7 +300,7 @@ public class GameAI {
                 startUpPhaseAIHard(game, ai);
                 break;
         }
-        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        Map<Actor, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
         if (startUpBuiltMap.get(ai) == NONE_BUILT) startUpBuiltMap.put(ai, FIRST_BOTH_BUILT);
         else startUpBuiltMap.put(ai, ALL_BUILT);
 

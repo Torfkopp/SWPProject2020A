@@ -4,7 +4,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * This Response has up-to-date info about what the inventory of a specified player contains
@@ -16,7 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final IResourceList resourceList;
     private final IDevelopmentCardList developmentCardList;
 
@@ -31,7 +31,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @author Phillip-André Suhr
      * @since 2021-04-17
      */
-    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, IResourceList resourceList,
+    public UpdateInventoryResponse(Actor user, LobbyName lobbyName, IResourceList resourceList,
                                    IDevelopmentCardList developmentCardList) {
         super(lobbyName);
         this.user = user;
@@ -68,7 +68,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The User whose inventory is being updated
      */
-    public UserOrDummy getUser() {
+    public Actor getUser() {
         return user;
     }
 }

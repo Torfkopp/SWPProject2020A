@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to update his Inventory
@@ -26,7 +26,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      * @param getResource  The name of the resource he gets from the bank
      * @param giveResource The name of the resource he has to give to the bank
      */
-    public ExecuteTradeWithBankRequest(UserOrDummy user, LobbyName originLobby, ResourceType getResource,
+    public ExecuteTradeWithBankRequest(Actor user, LobbyName originLobby, ResourceType getResource,
                                        ResourceType giveResource) {
         super(user, originLobby);
         this.getResource = getResource;

@@ -5,7 +5,7 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
+    public void changeOwner(LobbyName lobbyName, Actor newOwner) {
         ThreadManager.runNow(() -> syncLobbyService.changeOwner(lobbyName, newOwner));
     }
 
@@ -63,7 +63,7 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
+    public void kickUser(LobbyName lobbyName, Actor userToKick) {
         ThreadManager.runNow(() -> syncLobbyService.kickUser(lobbyName, userToKick));
     }
 

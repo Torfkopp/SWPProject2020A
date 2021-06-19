@@ -17,8 +17,8 @@ import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
@@ -358,7 +358,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby {}", lobbyName);
-        UserOrDummy user = msg.getUser();
+        Actor user = msg.getUser();
         LOG.debug("---- User {} joined", user.getUsername());
         Platform.runLater(() -> {
             if (joinLeaveMsgsOn)
@@ -398,7 +398,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
-        UserOrDummy user = msg.getUser();
+        Actor user = msg.getUser();
         if (Util.equals(user, owner)) {
             LOG.debug("---- Owner {} left", user.getUsername());
         } else LOG.debug("---- User {} left", user.getUsername());
@@ -425,13 +425,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void prepareMembersView() {
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(UserOrDummy user, boolean empty) {
+            protected void updateItem(Actor user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
                     //if the background should be in colour you need to use setBackground
                     setTextFill(Color.BLACK); // No clue why this is needed, but it is (It really is)
-                    if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
-                        switch (userOrDummyPlayerMap.get(user)) {
+                    if (user != null && actorPlayerMap != null && actorPlayerMap.containsKey(user)) {
+                        switch (actorPlayerMap.get(user)) {
                             case PLAYER_1:
                                 setTextFill(GameRendering.PLAYER_1_COLOUR);
                                 break;
@@ -455,7 +455,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                             if (cardAmountsList == null) {
                                 cardAmountsList = new ArrayList<>();
                                 // At the start of the game nobody has any cards, so add 0s for each user
-                                for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
+                                for (Actor u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
                                 if (Util.equals(cardsAmount.getUser(), user)) {

@@ -1,7 +1,6 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.Colour;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -15,8 +14,9 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventor
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
+import de.uol.swp.common.specialisedUtil.actorPair;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 
@@ -35,16 +35,16 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
-    private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
+    private final Deque<Actor> startUpPlayerOrder = new ArrayDeque<>();
     private final Set<User> taxPayers = new HashSet<>();
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
-    private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
-    private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
-    private final Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = new HashMap<>();
-    private final UserOrDummy first;
+    private final Map<Actor, Boolean> autoRollEnabled;
+    private final Map<Actor, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
+    private final Map<Actor, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
+    private final Map<Actor, Map<Integer, Integer>> victoryPointsOverTimeMap = new HashMap<>();
+    private final Actor first;
     private final int maxTradeDiff;
-    private final List<UserOrDummy> playerList;
-    private UserOrDummy activePlayer;
+    private final List<Actor> playerList;
+    private Actor activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
@@ -55,7 +55,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private userOrDummyPair robResourceReceiverVictimPair = null;
+    private actorPair robResourceReceiverVictimPair = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -70,7 +70,7 @@ public class Game {
      * @param first   The first player
      * @param gameMap The IGameMap the game will be using
      */
-    public Game(ILobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
+    public Game(ILobby lobby, Actor first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
@@ -78,7 +78,7 @@ public class Game {
         playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
-            List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+            List<Actor> playerList = new ArrayList<>(lobby.getActor());
             preparePausedMembers();
             victoryPointsOverTimeMap.put(first, new HashMap<>());
             victoryPointsOverTimeMap.get(first).put(0, 0);
@@ -89,13 +89,13 @@ public class Game {
             Player counterPlayer = Player.PLAYER_2;
             while (playerList.size() > 0) {
                 int randomNumber = (int) (Math.random() * playerList.size());
-                UserOrDummy randomUser = playerList.get(randomNumber);
+                Actor randomUser = playerList.get(randomNumber);
                 victoryPointsOverTimeMap.put(randomUser, new HashMap<>());
                 victoryPointsOverTimeMap.get(randomUser).put(0, 0);
                 startUpPlayerOrder.addLast(randomUser);
                 playersStartUpBuiltMap.put(randomUser, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(randomUser, counterPlayer, new Inventory());
-                counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
+                counterPlayer = counterPlayer.nextPlayer(lobby.getActor().size());
                 playerList.remove(randomUser);
                 autoRollEnabled.put(randomUser, false);
             }
@@ -159,7 +159,7 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-05-21
      */
-    public void changePauseStatus(UserOrDummy user) {
+    public void changePauseStatus(Actor user) {
         pauseGameMap.replace(user, !pauseGameMap.get(user));
     }
 
@@ -171,13 +171,12 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<UserOrDummy> createPlayerList() {
-        List<UserOrDummy> playerList = new ArrayList<>();
-        UserOrDummy player = activePlayer;
+    public List<Actor> createPlayerList() {
+        List<Actor> playerList = new ArrayList<>();
+        Actor player = activePlayer;
         playerList.add(activePlayer);
         for (int i = 0; i < players.size() - 1; i++) {
-            player = players
-                    .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(player).nextPlayer(players.size()));
+            player = players.getActorFromPlayer(players.getPlayerFromActor(player).nextPlayer(players.size()));
             playerList.add(player);
         }
         return playerList;
@@ -222,7 +221,7 @@ public class Game {
      * @author Phillip-André Suhr
      * @since 2021-03-01
      */
-    public UserOrDummy getActivePlayer() {
+    public Actor getActivePlayer() {
         return activePlayer;
     }
 
@@ -243,8 +242,8 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-04-26
      */
-    public Boolean getAutoRollEnabled(UserOrDummy userOrDummy) {
-        return autoRollEnabled.get(userOrDummy);
+    public Boolean getAutoRollEnabled(Actor actor) {
+        return autoRollEnabled.get(actor);
     }
 
     /**
@@ -259,10 +258,10 @@ public class Game {
     }
 
     /**
-     * Gets a list of triples consisting of the UserOrDummy, the amount of
+     * Gets a list of triples consisting of the Actor, the amount of
      * resource cards they have, and the amount of development cards they have
      *
-     * @return List of Triples of UserOrDummy, Integer, Integer
+     * @return List of Triples of Actor, Integer, Integer
      *
      * @author Alwin Bossert
      * @author Eric Vuong
@@ -270,7 +269,7 @@ public class Game {
      */
     public List<CardsAmount> getCardAmounts() {
         List<CardsAmount> list = new ArrayList<>();
-        for (UserOrDummy u : lobby.getUserOrDummies()) {
+        for (Actor u : lobby.getActor()) {
             list.add(new CardsAmount(u, players.get(u).getResourceAmount(),
                                      players.get(u).getAmountOfDevelopmentCards()));
         }
@@ -291,12 +290,12 @@ public class Game {
     }
 
     /**
-     * Gets the UserOrDummy who made the current game's first turn
+     * Gets the Actor who made the current game's first turn
      *
      * @author Aldin Dervisi
      * @since 2021-05-01
      */
-    public UserOrDummy getFirst() {
+    public Actor getFirst() {
         return first;
     }
 
@@ -318,7 +317,7 @@ public class Game {
      *
      * @return The player's inventory
      */
-    public Inventory getInventory(UserOrDummy user) {
+    public Inventory getInventory(Actor user) {
         return players.get(user);
     }
 
@@ -372,9 +371,8 @@ public class Game {
      *
      * @return User object of the next player
      */
-    public UserOrDummy getNextPlayer() {
-        return players
-                .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
+    public Actor getNextPlayer() {
+        return players.getActorFromPlayer(players.getPlayerFromActor(activePlayer).nextPlayer(players.size()));
     }
 
     /**
@@ -388,7 +386,7 @@ public class Game {
      */
     public int getPausedMembers() {
         int pausedMemebers = 0;
-        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
+        for (Map.Entry<Actor, Boolean> entry : pauseGameMap.entrySet()) {
             if (entry.getValue()) pausedMemebers++;
         }
         return pausedMemebers;
@@ -401,8 +399,8 @@ public class Game {
      *
      * @return A player
      */
-    public Player getPlayer(UserOrDummy user) {
-        return players.getPlayerFromUserOrDummy(user);
+    public Player getPlayer(Actor user) {
+        return players.getPlayerFromActor(user);
     }
 
     /**
@@ -413,7 +411,7 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<UserOrDummy> getPlayerList() {
+    public List<Actor> getPlayerList() {
         return playerList;
     }
 
@@ -422,8 +420,8 @@ public class Game {
      *
      * @return The player user mapping
      */
-    public Map<Player, UserOrDummy> getPlayerUserMapping() {
-        Map<Player, UserOrDummy> temp = new HashMap<>();
+    public Map<Player, Actor> getPlayerUserMapping() {
+        Map<Player, Actor> temp = new HashMap<>();
         for (Player player : Player.values()) {
             temp.put(player, getUserFromPlayer(player));
         }
@@ -471,8 +469,8 @@ public class Game {
      *
      * @return The array of Users participating in this game
      */
-    public UserOrDummy[] getPlayers() {
-        return players.getUserOrDummyArray();
+    public Actor[] getPlayers() {
+        return players.getActorArray();
     }
 
     /**
@@ -483,7 +481,7 @@ public class Game {
      * @author Sven Ahrens
      * @since 2021-05-03
      */
-    public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
+    public Map<Actor, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
         return playersStartUpBuiltMap;
     }
 
@@ -514,24 +512,24 @@ public class Game {
     /**
      * Gets the robResourceReceiverVictimPair
      *
-     * @return userOrDummyPair of receiver and victim
+     * @return actorPair of receiver and victim
      *
      * @author Mario Fokken
      * @since 2021-06-11
      */
-    public userOrDummyPair getRobResourceReceiverVictimPair() {
+    public actorPair getRobResourceReceiverVictimPair() {
         return robResourceReceiverVictimPair;
     }
 
     /**
      * Sets the robResourceReceiverVictimPair
      *
-     * @param robResourceReceiverVictimPair userOrDummyPair of receiver and victim
+     * @param robResourceReceiverVictimPair actorPair of receiver and victim
      *
      * @author Mario Fokken
      * @since 2021-06-11
      */
-    public void setRobResourceReceiverVictimPair(userOrDummyPair robResourceReceiverVictimPair) {
+    public void setRobResourceReceiverVictimPair(actorPair robResourceReceiverVictimPair) {
         this.robResourceReceiverVictimPair = robResourceReceiverVictimPair;
     }
 
@@ -576,7 +574,7 @@ public class Game {
      * @author Sven Ahrens
      * @since 2021-05-03
      */
-    public Deque<UserOrDummy> getStartUpPlayerOrder() {
+    public Deque<Actor> getStartUpPlayerOrder() {
         return startUpPlayerOrder;
     }
 
@@ -620,7 +618,7 @@ public class Game {
      * @author Mario Fokken
      * @since 2021-06-02
      */
-    public Map<UserOrDummy, Colour> getUserColoursMap() {
+    public Map<Actor, Colour> getUserColoursMap() {
         return lobby.getUserColourMap();
     }
 
@@ -631,8 +629,8 @@ public class Game {
      *
      * @return The user needed
      */
-    public UserOrDummy getUserFromPlayer(Player player) {
-        return players.getUserOrDummyFromPlayer(player);
+    public Actor getUserFromPlayer(Player player) {
+        return players.getActorFromPlayer(player);
     }
 
     /**
@@ -642,7 +640,7 @@ public class Game {
      *
      * @since 2021-05-20
      */
-    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+    public Map<Actor, Player> getUserToPlayerMap() {
         return players.getUserToPlayerMap();
     }
 
@@ -651,10 +649,10 @@ public class Game {
      *
      * @return A map containing users or dummies and their corresponding players
      *
-     * @since 2021-05-20
      * @author Aldin Dervisi
+     * @since 2021-05-20
      */
-    public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
+    public Map<Actor, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
         return victoryPointsOverTimeMap;
     }
 
@@ -727,7 +725,7 @@ public class Game {
      *
      * @return User object of the next player
      */
-    public UserOrDummy nextPlayer() {
+    public Actor nextPlayer() {
         activePlayer = getNextPlayer();
         if (activePlayer.equals(first)) round++;
         return activePlayer;
@@ -748,14 +746,14 @@ public class Game {
     /**
      * Replaces the autoRoll status for a specific player
      *
-     * @param userOrDummy       The user who wants to change the status
+     * @param actor             The user who wants to change the status
      * @param isAutoRollEnabled The new autoRoll status
      *
      * @author Maximilian Lindner
      * @since 2021-04-26
      */
-    public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
-        autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
+    public void setAutoRollEnabled(Actor actor, boolean isAutoRollEnabled) {
+        autoRollEnabled.replace(actor, isAutoRollEnabled);
     }
 
     /**
@@ -780,7 +778,7 @@ public class Game {
      * @since 2021-05-21
      */
     public void updatePauseByVotingStatus() {
-        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
+        for (Map.Entry<Actor, Boolean> entry : pauseGameMap.entrySet()) {
             if (!entry.getValue()) return;
         }
         pausedByVoting = !pausedByVoting;
@@ -794,10 +792,10 @@ public class Game {
      * @since 2021-05-21
      */
     private void preparePausedMembers() {
-        List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
-        for (UserOrDummy userOrDummy : playerList) {
-            if (userOrDummy instanceof User) pauseGameMap.put(userOrDummy, false);
-            else pauseGameMap.put(userOrDummy, true);
+        List<Actor> playerList = new ArrayList<>(lobby.getActor());
+        for (Actor actor : playerList) {
+            if (actor instanceof User) pauseGameMap.put(actor, false);
+            else pauseGameMap.put(actor, true);
         }
     }
 }

@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Event used to re-enable the offer trade button.
@@ -12,14 +12,14 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ResetOfferTradeButtonRequest extends AbstractGameRequest {
 
-    private final UserOrDummy offeringUserName;
+    private final Actor offeringUserName;
 
     /**
      * Constructor
      *
      * @param originLobby The name of the Lobby where the offer trade button should be re-enabled
      */
-    public ResetOfferTradeButtonRequest(LobbyName originLobby, UserOrDummy offeringUserName) {
+    public ResetOfferTradeButtonRequest(LobbyName originLobby, Actor offeringUserName) {
         super(originLobby);
         this.offeringUserName = offeringUserName;
     }
@@ -29,7 +29,7 @@ public class ResetOfferTradeButtonRequest extends AbstractGameRequest {
      *
      * @return Name of the offering user
      */
-    public UserOrDummy getOfferingUser() {
+    public Actor getOfferingUser() {
         return offeringUserName;
     }
 }

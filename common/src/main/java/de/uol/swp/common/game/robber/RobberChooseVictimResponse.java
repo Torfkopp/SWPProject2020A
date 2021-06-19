@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Set;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 public class RobberChooseVictimResponse extends AbstractResponseMessage {
 
     private final User player;
-    private final Set<UserOrDummy> victims;
+    private final Set<Actor> victims;
 
     /**
      * Constructor
@@ -27,7 +27,7 @@ public class RobberChooseVictimResponse extends AbstractResponseMessage {
      * @param player  The player choosing the victims
      * @param victims The victims to choose from
      */
-    public RobberChooseVictimResponse(User player, Set<UserOrDummy> victims) {
+    public RobberChooseVictimResponse(User player, Set<Actor> victims) {
         this.player = player;
         this.victims = victims;
     }
@@ -46,7 +46,7 @@ public class RobberChooseVictimResponse extends AbstractResponseMessage {
      *
      * @return Set of all victims
      */
-    public Set<UserOrDummy> getVictims() {
+    public Set<Actor> getVictims() {
         return victims;
     }
 }

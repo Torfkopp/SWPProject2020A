@@ -1,13 +1,13 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.io.Serializable;
 import java.util.*;
 
 /**
- * A class to store the mapping of UserOrDummy, Player and Inventory
+ * A class to store the mapping of Actor, Player and Inventory
  *
  * @author Temmo Junkhoff
  * @since 2021-03-19
@@ -17,15 +17,15 @@ public class InventoryMap implements Serializable {
     private final List<UserPlayerInventoryMapping> map = new LinkedList<>();
 
     /**
-     * Gets the inventory for a user or dummy
+     * Gets the inventory for an actor
      *
-     * @param userOrDummy The user or dummy whose inventory is needed
+     * @param actor The actor whose inventory is needed
      *
      * @return The requested inventory
      */
-    public Inventory get(UserOrDummy userOrDummy) {
+    public Inventory get(Actor actor) {
         for (UserPlayerInventoryMapping entry : map)
-            if (entry.getUser().equals(userOrDummy)) {
+            if (entry.getUser().equals(actor)) {
                 return entry.getInventory();
             }
         return null;
@@ -56,39 +56,39 @@ public class InventoryMap implements Serializable {
     }
 
     /**
-     * Gets the player for a given UserOrDummy
+     * Gets an array of the Actor objects
      *
-     * @param userOrDummy The user or dummy whose matching Player is needed
-     *
-     * @return The requested Player
+     * @return The array of Actor objects
      */
-    public Player getPlayerFromUserOrDummy(UserOrDummy userOrDummy) {
+    public Actor[] getActorArray() {
+        List<Actor> returnArray = new LinkedList<>();
+        map.forEach((key -> returnArray.add(key.getUser())));
+        return returnArray.toArray(new Actor[0]);
+    }
+
+    /**
+     * Gets the Actor for a given player
+     *
+     * @param player The player whose matching Actor is needed
+     *
+     * @return The requested Actor
+     */
+    public Actor getActorFromPlayer(Player player) {
         for (UserPlayerInventoryMapping entry : map)
-            if (Objects.equals(userOrDummy, entry.getUser())) return entry.getPlayer();
+            if (Objects.equals(player, entry.getPlayer())) return entry.getUser();
         return null;
     }
 
     /**
-     * Gets an array of the UserOrDummy objects
+     * Gets the player for a given Actor
      *
-     * @return The array of UserOrDummy objects
+     * @param actor The actor whose matching Player is needed
+     *
+     * @return The requested Player
      */
-    public UserOrDummy[] getUserOrDummyArray() {
-        List<UserOrDummy> returnArray = new LinkedList<>();
-        map.forEach((key -> returnArray.add(key.getUser())));
-        return returnArray.toArray(new UserOrDummy[0]);
-    }
-
-    /**
-     * Gets the UserOrDummy for a given player
-     *
-     * @param player The player whose matching UserOrDummy is needed
-     *
-     * @return The requested UserOrDummy
-     */
-    public UserOrDummy getUserOrDummyFromPlayer(Player player) {
+    public Player getPlayerFromActor(Actor actor) {
         for (UserPlayerInventoryMapping entry : map)
-            if (Objects.equals(player, entry.getPlayer())) return entry.getUser();
+            if (Objects.equals(actor, entry.getUser())) return entry.getPlayer();
         return null;
     }
 
@@ -99,8 +99,8 @@ public class InventoryMap implements Serializable {
      *
      * @since 2021-05-20
      */
-    public Map<UserOrDummy, Player> getUserToPlayerMap() {
-        Map<UserOrDummy, Player> temp = new HashMap<>();
+    public Map<Actor, Player> getUserToPlayerMap() {
+        Map<Actor, Player> temp = new HashMap<>();
         for (UserPlayerInventoryMapping entry : map)
             temp.put(entry.getUser(), entry.getPlayer());
         return temp;
@@ -109,23 +109,23 @@ public class InventoryMap implements Serializable {
     /**
      * Puts a new entry in the list
      *
-     * @param userOrDummy The userOrDummy key
-     * @param player      The player key
-     * @param inventory   The inventory value
+     * @param actor     The actor key
+     * @param player    The player key
+     * @param inventory The inventory value
      */
-    public void put(UserOrDummy userOrDummy, Player player, Inventory inventory) {
+    public void put(Actor actor, Player player, Inventory inventory) {
         for (int i = 0; i < map.size(); i++) {
             UserPlayerInventoryMapping entry = map.get(i);
-            if ((Objects.equals(entry.getUser(), userOrDummy) && !Objects
+            if ((Objects.equals(entry.getUser(), actor) && !Objects
                     .equals(entry.getPlayer(), player)) || (Objects.equals(entry.getPlayer(), player) && !Objects
-                    .equals(entry.getUser(), userOrDummy))) {
+                    .equals(entry.getUser(), actor))) {
                 throw new IllegalArgumentException("Keys are not matching!");
-            } else if (Objects.equals(entry.getUser(), userOrDummy) && Objects.equals(entry.getPlayer(), player)) {
-                map.set(i, new UserPlayerInventoryMapping(userOrDummy, player, inventory));
+            } else if (Objects.equals(entry.getUser(), actor) && Objects.equals(entry.getPlayer(), player)) {
+                map.set(i, new UserPlayerInventoryMapping(actor, player, inventory));
                 return;
             }
         }
-        map.add(new UserPlayerInventoryMapping(userOrDummy, player, inventory));
+        map.add(new UserPlayerInventoryMapping(actor, player, inventory));
     }
 
     /**
@@ -145,7 +145,7 @@ public class InventoryMap implements Serializable {
      */
     private class UserPlayerInventoryMapping {
 
-        private final UserOrDummy user;
+        private final Actor user;
         private final Player player;
         private final Inventory inventory;
 
@@ -159,7 +159,7 @@ public class InventoryMap implements Serializable {
          * @author Temmo Junkhoff
          * @since 2021-05-04
          */
-        public UserPlayerInventoryMapping(UserOrDummy user, Player player, Inventory inventory) {
+        public UserPlayerInventoryMapping(Actor user, Player player, Inventory inventory) {
             this.user = user;
             this.player = player;
             this.inventory = inventory;
@@ -197,7 +197,7 @@ public class InventoryMap implements Serializable {
          * @author Temmo Junkhoff
          * @since 2021-05-04
          */
-        public UserOrDummy getUser() {
+        public Actor getUser() {
             return user;
         }
     }

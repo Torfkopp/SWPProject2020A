@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request is sent to the Server to notify the responding user that
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class TradeWithUserCancelRequest extends AbstractGameRequest {
 
-    private final UserOrDummy respondingUser;
+    private final Actor respondingUser;
 
     /**
      * Constructor
@@ -22,7 +22,7 @@ public class TradeWithUserCancelRequest extends AbstractGameRequest {
      * @param originLobby    The lobby where the trade was opened
      * @param respondingUser The user to whom the offer was made
      */
-    public TradeWithUserCancelRequest(LobbyName originLobby, UserOrDummy respondingUser) {
+    public TradeWithUserCancelRequest(LobbyName originLobby, Actor respondingUser) {
         super(originLobby);
         this.respondingUser = respondingUser;
     }
@@ -32,7 +32,7 @@ public class TradeWithUserCancelRequest extends AbstractGameRequest {
      *
      * @return The name of the user to whom the offer was made
      */
-    public UserOrDummy getRespondingUser() {
+    public Actor getRespondingUser() {
         return respondingUser;
     }
 }

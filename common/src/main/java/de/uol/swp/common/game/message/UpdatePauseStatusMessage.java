@@ -2,7 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message sent to everyone in the lobby to update everyone
@@ -16,7 +16,7 @@ public class UpdatePauseStatusMessage extends AbstractServerMessage {
     private final LobbyName lobbyName;
     private final boolean paused;
     private final int pausedMembers;
-    private final UserOrDummy activePlayer;
+    private final Actor activePlayer;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ public class UpdatePauseStatusMessage extends AbstractServerMessage {
      * @param pausedMembers Amount of players who want to change the pause status of the game
      * @param activePlayer  The user whose turn it is
      */
-    public UpdatePauseStatusMessage(LobbyName lobbyName, boolean paused, int pausedMembers, UserOrDummy activePlayer) {
+    public UpdatePauseStatusMessage(LobbyName lobbyName, boolean paused, int pausedMembers, Actor activePlayer) {
         this.lobbyName = lobbyName;
         this.paused = paused;
         this.pausedMembers = pausedMembers;
@@ -38,7 +38,7 @@ public class UpdatePauseStatusMessage extends AbstractServerMessage {
      *
      * @return The active player of the game
      */
-    public UserOrDummy getActivePlayer() {
+    public Actor getActivePlayer() {
         return activePlayer;
     }
 

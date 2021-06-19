@@ -32,8 +32,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
@@ -88,7 +88,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected TableView<IResource> resourceTableView;
     @FXML
-    protected ListView<UserOrDummy> membersView;
+    protected ListView<Actor> membersView;
     @FXML
     protected Button playCard;
     @FXML
@@ -128,7 +128,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Button pauseButton;
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
+    protected ObservableList<Actor> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
@@ -151,17 +151,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected User owner;
     protected ObservableList<UniqueCard> uniqueCardList;
     protected Window window;
-    protected UserOrDummy winner = null;
+    protected Actor winner = null;
     protected boolean helpActivated = false;
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
-    protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
-    protected Map<UserOrDummy, Colour> userColoursMap = null;
+    protected Map<Actor, Player> actorPlayerMap = null;
+    protected Map<Actor, Colour> userColoursMap = null;
     protected IGameService gameService;
     protected int maxTradeDiff;
-    protected Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap;
-    protected List<UserOrDummy> inGameUserList;
+    protected Map<Actor, Map<Integer, Integer>> victoryPointsOverTimeMap;
+    protected List<Actor> inGameUserList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -257,7 +257,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         xAxis.setTickUnit(1.0);
         yAxis.setMinorTickVisible(false);
         xAxis.setMinorTickVisible(false);
-        for (Map.Entry<UserOrDummy, Map<Integer, Integer>> victoryPointMap : victoryPointsOverTimeMap.entrySet()) {
+        for (Map.Entry<Actor, Map<Integer, Integer>> victoryPointMap : victoryPointsOverTimeMap.entrySet()) {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
             Colour colour = userColoursMap.get(victoryPointMap.getKey());
             for (Map.Entry<Integer, Integer> points : victoryPointMap.getValue().entrySet()) {
@@ -474,7 +474,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void onTradeWithUserButtonPressed() {
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
+        Actor user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
             tradeService.showTradeError(ResourceManager.get("game.trade.error.noplayer"));
         } else if (Util.equals(user, userService.getLoggedInUser())) {
@@ -588,7 +588,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @author Mario Fokken
      * @since 2021-02-22
      */
-    protected void setRollDiceButtonState(UserOrDummy user) {
+    protected void setRollDiceButtonState(Actor user) {
         if (!gamePaused) rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
     }
 
@@ -604,7 +604,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    protected void setTurnIndicatorText(UserOrDummy user) {
+    protected void setTurnIndicatorText(Actor user) {
         Text preUsernameText = new Text(ResourceManager.get("lobby.game.text.turnindicator1"));
         Text postUsernameText = new Text(ResourceManager.get("lobby.game.text.turnindicator2"));
         Platform.runLater(() -> {
@@ -617,8 +617,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Text username = new Text(name);
             username.setFont(Font.font(20.0));
 
-            if (userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
-                switch (userOrDummyPlayerMap.get(user)) {
+            if (actorPlayerMap != null && actorPlayerMap.containsKey(user)) {
+                switch (actorPlayerMap.get(user)) {
                     case PLAYER_1:
                         username.setFill(GameRendering.PLAYER_1_COLOUR);
                         break;
@@ -1165,8 +1165,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             String confirmText = ResourceManager.get("button.confirm");
             String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
-                List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
-                ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
+                List<Actor> victims = new ArrayList<>(rsp.getVictims());
+                ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
                 dialogue.setTitle(title);
                 dialogue.setHeaderText(headerText);
                 dialogue.setContentText(contentText);
@@ -1177,9 +1177,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 dialogue.getDialogPane().getStylesheets().add(styleSheet);
-                Optional<UserOrDummy> rst = dialogue.showAndWait();
+                Optional<Actor> rst = dialogue.showAndWait();
                 soundService.button();
-                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
+                rst.ifPresent(actor -> gameService.robberChooseVictim(lobbyName, actor));
             });
         }
     }
@@ -1593,7 +1593,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    private void resetButtonStates(UserOrDummy user) {
+    private void resetButtonStates(Actor user) {
         if (!gamePaused) {
             tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
             endTurn.setDisable(!userService.getLoggedInUser().equals(user));
