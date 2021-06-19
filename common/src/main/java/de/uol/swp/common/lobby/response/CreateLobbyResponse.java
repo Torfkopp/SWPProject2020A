@@ -23,7 +23,7 @@ public class CreateLobbyResponse extends AbstractLobbyResponse {
      *
      * @param lobbyName The name for the new lobby
      * @param lobby     The object of the created lobby
-     * @param password  The password og the created lobby
+     * @param password  The password of the created lobby
      **/
     public CreateLobbyResponse(LobbyName lobbyName, ISimpleLobby lobby, String password) {
         super(lobbyName);
