@@ -163,6 +163,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected int maxTradeDiff;
     protected Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap;
     protected List<UserOrDummy> inGameUserList;
+    protected boolean drawHitboxGrid;
+    protected String renderingStyle;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -222,7 +224,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         double dimension = Math.min(heightValue, widthValue);
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
@@ -1633,10 +1635,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-06-09
      */
     @Inject
-    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
+    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme,
+                            @Named("drawHitboxGrid") boolean drawHitboxGrid,
+                            @Named("renderingStyle") String renderingStyle) {
         this.tradeService = tradeService;
         this.gameService = gameService;
         this.theme = theme;
+        this.drawHitboxGrid = drawHitboxGrid;
+        this.renderingStyle = renderingStyle;
     }
 
     /**

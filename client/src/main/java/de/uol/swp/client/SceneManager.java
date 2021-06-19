@@ -694,16 +694,6 @@ public class SceneManager {
         showMainScreen(rsp.getUser());
     }
 
-    @Subscribe
-    private void onChangeGameSettingsCanceledEvent(ChangeGameSettingsCanceledEvent event) {
-        //TODO no idea how this works
-    }
-
-    @Subscribe
-    private void onChangeGameSettingsSuccessfulEvent(ChangeGameSettingsSuccessfulEvent event) {
-        //TODO no idea how this works
-    }
-
     /**
      * Handles the ChangeSettingsCanceledEvent detected on the EventBus
      * <p>
@@ -1021,7 +1011,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowChangeGameSettingsViewEvent(ShowChangeGameSettingsViewEvent event) {
-        String title = resourceBundle.getString("rules.window.title");
+        String title = ResourceManager.get("rules.window.title");
         Platform.runLater(() -> {
             Stage changeGameSettingsStage = new Stage();
             changeGameSettingsStage.setTitle(title);

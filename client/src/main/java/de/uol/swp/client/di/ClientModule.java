@@ -93,21 +93,21 @@ public class ClientModule extends AbstractModule {
         String lang = properties.getProperty("lang");
 
         //Setting the rendering style
-        final String renderingStyle = properties.getProperty("renderingStyle");
+        String renderingStyle = properties.getProperty("renderingStyle");
 
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
         String theme = properties.getProperty("theme");
         if (!theme.equals("default") && !theme.equals("dark") && !theme.equals("classic") && !theme.equals("cursed"))
             theme = "default";
-        final String styleSheet = "css/" + theme + ".css";
+        String styleSheet = "css/" + theme + ".css";
 
         //Setting the sound pack and volume
         LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
                   properties.getProperty("volume"));
         String pack = properties.getProperty("soundpack");
         if (!pack.equals("default") && !pack.equals("classic") && !pack.equals("cursed")) pack = "default";
-        final String soundPack = "client/src/main/resources/sounds/" + pack + "/";
+        String soundPack = "client/src/main/resources/sounds/" + pack + "/";
         double volume;
         double backgroundVolume;
         try {
@@ -175,7 +175,6 @@ public class ClientModule extends AbstractModule {
         bind(TradeService.class).in(Scopes.SINGLETON);
         bind(ISoundService.class).to(AsyncSoundService.class).in(Scopes.SINGLETON);
         bind(SoundService.class).in(Scopes.SINGLETON);
-        requestStaticInjection(GameRendering.class);
         requestStaticInjection(SceneManager.class);
         requestStaticInjection(ResourceManager.class);
     }

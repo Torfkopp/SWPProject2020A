@@ -1,7 +1,5 @@
 package de.uol.swp.client;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
@@ -61,15 +59,8 @@ public class GameRendering {
     public static Color PLAYER_2_COLOUR = Color.BLACK;
     public static Color PLAYER_3_COLOUR = Color.BLACK;
     public static Color PLAYER_4_COLOUR = Color.BLACK;
-
-    @Inject
-    private static IUserService userService;
-    @Inject
-    @Named("drawHitboxGrid")
-    private static boolean drawHitboxGrid;
-    @Inject
-    @Named("renderingStyle")
-    private static String renderingStyle;
+    private final IUserService userService;
+    private final boolean drawHitboxGrid;
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
@@ -77,7 +68,8 @@ public class GameRendering {
     private final double tokenTextFontSize;
     private final double centerTextFontSize;
     private final double bottomTextFontSize;
-    private final Map<String, Image> hexTiles = new HashMap<>();
+    private final Map<String, Image> gameAssetImages = new HashMap<>();
+    private String renderingStyle;
     private boolean buildingEnabled;
     private GameMapDescription gameMapDescription = new GameMapDescription();
 
@@ -86,7 +78,7 @@ public class GameRendering {
      *
      * @param canvas The canvas that should be drawn on
      */
-    public GameRendering(Canvas canvas) {
+    public GameRendering(Canvas canvas, IUserService userService, boolean drawHitboxGrid, String renderingStyle) {
         double WIDTH_FACTOR = Math.sqrt(3) / 2;
         double HEX_HEIGHT_FACTOR = 1.0 / 5.5;
         double HEX_WIDTH_FACTOR = HEX_HEIGHT_FACTOR * WIDTH_FACTOR;
@@ -113,28 +105,40 @@ public class GameRendering {
         this.tokenTextFontSize = (20.0 / 750.0) * effectiveWidth;
         this.bottomTextFontSize = (25.0 / 750.0) * effectiveWidth;
         this.centerTextFontSize = (30.0 / 750.0) * effectiveWidth;
+        this.userService = userService;
+        this.drawHitboxGrid = drawHitboxGrid;
+        this.renderingStyle = renderingStyle;
         try {
-            this.hexTiles.put("water", new Image("images/hexes/" + renderingStyle + "/water.png"));
-            this.hexTiles.put("desert", new Image("images/hexes/" + renderingStyle + "/desert.png"));
-            this.hexTiles.put("fields", new Image("images/hexes/" + renderingStyle + "/fields.png"));
-            this.hexTiles.put("hills", new Image("images/hexes/" + renderingStyle + "/hills.png"));
-            this.hexTiles.put("mountains", new Image("images/hexes/" + renderingStyle + "/mountains.png"));
-            this.hexTiles.put("pasture", new Image("images/hexes/" + renderingStyle + "/pasture.png"));
-            this.hexTiles.put("forest", new Image("images/hexes/" + renderingStyle + "/forest.png"));
-            this.hexTiles.put("robber", new Image("images/hexes/" + renderingStyle + "/robber.png"));
-            this.hexTiles.put("harbour_east", new Image("images/hexes/" + renderingStyle + "/harbour_east.png"));
-            this.hexTiles
-                    .put("harbour_northeast", new Image("images/hexes/" + renderingStyle + "/harbour_northeast.png"));
-            this.hexTiles
-                    .put("harbour_northwest", new Image("images/hexes/" + renderingStyle + "/harbour_northwest.png"));
-            this.hexTiles.put("harbour_west", new Image("images/hexes/" + renderingStyle + "/harbour_west.png"));
-            this.hexTiles
-                    .put("harbour_southwest", new Image("images/hexes/" + renderingStyle + "/harbour_southwest.png"));
-            this.hexTiles
-                    .put("harbour_southeast", new Image("images/hexes/" + renderingStyle + "/harbour_southeast.png"));
+            this.gameAssetImages.put("water", new Image("images/assets/" + renderingStyle + "/water.png"));
+            this.gameAssetImages.put("desert", new Image("images/assets/" + renderingStyle + "/desert.png"));
+            this.gameAssetImages.put("fields", new Image("images/assets/" + renderingStyle + "/fields.png"));
+            this.gameAssetImages.put("hills", new Image("images/assets/" + renderingStyle + "/hills.png"));
+            this.gameAssetImages.put("mountains", new Image("images/assets/" + renderingStyle + "/mountains.png"));
+            this.gameAssetImages.put("pasture", new Image("images/assets/" + renderingStyle + "/pasture.png"));
+            this.gameAssetImages.put("forest", new Image("images/assets/" + renderingStyle + "/forest.png"));
+            this.gameAssetImages.put("robber", new Image("images/assets/" + renderingStyle + "/robber.png"));
+            this.gameAssetImages
+                    .put("harbour_east", new Image("images/assets/" + renderingStyle + "/harbour_east.png"));
+            this.gameAssetImages
+                    .put("harbour_northeast", new Image("images/assets/" + renderingStyle + "/harbour_northeast.png"));
+            this.gameAssetImages
+                    .put("harbour_northwest", new Image("images/assets/" + renderingStyle + "/harbour_northwest.png"));
+            this.gameAssetImages
+                    .put("harbour_west", new Image("images/assets/" + renderingStyle + "/harbour_west.png"));
+            this.gameAssetImages
+                    .put("harbour_southwest", new Image("images/assets/" + renderingStyle + "/harbour_southwest.png"));
+            this.gameAssetImages
+                    .put("harbour_southeast", new Image("images/assets/" + renderingStyle + "/harbour_southeast.png"));
+            //this.gameAssetImages
+            //        .put("road_northwest", new Image("images/assets/" + renderingStyle + "/road_northwest.png"));
+            //this.gameAssetImages
+            //        .put("road_northeast", new Image("images/assets/" + renderingStyle + "/road_northeast.png"));
+            //this.gameAssetImages.put("road_south", new Image("images/assets/" + renderingStyle + "/road_south.png"));
+            //this.gameAssetImages.put("settlement", new Image("images/assets/" + renderingStyle + "/settlement.png"));
+            //this.gameAssetImages.put("city", new Image("images/assets/" + renderingStyle + "/city.png"));
         } catch (IllegalArgumentException e) {
             LOG.error(e.getMessage());
-            renderingStyle = "plain";
+            this.renderingStyle = "plain";
         }
     }
 
@@ -270,13 +274,16 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawCity(Optional<Player> owner, double currentX, double currentY) {
-        //TODO optionally render images
         if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
         else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
         double halfCitySize = citySize / 2.0;
         double x = currentX - halfCitySize;
         double y = currentY - halfCitySize;
-        Platform.runLater(() -> gfxCtx.fillRoundRect(x, y, citySize, citySize, halfCitySize, halfCitySize));
+        Platform.runLater(() -> {
+            if (!renderingStyle.equals("plain"))
+                gfxCtx.drawImage(gameAssetImages.get("city"), x, y, citySize, citySize);
+            gfxCtx.fillRoundRect(x, y, citySize, citySize, halfCitySize, halfCitySize);
+        });
     }
 
     /**
@@ -415,7 +422,7 @@ public class GameRendering {
         double maxWidth = hexWidth * (6.0 / 8.0);
         Platform.runLater(() -> {
             if (!renderingStyle.equals("plain"))
-                gfxCtx.drawImage(hexTiles.get(finalHarbourType), currentX, currentY, hexWidth, hexHeight);
+                gfxCtx.drawImage(gameAssetImages.get(finalHarbourType), currentX, currentY, hexWidth, hexHeight);
             else {
                 gfxCtx.setStroke(HARBOUR_COLOUR);
                 gfxCtx.setFill(HARBOUR_COLOUR);
@@ -449,7 +456,7 @@ public class GameRendering {
         Platform.runLater(() -> {
             gfxCtx.fillPolygon(xCords, yCords, 6);
             if (!renderingStyle.equals("plain"))
-                gfxCtx.drawImage(hexTiles.get(type), currentX, currentY, hexWidth, hexHeight);
+                gfxCtx.drawImage(gameAssetImages.get(type), currentX, currentY, hexWidth, hexHeight);
             gfxCtx.setStroke(BORDER_COLOUR);
             gfxCtx.setLineWidth(2);
             gfxCtx.strokePolygon(xCords, yCords, 6);
@@ -535,7 +542,8 @@ public class GameRendering {
                             currentY + hexHeight * (1.125 / 4.0)};
         Platform.runLater(() -> {
             if (!renderingStyle.equals("plain"))
-                gfxCtx.drawImage(hexTiles.get("robber"), currentX, currentY * 1.1, hexWidth * 0.5, hexHeight * 0.5);
+                gfxCtx.drawImage(gameAssetImages.get("robber"), currentX, currentY * 1.1, hexWidth * 0.5,
+                                 hexHeight * 0.5);
             else {
                 gfxCtx.setLineWidth(robberLineWidth);
                 gfxCtx.setStroke(ROBBER_COLOUR);
@@ -556,13 +564,16 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
-        //TODO optionally render images
         double x = currentX - (settlementSize / 2.0);
         double y = currentY - (settlementSize / 2.0);
 
         if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
         else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
-        Platform.runLater(() -> gfxCtx.fillOval(x, y, settlementSize, settlementSize));
+        Platform.runLater(() -> {
+            if (!renderingStyle.equals("plain"))
+                gfxCtx.drawImage(gameAssetImages.get("settlement"), x, y, settlementSize, settlementSize);
+            gfxCtx.fillOval(x, y, settlementSize, settlementSize);
+        });
     }
 
     /**
@@ -797,7 +808,6 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
-        //TODO optionally render images
         Platform.runLater(() -> gfxCtx.setLineWidth(roadWidth));
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
@@ -807,27 +817,49 @@ public class GameRendering {
             } else if (edge.getOwner() == null) {
                 continue;
             } else {
-                Color playerColour = getPlayerColour(edge.getOwner());
+                Color playerColour;
+                if (renderingStyle.equals("plain")) {
+                    playerColour = getPlayerColour(edge.getOwner());
+                } else {
+                    playerColour = getPlayerColour(edge.getOwner()).deriveColor(1, 1, 1, 0.5);
+                }
                 Platform.runLater(() -> gfxCtx.setStroke(playerColour));
             }
             //Northwest road
             if (edge.getOrientation() == IEdge.Orientation.WEST) {
                 double x2 = currentX - (hexWidth / 2.0);
                 double y2 = currentY - (hexHeight / 4.0);
-                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, x2, y2));
+                Platform.runLater(() -> {
+                    if (!renderingStyle.equals("plain"))
+                        gfxCtx.drawImage(gameAssetImages.get("road_northwest"), x2, y2, hexWidth / 2, hexHeight / 4);
+                    gfxCtx.strokeLine(currentX, currentY, x2, y2);
+                });
+                return;
             }
 
             //South road
-            else if (edge.getOrientation() == IEdge.Orientation.SOUTH) {
+            if (edge.getOrientation() == IEdge.Orientation.SOUTH) {
                 double y2 = currentY + (hexHeight / 2.0);
-                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, currentX, y2));
+                Platform.runLater(() -> {
+                    if (!renderingStyle.equals("plain"))
+                        gfxCtx.drawImage(gameAssetImages.get("road_south"), currentX, currentY, hexWidth / 2,
+                                         hexHeight / 4);
+                    gfxCtx.strokeLine(currentX, currentY, currentX, y2);
+                });
+                return;
             }
 
             //Northeast road
             if (edge.getOrientation() == IEdge.Orientation.EAST) {
                 double x2 = currentX + (hexWidth / 2.0);
                 double y2 = currentY - (hexHeight / 4.0);
-                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, x2, y2));
+                Platform.runLater(() -> {
+                    if (!renderingStyle.equals("plain"))
+                        gfxCtx.drawImage(gameAssetImages.get("road_northeast"), currentX, y2, hexWidth / 2,
+                                         hexHeight / 4);
+                    gfxCtx.strokeLine(currentX, currentY, x2, y2);
+                });
+                return;
             }
         }
     }

@@ -2,8 +2,6 @@ package de.uol.swp.client.changeSettings;
 
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ClientApp;
-import de.uol.swp.client.changeSettings.event.ChangeGameSettingsCanceledEvent;
-import de.uol.swp.client.changeSettings.event.ChangeGameSettingsSuccessfulEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 
@@ -34,13 +32,57 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the CancelButton is pressed.
      * It posts a new ChangeGameSettingsCanceledEvent onto the EventBus.
-     *
-     * @see de.uol.swp.client.changeSettings.event.ChangeGameSettingsCanceledEvent
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(new ChangeGameSettingsCanceledEvent());
+        renderingStyleBox.getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .getScene().getWindow().getScene().getWindow().getScene().getWindow().getScene().getWindow()
+                         .hide();
     }
 
     /**
@@ -49,14 +91,12 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
      * This method is called when the ChangeGameSettingsButton is pressed.
      * It gets the value chosen in the ComboBox and puts it into the Preferences.
      * It also posts a new ChangeGameSettingsSuccessfulEvent onto the EventBus.
-     *
-     * @see de.uol.swp.client.changeSettings.event.ChangeGameSettingsSuccessfulEvent
      */
     @FXML
     private void onChangeGameSettingsButtonPressed() {
         soundService.button();
         String theme = renderingStyleBox.getValue();
         if (theme != null) preferences.put("renderingstyle", theme.toLowerCase());
-        post(new ChangeGameSettingsSuccessfulEvent());
+        renderingStyleBox.getScene().getWindow().hide();
     }
 }
