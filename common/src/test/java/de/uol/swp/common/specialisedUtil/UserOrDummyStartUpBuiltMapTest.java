@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserOrDummyStartUpBuildMapTest {
+public class UserOrDummyStartUpBuiltMapTest {
 
     @Test
     void test() {
-        UserOrDummyStartUpBuildMap map = new UserOrDummyStartUpBuildMap();
+        UserOrDummyStartUpBuiltMap map = new UserOrDummyStartUpBuiltMap();
         UserOrDummy user = new AIDTO(AI.Difficulty.EASY);
         map.put(user);
         assertTrue(map.containsKey(user));

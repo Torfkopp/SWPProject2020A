@@ -108,13 +108,13 @@ public class SceneManager {
     /**
      * Constructor
      *
-     * @param userService    The UserService this class should use.
-     * @param lobbyService   The LobbyService this class should use.
-     * @param tradeService   The TradeService this class should use.
-     * @param soundService   The SoundService this class should use.
-     * @param eventBus       The EventBus this class should use.
-     * @param primaryStage   The created PrimaryStage.
-     * @param styleSheet     The used StyleSheet.
+     * @param userService  The UserService this class should use.
+     * @param lobbyService The LobbyService this class should use.
+     * @param tradeService The TradeService this class should use.
+     * @param soundService The SoundService this class should use.
+     * @param eventBus     The EventBus this class should use.
+     * @param primaryStage The created PrimaryStage.
+     * @param styleSheet   The used StyleSheet.
      */
     @Inject
     public SceneManager(IUserService userService, ILobbyService lobbyService, ITradeService tradeService,
@@ -1287,8 +1287,8 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-tradingStages.close(lobby);
-        }
+        tradingStages.close(lobby);
+    }
 
     /**
      * Handles the TradeErrorEvent detected on the EventBus

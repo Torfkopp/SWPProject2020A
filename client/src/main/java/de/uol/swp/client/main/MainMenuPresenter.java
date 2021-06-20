@@ -857,11 +857,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     private void updateLobbyList(List<ISimpleLobby> lobbyList) {
         Platform.runLater(() -> {
-            //Wird dies überhaupt gebraucht? Im initialise wird lobbies gesetzt, wodurch hier lobbies eigentlich nie null sein sollte
-            /*if (lobbies == null) {
-                lobbies = FXCollections.observableArrayList();
-                lobbyView.setItems(lobbies);
-            }*/
             List<ISimpleLobby> newLobbies = new ArrayList<>(lobbyList);
             List<LobbyStringPair> oldLobbies = new ArrayList<>(lobbies.get());
             for (ISimpleLobby lobby : lobbyList) {

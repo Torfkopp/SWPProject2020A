@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 /**
  * Specialised class to map
- * a UserOrDummy and a Player
+ * a UserOrDummy to a Player
  *
  * @author Mario Fokken
  * @since 2021-06-16

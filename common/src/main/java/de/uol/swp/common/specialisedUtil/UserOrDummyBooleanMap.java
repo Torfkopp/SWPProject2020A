@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 /**
  * Specialised class to map
- * a UserOrDummy and a Boolean
+ * a UserOrDummy to a Boolean
  *
  * @author Mario Fokken
  * @since 2021-06-16

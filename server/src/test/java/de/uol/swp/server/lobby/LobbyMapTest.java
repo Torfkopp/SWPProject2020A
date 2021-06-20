@@ -16,11 +16,8 @@ public class LobbyMapTest {
         User user = new UserDTO(69, "Rüdiger", "", "");
         map.create(name, user, "");
         assertTrue(map.containsKey(name));
-        try {
-            map.create(name, null, "asfuiasdfh");
-            fail();
-        } catch (IllegalArgumentException exception) { assertTrue(true); }
 
+        assertThrows(IllegalArgumentException.class, () -> map.create(name, null, "asfuiasdfh"));
         assertEquals(map.getLobby(name).get(), map.getLobby(name, "").get());
         map.getSimpleLobbies();
 
@@ -29,9 +26,6 @@ public class LobbyMapTest {
 
         map.drop(name);
         assertFalse(map.containsKey(name));
-        try {
-            map.drop(name);
-            fail();
-        } catch (IllegalArgumentException exception) { assertTrue(true); }
+        assertThrows(IllegalArgumentException.class, () -> map.drop(name));
     }
 }

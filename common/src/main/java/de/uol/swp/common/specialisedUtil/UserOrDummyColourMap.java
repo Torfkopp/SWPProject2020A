@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Specialised class to map
- * a UserOrDummy and a Colour
+ * a UserOrDummy to a Colour
  *
  * @author Mario Fokken
  * @since 2021-06-16

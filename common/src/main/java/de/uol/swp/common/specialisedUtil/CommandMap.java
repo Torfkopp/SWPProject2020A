@@ -13,6 +13,4 @@ import java.util.function.BiConsumer;
  * @author Mario Fokken
  * @since 2021-06-18
  */
-public class CommandMap extends HashMap<String, BiConsumer<List<String>, NewChatMessageRequest>> {
-
-}
+public class CommandMap extends HashMap<String, BiConsumer<List<String>, NewChatMessageRequest>> {}

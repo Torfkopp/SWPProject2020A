@@ -37,7 +37,7 @@ public class Game {
     private final UserOrDummySet taxPayers = new UserOrDummySet();
     private final UserOrDummyBooleanMap autoRollEnabled;
     private final UserOrDummyBooleanMap pauseGameMap = new UserOrDummyBooleanMap(); //true if the user wants to change the current pause status of the game
-    private final UserOrDummyStartUpBuildMap playersStartUpBuiltMap;
+    private final UserOrDummyStartUpBuiltMap playersStartUpBuiltMap;
     private final VictoryPointOverTimeMap victoryPointsOverTimeMap = new VictoryPointOverTimeMap();
     private final UserOrDummy first;
     private final int maxTradeDiff;
@@ -73,7 +73,7 @@ public class Game {
         this.map = gameMap;
         this.first = first;
         this.maxTradeDiff = getLobby().getMaxTradeDiff();
-        playersStartUpBuiltMap = new UserOrDummyStartUpBuildMap();
+        playersStartUpBuiltMap = new UserOrDummyStartUpBuiltMap();
         autoRollEnabled = new UserOrDummyBooleanMap();
         {
             UserOrDummyList playerList = new UserOrDummyList(lobby.getUserOrDummies());
@@ -481,7 +481,7 @@ public class Game {
      * @author Sven Ahrens
      * @since 2021-05-03
      */
-    public UserOrDummyStartUpBuildMap getPlayersStartUpBuiltMap() {
+    public UserOrDummyStartUpBuiltMap getPlayersStartUpBuiltMap() {
         return playersStartUpBuiltMap;
     }
 

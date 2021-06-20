@@ -541,7 +541,7 @@ public class GameService extends AbstractService {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                    UserOrDummyStartUpBuildMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                    UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                     StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                     if (built == NONE_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
                         boolean success = gameMap.placeFoundingSettlement(player, mapPoint);
@@ -605,8 +605,7 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
                     } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                        UserOrDummyStartUpBuildMap startUpBuiltMap = game
-                                .getPlayersStartUpBuiltMap();
+                        UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                         StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                         if (built == FIRST_SETTLEMENT_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
                             boolean success = gameMap.placeRoad(player, mapPoint);
@@ -1916,7 +1915,7 @@ public class GameService extends AbstractService {
             if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
                 onRollDiceRequest(new RollDiceRequest(npc, game.getLobby().getName()));
             else {
-                UserOrDummyStartUpBuildMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                 dummyTurnInFoundingPhase(game, npc);
                 startUpBuiltMap.nextPhase(npc);
             }
