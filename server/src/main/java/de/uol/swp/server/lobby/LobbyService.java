@@ -19,6 +19,7 @@ import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
@@ -408,7 +409,7 @@ public class LobbyService extends AbstractService {
             }
         });
         if (!filteredLobbies.isEmpty()) {
-            int i = (int) (Math.random() * filteredLobbies.size());
+            int i = Util.randomInt(filteredLobbies.size());
             ILobby randomLobby = filteredLobbies.get(i);
 
             randomLobby.joinUser(req.getUser());

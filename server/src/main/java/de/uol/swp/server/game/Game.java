@@ -1,7 +1,6 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.Colour;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -15,8 +14,10 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventor
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 
@@ -88,7 +89,7 @@ public class Game {
             playerList.remove(first);
             Player counterPlayer = Player.PLAYER_2;
             while (playerList.size() > 0) {
-                int randomNumber = (int) (Math.random() * playerList.size());
+                int randomNumber = Util.randomInt(playerList.size());
                 UserOrDummy randomUser = playerList.get(randomNumber);
                 victoryPointsOverTimeMap.put(randomUser, new HashMap<>());
                 victoryPointsOverTimeMap.get(randomUser).put(0, 0);
@@ -112,11 +113,9 @@ public class Game {
      * @return Array of two integers
      */
     public static int[] rollDice() {
-        int dice1 = (int) (Math.random() * 6 + 1);
-        int dice2 = (int) (Math.random() * 6 + 1);
-        dices[0] = dice1;
-        dices[1] = dice2;
-        return (new int[]{dice1, dice2});
+        dices[0] = Util.randomPositiveInt(7);
+        dices[1] = Util.randomPositiveInt(7);
+        return (dices);
     }
 
     /**
@@ -651,8 +650,8 @@ public class Game {
      *
      * @return A map containing users or dummies and their corresponding players
      *
-     * @since 2021-05-20
      * @author Aldin Dervisi
+     * @since 2021-05-20
      */
     public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
         return victoryPointsOverTimeMap;
