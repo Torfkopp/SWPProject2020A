@@ -16,14 +16,12 @@ public class UserOrDummyList extends ArrayList<UserOrDummy> {
     /**
      * Default constructor
      */
-    public UserOrDummyList() {super();}
+    public UserOrDummyList() { super(); }
 
     /**
      * Constructor with a Set
      *
      * @param users UserOrDummySet Object
      */
-    public UserOrDummyList(UserOrDummySet users) {
-        super(users);
-    }
+    public UserOrDummyList(UserOrDummySet users) { super(users); }
 }
