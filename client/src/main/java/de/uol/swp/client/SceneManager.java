@@ -1209,9 +1209,8 @@ public class SceneManager {
         LobbyName lobbyName = event.getLobbyName();
         String bundleString = ResourceManager.get("game.trade.window.receiving.title");
         String title = String.format(bundleString, event.getOfferingUser());
+        tradingStages.close(lobbyName);
         Platform.runLater(() -> {
-            //Hierhin oder übers runLater?
-            tradingStages.close(lobbyName);
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(title);
             tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
