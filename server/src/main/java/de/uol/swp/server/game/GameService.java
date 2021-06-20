@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.message.SystemMessageMessage;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
@@ -38,7 +37,9 @@ import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.user.*;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
@@ -700,7 +701,7 @@ public class GameService extends AbstractService {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
             Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
-            int randomNbr = (int) (Math.random() * users.size());
+            int randomNbr = Util.randomInt(users.size());
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
@@ -1810,7 +1811,7 @@ public class GameService extends AbstractService {
         if (victimInventory.get(LUMBER) > 0) victimsResource.add(LUMBER);
         if (victimInventory.get(ORE) > 0) victimsResource.add(ORE);
         if (victimInventory.get(WOOL) > 0) victimsResource.add(WOOL);
-        ResourceType stolenResource = victimsResource.get((int) (Math.random() * victimsResource.size()));
+        ResourceType stolenResource = victimsResource.get(Util.randomInt(victimsResource.size()));
         victimInventory.decrease(stolenResource);
         receiverInventory.increase(stolenResource);
 
