@@ -85,6 +85,7 @@ public class LobbyDTO implements ILobby {
      * @param startUpPhaseEnabled    The start up phase enabled
      * @param randomPlayFieldEnabled The random playfield enabled
      * @param maxTradeDiff           The maximum Resource difference
+     *
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
@@ -177,20 +178,6 @@ public class LobbyDTO implements ILobby {
     @Override
     public Map<Actor, Colour> getUserColourMap() {
         return userColours;
-    }
-
-    @Override
-    public void joinUser(Actor user) {
-        this.users.add(user);
-        //Give a new user a random colour (except Gold)
-        Colour colour = Colour.values()[(int) (Math.random() * (Colour.values().length - 1))];
-        while (userColours.containsValue(colour))
-            colour = Colour.values()[(int) (Math.random() * (Colour.values().length - 1))];
-        userColours.put(user, colour);
-        if (user instanceof Computer) {
-            if (user.getUsername().equals("Temmo")) userColours.put(user, Colour.TEMMO);
-            readyUsers.add(user);
-        }
     }
 
     @Override
@@ -301,6 +288,5 @@ public class LobbyDTO implements ILobby {
     @Override
     public void setMaxTradeDiff(int newTradeDiff) {
         this.maxTradeDiff = newTradeDiff;
-
     }
 }
