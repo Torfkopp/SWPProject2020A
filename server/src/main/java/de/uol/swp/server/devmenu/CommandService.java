@@ -12,18 +12,19 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.request.EditInventoryRequest;
-import de.uol.swp.common.game.request.EndTurnRequest;
-import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.request.ChangeOwnerRequest;
 import de.uol.swp.common.lobby.request.JoinLobbyRequest;
+import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.chat.CommandChatService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobby;
@@ -53,23 +54,27 @@ public class CommandService extends AbstractService {
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement;
     private final ILobbyManagement lobbyManagement;
+    private final CommandChatService commandChatService;
     private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
 
     /**
      * Constructor
      *
-     * @param eventBus        The {@link com.google.common.eventbus.EventBus} (injected)
-     * @param lobbyManagement The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
-     * @param userManagement  The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param eventBus           The {@link com.google.common.eventbus.EventBus} (injected)
+     * @param lobbyManagement    The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
+     * @param userManagement     The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param commandChatService The {@link de.uol.swp.server.chat.CommandChatService} (injected)
      *
      * @see de.uol.swp.server.lobby.ILobbyManagement
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     @Inject
-    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
+    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
+                          CommandChatService commandChatService) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.userManagement = userManagement;
+        this.commandChatService = commandChatService;
         getAllClasses();
         commandMap.put("devmenu", this::command_DevMenu);
         commandMap.put("forceendturn", this::command_ForceEndTurn);
@@ -81,6 +86,12 @@ public class CommandService extends AbstractService {
         commandMap.put("d", this::command_AddDummy);
         commandMap.put("addai", this::command_AddAI);
         commandMap.put("ai", this::command_AddAI);
+        commandMap.put("kick", this::command_Kick);
+        commandChatService.addGameCommand("/kick");
+        commandMap.put("changeowner", this::command_ChangeOwner);
+        commandChatService.addGameCommand("/changeowner");
+        commandMap.put("pause", this::command_pause);
+        commandChatService.addGameCommand("/pause");
         LOG.debug("CommandService started");
     }
 
@@ -214,6 +225,51 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Handles the /changeowner command
+     * <p>
+     * Usage: {@code /changeowner <player>}
+     * <p>
+     * Takes the given User and posts the fitting ChangeOwnerRequest onto the Eventbus.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_ChangeOwner(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /changeowner command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        Actor newOwner = getUserOrDummy(args.get(1));
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new ChangeOwnerRequest(lobbyName, user, newOwner));
+            }
+        }
+    }
+
+    /**
+     * Handles the /devmenu command
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /devmenu command");
+        OpenDevMenuResponse msg = new OpenDevMenuResponse();
+        msg.initWithMessage(originalMessage);
+        post(msg);
+    }
+
+    /**
      * Handles the /forceendturn command
      * <p>
      * Usage: {@code /forceendturn <player>}
@@ -282,6 +338,35 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Handles the /kick command
+     * <p>
+     * Usage: {@code /kick <player>}
+     * <p>
+     * Takes the given UserOrDummy and posts the fitting KickUserRequest onto the Eventbus.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_Kick(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /kick command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        UserOrDummy toBeKickedUser = getUserOrDummy(args.get(1));
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new KickUserRequest(lobbyName, user, toBeKickedUser));
+            }
+        }
+    }
+
+    /**
      * Handles the /post command
      * <p>
      * Usage: {@code /post <? extends Message> <*args>}
@@ -337,6 +422,34 @@ public class CommandService extends AbstractService {
         LOG.debug("Received /remove command");
         args.set(args.size() - 1, String.valueOf(Integer.parseInt(args.get(args.size() - 1)) * -1));
         command_Give(args, originalMessage);
+    }
+
+    /**
+     * Handles the /pause command
+     * <p>
+     * Usage: {@code /pause}
+     * <p>
+     * Posts a PauseGameRequest onto the Eventbus, coming from the player who used the command.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_pause(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /pause command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new PauseGameRequest(lobbyName, user));
+            }
+        }
     }
 
     /**

@@ -52,10 +52,6 @@ import java.util.function.UnaryOperator;
 public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends AbstractPresenterWithChatWithGame {
 
     @FXML
-    protected Button kickUserButton;
-    @FXML
-    protected Button changeOwnerButton;
-    @FXML
     protected Label moveTimeLabel;
     @FXML
     protected TextField moveTimeTextField;
@@ -207,39 +203,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void setAllowedPlayers(int allowedPlayers) {
         threePlayerRadioButton.setSelected(allowedPlayers == 3);
         fourPlayerRadioButton.setSelected(allowedPlayers == 4);
-    }
-
-    /**
-     * Helper function that sets the visibility and state of the changeOwnerButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @since 2021-04-13
-     */
-    protected void setChangeOwnerButtonState() {
-        Platform.runLater(() -> {
-            changeOwnerButton.setVisible(userService.getLoggedInUser().equals(owner));
-            changeOwnerButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
-    }
-
-    /**
-     * Helper function that sets the visibility and state of the kickUserButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @since 2021-03-03
-     */
-    protected void setKickUserButtonState() {
-        Platform.runLater(() -> {
-            kickUserButton.setVisible(userService.getLoggedInUser().equals(owner));
-            kickUserButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
     }
 
     /**
@@ -481,7 +444,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
             turnIndicator.setVisible(false);
-            pauseButton.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
             helpCheckBox.setDisable(true);
@@ -564,8 +526,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             readyCheckBox.setSelected(false);
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
-            kickUserButton.setVisible(true);
-            changeOwnerButton.setVisible(true);
         });
     }
 
@@ -616,7 +576,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
-            kickUserButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -706,7 +665,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
-        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);

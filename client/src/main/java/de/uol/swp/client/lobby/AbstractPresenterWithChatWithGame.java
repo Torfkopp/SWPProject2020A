@@ -125,8 +125,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label currentRound;
     @FXML
     protected Button helpCheckBox;
-    @FXML
-    protected Button pauseButton;
 
     protected ObservableList<Actor> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
@@ -965,7 +963,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         gamePaused = msg.isPaused();
         if (gamePaused) {
-            Platform.runLater(() -> pauseButton.setText(ResourceManager.get("game.menu.unpause")));
             timerPaused = true;
             tradeService.closeBankTradeWindow(lobbyName);
             tradeService.closeTradeResponseWindow(lobbyName);
@@ -973,7 +970,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             rollDice.setDisable(true);
         } else {
-            Platform.runLater(() -> pauseButton.setText(ResourceManager.get("game.menu.pause")));
             timerPaused = false;
             if (userService.getLoggedInUser().equals(msg.getActivePlayer()) && !robberNewPosition && statusChange) {
                 if (diceRolled) resetButtonStates(userService.getLoggedInUser());
