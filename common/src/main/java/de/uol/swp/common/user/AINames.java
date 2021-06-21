@@ -1,5 +1,7 @@
 package de.uol.swp.common.user;
 
+import de.uol.swp.common.util.Util;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,13 +88,13 @@ public class AINames implements Serializable {
         String name = "Man X";
         switch (difficulty) {
             case EASY:
-                name = aiTalking ? aiNameEasy.get((int) (Math.random() * aiNameEasy.size())) :
-                       aiNameEasyNoTalk.get((int) (Math.random() * aiNameEasyNoTalk.size()));
+                name = aiTalking ? aiNameEasy.get(Util.randomInt(aiNameEasy.size())) :
+                       aiNameEasyNoTalk.get(Util.randomInt(aiNameEasyNoTalk.size()));
                 break;
             case HARD:
-                name = aiTalking ? aiNameHard.get((int) (Math.random() * aiNameHard.size())) :
-                       aiNameHardNoTalk.get((int) (Math.random() * aiNameHardNoTalk.size()));
-                if ((int) (Math.random() * 10000) <= 1) name = "Temmo";
+                name = aiTalking ? aiNameHard.get(Util.randomInt(aiNameHard.size())) :
+                       aiNameHardNoTalk.get(Util.randomInt(aiNameHardNoTalk.size()));
+                if (Util.randomPositiveInt(10001) == 1) name = "Temmo";
                 break;
         }
         return name;
@@ -488,7 +490,7 @@ public class AINames implements Serializable {
                         }
                         break;
                     case TAX:
-                        if ((int) (Math.random() * 100) < 60) break;
+                        if (Util.randomInt(100) < 60) break;
                         switch (language) {
                             case BRITISH:
                                 msg = "I pay what I must";
@@ -590,7 +592,7 @@ public class AINames implements Serializable {
                         }
                         break;
                     case MOVE_ROBBER:
-                        if ((int) (Math.random() * 100) < 60) break;
+                        if (Util.randomInt(100) < 60) break;
                         switch (language) {
                             case BRITISH:
                                 msg = "Those who can't use their head must use their legs.";
@@ -958,7 +960,7 @@ public class AINames implements Serializable {
                         }
                         break;
                     case TAX:
-                        if ((int) (Math.random() * 100) < 60) break;
+                        if (Util.randomInt(100) < 60) break;
                         switch (language) {
                             case BRITISH:
                                 msg = "Why do I have to pay someone?";
@@ -1072,7 +1074,7 @@ public class AINames implements Serializable {
                         }
                         break;
                     case MOVE_ROBBER:
-                        if ((int) (Math.random() * 100) < 60) break;
+                        if (Util.randomInt(100) < 60) break;
                         switch (language) {
                             case BRITISH:
                                 msg = "Move that peasant away";

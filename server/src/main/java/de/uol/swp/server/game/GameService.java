@@ -39,6 +39,7 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.*;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
@@ -699,7 +700,7 @@ public class GameService extends AbstractService {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
             UserOrDummySet users = msg.getLobby().getUserOrDummies();
-            int randomNbr = (int) (Math.random() * users.size());
+            int randomNbr = Util.randomInt(users.size());
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
@@ -1809,7 +1810,7 @@ public class GameService extends AbstractService {
         if (victimInventory.get(LUMBER) > 0) victimsResource.add(LUMBER);
         if (victimInventory.get(ORE) > 0) victimsResource.add(ORE);
         if (victimInventory.get(WOOL) > 0) victimsResource.add(WOOL);
-        ResourceType stolenResource = victimsResource.get((int) (Math.random() * victimsResource.size()));
+        ResourceType stolenResource = victimsResource.get(Util.randomInt(victimsResource.size()));
         victimInventory.decrease(stolenResource);
         receiverInventory.increase(stolenResource);
 
