@@ -21,7 +21,7 @@ public class LobbySceneMapTest {
         map.put(name, scene);
         assertFalse(map.isEmpty());
         assertTrue(map.containsKey(name));
-        assertEquals(map.get(name), scene);
+        assertEquals(scene, map.get(name));
         List<LobbyName> list = new ArrayList<>();
         list.add(name);
         list.add(name2);

@@ -18,6 +18,6 @@ public class UserOrDummyIntegerMapTest {
         map.put(user, number);
         assertTrue(map.containsKey(user));
         assertTrue(map.containsValue(number));
-        assertEquals(map.get(user), number);
+        assertEquals(number, map.get(user));
     }
 }

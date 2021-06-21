@@ -18,6 +18,6 @@ public class UserOrDummyBooleanMapTest {
         map.put(user, bool);
         assertTrue(map.containsKey(user));
         assertTrue(map.containsValue(bool));
-        assertEquals(map.get(user), bool);
+        assertEquals(bool, map.get(user));
     }
 }

@@ -15,7 +15,7 @@ public class LobbyStringPairTest {
                                              0);
         String s = "Test";
         LobbyStringPair pair = new LobbyStringPair(lobby, s);
-        assertEquals(pair.getKey(), lobby);
-        assertEquals(pair.getValue(), s);
+        assertEquals(lobby, pair.getKey());
+        assertEquals(s, pair.getValue());
     }
 }

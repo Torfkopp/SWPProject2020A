@@ -18,11 +18,11 @@ public class UserOrDummyStartUpBuiltMapTest {
         map.put(user);
         assertTrue(map.containsKey(user));
         assertTrue(map.containsValue(StartUpPhaseBuiltStructures.NONE_BUILT));
-        assertEquals(map.get(user), StartUpPhaseBuiltStructures.NONE_BUILT);
+        assertEquals(StartUpPhaseBuiltStructures.NONE_BUILT, map.get(user));
         map.nextPhase(user);
-        assertEquals(map.get(user), StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT);
+        assertEquals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT, map.get(user));
         map.nextPhase(user);
-        assertEquals(map.get(user), StartUpPhaseBuiltStructures.ALL_BUILT);
+        assertEquals(StartUpPhaseBuiltStructures.ALL_BUILT, map.get(user));
         assertTrue(map.finished(user));
     }
 }

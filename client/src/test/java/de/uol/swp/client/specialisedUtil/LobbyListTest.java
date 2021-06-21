@@ -13,7 +13,7 @@ public class LobbyListTest {
         assertTrue(list.get().isEmpty());
         list.add(pair);
         assertFalse(list.get().isEmpty());
-        assertEquals(list.get().get(0), pair);
+        assertEquals(pair, list.get().get(0));
         list.clear();
         assertTrue(list.get().isEmpty());
     }

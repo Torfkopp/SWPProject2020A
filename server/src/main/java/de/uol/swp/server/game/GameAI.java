@@ -148,7 +148,7 @@ public class GameAI {
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
-        List<Player> player = new ArrayList<>(map.getPlayersAroundHex(mapPoint));
+        List<Player> player = map.getPlayersAroundHex(mapPoint);
         if (player.size() > 0) {
             Player victim = player.get(0);
             switch (difficulty) {
@@ -1052,7 +1052,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
         if (!harbours.containsKey(ai)) return;
         ResourceType tradeGive = null;
-        ResourceType tradeGet = null;
+        ResourceType tradeGet;
         //Check if any resource amount is relatively high
         for (ResourceType res : ResourceType.values())
             if (1.0 * inv.get(res) / inv.getResourceAmount() > 0.6) {

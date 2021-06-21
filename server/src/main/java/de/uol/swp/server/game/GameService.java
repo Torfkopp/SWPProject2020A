@@ -1437,16 +1437,16 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
-        Set<Player> players = map.getPlayersAroundHex(msg.getPosition());
-        UserOrDummySet victims = new UserOrDummySet();
+        Set<Player> players = new HashSet<>(map.getPlayersAroundHex(msg.getPosition()));
+        UserOrDummyList victims = new UserOrDummyList();
         for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
-            ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), new UserOrDummyList(victims));
+            ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
             rcvm.initWithMessage(msg);
             post(rcvm);
         } else if (players.size() == 1) {
-            robRandomResource(gameManagement.getGame(msg.getLobby()), msg.getPlayer(), new ArrayList<>(victims).get(0));
+            robRandomResource(gameManagement.getGame(msg.getLobby()), msg.getPlayer(), victims.get(0));
         }
     }
 
@@ -1840,7 +1840,7 @@ public class GameService extends AbstractService {
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
         lobbyService.sendToAllInLobby(lobby, msg);
         LOG.debug("{} moves the robber to position: {}|{}", dummy, 3, 3);
-        Set<Player> players = map.getPlayersAroundHex(mapPoint);
+        List<Player> players = map.getPlayersAroundHex(mapPoint);
         if (players.size() > 0) robRandomResource(game, dummy, game.getUserFromPlayer((Player) players.toArray()[0]));
     }
 

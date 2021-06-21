@@ -3,6 +3,7 @@ package de.uol.swp.common.specialisedUtil;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Util;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,6 +42,6 @@ public class UserOrDummyColourMap extends LinkedHashMap<UserOrDummy, Colour> {
      * @param user The UserOrDummy to be put into the map
      */
     public void put(UserOrDummy user) {
-        super.put(user, Colour.values()[(int) (Math.random() * (Colour.values().length - 1))]);
+        super.put(user, Util.randomColour());
     }
 }

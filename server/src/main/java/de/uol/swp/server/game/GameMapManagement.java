@@ -325,8 +325,8 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public Set<Player> getPlayersAroundHex(MapPoint mapPoint) {
-        Set<Player> players = new HashSet<>();
+    public List<Player> getPlayersAroundHex(MapPoint mapPoint) {
+        List<Player> players = new ArrayList<>();
         for (IIntersection i : getIntersectionsFromHex(mapPoint)) if (i.getOwner() != null) players.add(i.getOwner());
         return players;
     }

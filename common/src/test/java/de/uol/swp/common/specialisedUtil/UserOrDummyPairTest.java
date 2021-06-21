@@ -15,7 +15,7 @@ public class UserOrDummyPairTest {
         UserOrDummy user2 = new AIDTO(AI.Difficulty.EASY);
         UserOrDummyPair pair = new UserOrDummyPair(user, user2);
 
-        assertEquals(pair.getUser1(), user);
-        assertEquals(pair.getUser2(), user2);
+        assertEquals(user, pair.getUser1());
+        assertEquals(user2, pair.getUser2());
     }
 }

@@ -26,18 +26,18 @@ public class AIHarbourMapTest {
         list.add(LUMBER);
         list.add(GRAIN);
         map.put(ai, list);
-        assertEquals(map.tradeGet(ai, 0), ResourceType.LUMBER);
-        assertEquals(map.tradeGet(ai, 15), ResourceType.GRAIN);
+        assertEquals( ResourceType.LUMBER,map.tradeGet(ai, 0));
+        assertEquals(ResourceType.GRAIN,map.tradeGet(ai, 15));
         list.add(BRICK);
         list.remove(LUMBER);
         list.add(ORE);
         map.put(ai, list);
-        assertEquals(map.tradeGet(ai, 0), ResourceType.BRICK);
-        assertEquals(map.tradeGet(ai, 15), ResourceType.ORE);
+        assertEquals(ResourceType.BRICK,map.tradeGet(ai, 0) );
+        assertEquals( ResourceType.ORE,map.tradeGet(ai, 15));
         list.clear();
         list.add(WOOL);
         map.put(ai, list);
-        assertEquals(map.tradeGet(ai, 0), ResourceType.WOOL);
-        assertEquals(map.tradeGet(ai, 15), ResourceType.WOOL);
+        assertEquals(ResourceType.WOOL,map.tradeGet(ai, 0));
+        assertEquals(ResourceType.WOOL,map.tradeGet(ai, 15));
     }
 }
