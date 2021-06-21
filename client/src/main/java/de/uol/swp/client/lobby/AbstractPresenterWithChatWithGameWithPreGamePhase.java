@@ -449,11 +449,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 returnToLobby.setPrefWidth(250);
             }
             gameMapDescription.clear();
+            gameRendering.redraw();
             gameMapDescription.setCenterText(
                     winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
                     ResourceManager.get("game.won.info", winner));
+            fitCanvasToSize();
         });
-        fitCanvasToSize();
         soundService.victory();
     }
 
