@@ -83,7 +83,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     /**
      * Initialises the Presenter by setting up the membersView, the
-     * inventory view, the kickUserButton and the tradeWithUserButton.
+     * inventory view and the tradeWithUserButton.
      *
      * @implNote Called automatically by JavaFX
      * @author Temmo Junkhoff
@@ -132,8 +132,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         Platform.runLater(() -> {
             if (!inGame) {
                 setStartSessionButtonState();
-                setKickUserButtonState();
-                setChangeOwnerButtonState();
             }
             setPreGameSettings();
         });
@@ -172,14 +170,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Additionally, this method sets the accelerators for the LobbyPresenter, namely
      * <ul>
      *     <li> CTRL/META + S = Start Session button
-     *     <li> CTRL/META + K = Kick User button
+     *     <li> CTRL/META + K = Kick User Function
      *     <li> CTRL/META + E = End Turn button
      *     <li> CTRL/META + R = Roll Dice button
      *     <li> CTRL/META + T = Make Offer to User button
      *     <li> CTRL/META + B = Trade with Bank button
      *     <li> CTRL/META + C = Play a Card button
      *     <li> CTRL/META + H = Return to Lobby button
-     *     <li> CTRL/META + P = Pause button
+     *     <li> CTRL/META + P = Pause Function
      *     <li> F1            = Toggle help action list
      *     <li> F2            = Open Rules menu
      *
@@ -245,8 +243,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
         Platform.runLater(() -> {
-            kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
-            changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
             tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
             moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
@@ -327,8 +323,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             owner = msg.getLobby().getOwner();
             prepareMembersView();
             setStartSessionButtonState();
-            setKickUserButtonState();
-            setChangeOwnerButtonState();
             setPreGameSettings();
         }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
@@ -477,22 +471,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {
-                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
-                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
                 return;
             }
             String name = newValue.getUsername();
             boolean isSelf = newValue.equals(userService.getLoggedInUser());
-            kickUserButton.setDisable(isSelf);
-            changeOwnerButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf || !tradingCurrentlyAllowed);
             if (isSelf) {
-                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
-                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
                 tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
             } else {
-                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", name));
-                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", name));
                 tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade", name));
             }
         });
