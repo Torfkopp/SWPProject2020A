@@ -112,7 +112,7 @@ public class CommandService extends AbstractService {
      * @author Phillip-André Suhr
      * @since 2021-03-30
      */
-    private Actor actor(String name) {
+    private Actor getActor(String name) {
         Optional<User> userOptional = userManagement.getUser(name);
         if (userOptional.isPresent()) {
             return userOptional.get();
@@ -242,7 +242,7 @@ public class CommandService extends AbstractService {
     private void command_ChangeOwner(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /changeowner command");
         if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
-        Actor newOwner = getUserOrDummy(args.get(1));
+        Actor newOwner = getActor(args.get(1));
         User user = (User) originalMessage.getAuthor();
         if (originalMessage.isFromLobby()) {
             LobbyName lobbyName = originalMessage.getOriginLobby();
@@ -251,22 +251,6 @@ public class CommandService extends AbstractService {
                 post(new ChangeOwnerRequest(lobbyName, user, newOwner));
             }
         }
-    }
-
-    /**
-     * Handles the /devmenu command
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /devmenu command");
-        OpenDevMenuResponse msg = new OpenDevMenuResponse();
-        msg.initWithMessage(originalMessage);
-        post(msg);
     }
 
     /**
@@ -298,7 +282,7 @@ public class CommandService extends AbstractService {
                                  Optional.of(originalMessage.getAuthor()));
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
-            Actor user = actor(args.get(0));
+            Actor user = getActor(args.get(0));
             post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
@@ -355,7 +339,7 @@ public class CommandService extends AbstractService {
     private void command_Kick(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /kick command");
         if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
-        UserOrDummy toBeKickedUser = getUserOrDummy(args.get(1));
+        Actor toBeKickedUser = getActor(args.get(1));
         User user = (User) originalMessage.getAuthor();
         if (originalMessage.isFromLobby()) {
             LobbyName lobbyName = originalMessage.getOriginLobby();
@@ -492,7 +476,7 @@ public class CommandService extends AbstractService {
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
         if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
-        Actor user = actor(args.get(1));
+        Actor user = getActor(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
         ResourceType resource = null;
