@@ -505,6 +505,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(190);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
+            displayVictoryPointChartButton.setVisible(false);
+            gameMapDescription.setCenterText("");
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
         });
