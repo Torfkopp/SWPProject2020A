@@ -96,38 +96,6 @@ public class CommandService extends AbstractService {
     }
 
     /**
-     * Helper method used to find an Actor, depending on the input
-     * String
-     * <p>
-     * This method looks up the provided name in the UserManagement and returns the
-     * found User, if one exists. If no matching user is found and the name happens
-     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
-     * instead.
-     * If neither case happens, the returned value will be null.
-     *
-     * @param name The name of the actor to look up
-     *
-     * @return Actor object representing the found result (null if nothing found)
-     *
-     * @author Phillip-André Suhr
-     * @since 2021-03-30
-     */
-    private Actor getActor(String name) {
-        Optional<User> userOptional = userManagement.getUser(name);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        } else {
-            if (name.matches("^Dummy\\d+")) {
-                StringBuilder x = new StringBuilder();
-                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
-                return new DummyDTO(Integer.parseInt(x.toString()));
-            }
-            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
-            return null;
-        }
-    }
-
-    /**
      * Handles the /addai command
      * <p>
      * Usage: {@code /addai}
@@ -171,22 +139,6 @@ public class CommandService extends AbstractService {
         } else {
             command_Invalid(args, originalMessage);
         }
-    }
-
-    /**
-     * Handles the /devmenu command
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /devmenu command");
-        OpenDevMenuResponse msg = new OpenDevMenuResponse();
-        msg.initWithMessage(originalMessage);
-        post(msg);
     }
 
     /**
@@ -254,6 +206,22 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Handles the /devmenu command
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /devmenu command");
+        OpenDevMenuResponse msg = new OpenDevMenuResponse();
+        msg.initWithMessage(originalMessage);
+        post(msg);
+    }
+
+    /**
      * Handles the /forceendturn command
      * <p>
      * Usage: {@code /forceendturn <player>}
@@ -285,6 +253,78 @@ public class CommandService extends AbstractService {
             Actor user = getActor(args.get(0));
             post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
+    }
+
+    /**
+     * Handles the /give command
+     * <p>
+     * Usage: {@code /give [lobby] <player> <resource> <amount>}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /give command");
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
+        Actor user = getActor(args.get(1));
+        if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
+        LobbyName lobbyName = new LobbyName(args.get(0));
+        ResourceType resource = null;
+        DevelopmentCardType developmentCard = null;
+        boolean giveAllCards = false;
+        switch (args.get(2).toLowerCase()) {
+            case "bricks":
+            case "brick":
+                resource = ResourceType.BRICK;
+                break;
+            case "grains":
+            case "grain":
+                resource = ResourceType.GRAIN;
+                break;
+            case "ore":
+                resource = ResourceType.ORE;
+                break;
+            case "lumber":
+                resource = ResourceType.LUMBER;
+                break;
+            case "wool":
+                resource = ResourceType.WOOL;
+                break;
+            case "knightcard":
+            case "kc":
+                developmentCard = DevelopmentCardType.KNIGHT_CARD;
+                break;
+            case "knight":
+            case "knights":
+                break;
+            case "monopolycard":
+            case "mc":
+                developmentCard = DevelopmentCardType.MONOPOLY_CARD;
+                break;
+            case "roadbuildingcard":
+            case "rbc":
+                developmentCard = DevelopmentCardType.ROAD_BUILDING_CARD;
+                break;
+            case "victorypointcard":
+            case "vpc":
+                developmentCard = DevelopmentCardType.VICTORY_POINT_CARD;
+                break;
+            case "yearofplentycard":
+            case "yearofplenty":
+            case "yopc":
+                developmentCard = DevelopmentCardType.YEAR_OF_PLENTY_CARD;
+                break;
+            case "everything":
+            case "all":
+                giveAllCards = true;
+                break;
+        }
+        Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,
+                                               Integer.parseInt(args.get(3)), giveAllCards);
+        post(msg);
     }
 
     /**
@@ -437,6 +477,38 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Helper method used to find an Actor, depending on the input
+     * String
+     * <p>
+     * This method looks up the provided name in the UserManagement and returns the
+     * found User, if one exists. If no matching user is found and the name happens
+     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
+     * instead.
+     * If neither case happens, the returned value will be null.
+     *
+     * @param name The name of the actor to look up
+     *
+     * @return Actor object representing the found result (null if nothing found)
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private Actor getActor(String name) {
+        Optional<User> userOptional = userManagement.getUser(name);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            if (name.matches("^Dummy\\d+")) {
+                StringBuilder x = new StringBuilder();
+                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
+                return new DummyDTO(Integer.parseInt(x.toString()));
+            }
+            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
+            return null;
+        }
+    }
+
+    /**
      * Helper method that filters through all classes in the project modules
      * and returns a list that contains only classes the Developer Menu is
      * allowed to request an instantiation and posting of.
@@ -460,78 +532,6 @@ public class CommandService extends AbstractService {
                   .filter(cls -> !AbstractServerInternalMessage.class.isAssignableFrom(cls)) // No server-only Messages
                   .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException ignored) {}
-    }
-
-    /**
-     * Handles the /give command
-     * <p>
-     * Usage: {@code /give [lobby] <player> <resource> <amount>}
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /give command");
-        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
-        Actor user = getActor(args.get(1));
-        if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
-        LobbyName lobbyName = new LobbyName(args.get(0));
-        ResourceType resource = null;
-        DevelopmentCardType developmentCard = null;
-        boolean giveAllCards = false;
-        switch (args.get(2).toLowerCase()) {
-            case "bricks":
-            case "brick":
-                resource = ResourceType.BRICK;
-                break;
-            case "grains":
-            case "grain":
-                resource = ResourceType.GRAIN;
-                break;
-            case "ore":
-                resource = ResourceType.ORE;
-                break;
-            case "lumber":
-                resource = ResourceType.LUMBER;
-                break;
-            case "wool":
-                resource = ResourceType.WOOL;
-                break;
-            case "knightcard":
-            case "kc":
-                developmentCard = DevelopmentCardType.KNIGHT_CARD;
-                break;
-            case "knight":
-            case "knights":
-                break;
-            case "monopolycard":
-            case "mc":
-                developmentCard = DevelopmentCardType.MONOPOLY_CARD;
-                break;
-            case "roadbuildingcard":
-            case "rbc":
-                developmentCard = DevelopmentCardType.ROAD_BUILDING_CARD;
-                break;
-            case "victorypointcard":
-            case "vpc":
-                developmentCard = DevelopmentCardType.VICTORY_POINT_CARD;
-                break;
-            case "yearofplentycard":
-            case "yearofplenty":
-            case "yopc":
-                developmentCard = DevelopmentCardType.YEAR_OF_PLENTY_CARD;
-                break;
-            case "everything":
-            case "all":
-                giveAllCards = true;
-                break;
-        }
-        Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,
-                                               Integer.parseInt(args.get(3)), giveAllCards);
-        post(msg);
     }
 
     /**
