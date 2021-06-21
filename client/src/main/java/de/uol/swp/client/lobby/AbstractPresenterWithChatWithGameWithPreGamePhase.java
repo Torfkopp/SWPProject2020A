@@ -441,14 +441,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             roundCounter = 0;
             this.elapsedTimer.stop();
             displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setDisable(false);
             displayVictoryPointChartButton.setPrefHeight(30);
             displayVictoryPointChartButton.setPrefWidth(230);
             if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
+                returnToLobby.setDisable(false);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
             }
-            gameMapDescription.clear();
             gameRendering.redraw();
             gameMapDescription.setCenterText(
                     winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
@@ -494,6 +495,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             returnToLobby.setVisible(false);
+            returnToLobby.setDisable(true);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
             window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -507,7 +509,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
             displayVictoryPointChartButton.setVisible(false);
+            displayVictoryPointChartButton.setDisable(true);
+            displayVictoryPointChartButton.setPrefHeight(0);
+            displayVictoryPointChartButton.setPrefWidth(0);
             gameMapDescription.setCenterText("");
+            gameMapDescription.clear();
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
         });

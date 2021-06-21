@@ -408,6 +408,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onReturnToLobbyButtonPressed() {
+        if (returnToLobby.isDisabled()) {
+            LOG.trace("onReturnToLobbyButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
