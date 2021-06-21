@@ -4,9 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import de.uol.swp.server.chat.ChatManagement;
-import de.uol.swp.server.chat.ChatService;
-import de.uol.swp.server.chat.IChatManagement;
+import de.uol.swp.server.chat.*;
 import de.uol.swp.server.chat.store.IChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.game.GameManagement;
@@ -106,6 +104,7 @@ public class ServerModule extends AbstractModule {
         bind(IUserManagement.class).to(UserManagement.class).in(Scopes.SINGLETON);
         bind(AuthenticationService.class).in(Scopes.SINGLETON);
         bind(ChatService.class).in(Scopes.SINGLETON);
+        bind(CommandChatService.class).in(Scopes.SINGLETON);
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(SessionService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);

@@ -10,7 +10,6 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -39,26 +38,30 @@ public class ChatService extends AbstractService {
 
     private final IChatManagement chatManagement;
     private final ILobbyManagement lobbyManagement;
+    private final CommandChatService commandChatService;
     private final LobbyService lobbyService;
     private final boolean commandsAllowed;
 
     /**
      * Constructor
      *
-     * @param bus             The EventBus used throughout the entire server (injected)
-     * @param chatManagement  The ChatManagement to use (injected)
-     * @param lobbyManagement The LobbyManagement to use (injected)
-     * @param lobbyService    The LobbyService to use (injected)
-     * @param commandsAllowed Boolean whether commands are allowed.
+     * @param bus                The EventBus used throughout the entire server (injected)
+     * @param chatManagement     The ChatManagement to use (injected)
+     * @param lobbyManagement    The LobbyManagement to use (injected)
+     * @param commandChatService The commandChatService to use (injected)
+     * @param lobbyService       The LobbyService to use (injected)
+     * @param commandsAllowed    Boolean whether Commands are allowed.
      *
      * @since 2020-12-30
      */
     @Inject
     public ChatService(EventBus bus, IChatManagement chatManagement, ILobbyManagement lobbyManagement,
-                       LobbyService lobbyService, @Named("commandsAllowed") boolean commandsAllowed) {
+                       CommandChatService commandChatService, LobbyService lobbyService,
+                       @Named("commandsAllowed") boolean commandsAllowed) {
         super(bus);
         this.chatManagement = chatManagement;
         this.lobbyManagement = lobbyManagement;
+        this.commandChatService = commandChatService;
         this.lobbyService = lobbyService;
         this.commandsAllowed = commandsAllowed;
         LOG.debug("ChatService started");
@@ -230,11 +233,9 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
-        if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
+        if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandChatService
             if (!commandsAllowed) {
-                ExceptionMessage msg = new ExceptionMessage("This server doesn't allow the use of commands!");
-                msg.initWithMessage(req);
-                post(msg);
+                commandChatService.newGameOrDevCommand(req);
                 return;
             }
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));

@@ -52,10 +52,6 @@ import java.util.function.UnaryOperator;
 public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends AbstractPresenterWithChatWithGame {
 
     @FXML
-    protected Button kickUserButton;
-    @FXML
-    protected Button changeOwnerButton;
-    @FXML
     protected Label moveTimeLabel;
     @FXML
     protected TextField moveTimeTextField;
@@ -210,39 +206,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the visibility and state of the changeOwnerButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @since 2021-04-13
-     */
-    protected void setChangeOwnerButtonState() {
-        Platform.runLater(() -> {
-            changeOwnerButton.setVisible(userService.getLoggedInUser().equals(owner));
-            changeOwnerButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
-    }
-
-    /**
-     * Helper function that sets the visibility and state of the kickUserButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @since 2021-03-03
-     */
-    protected void setKickUserButtonState() {
-        Platform.runLater(() -> {
-            kickUserButton.setVisible(userService.getLoggedInUser().equals(owner));
-            kickUserButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
-    }
-
-    /**
      * Helper method that sets the visibility and state of buttons and checkboxes for the
      * pre-game settings. The pre-game settings are disabled for everyone, except the
      * owner of the lobby.
@@ -360,25 +323,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Method called when the ChangeOwnerButtonPressed is pressed
-     * <p>
-     * If the ChangeOwnerButton is pressed, this method requests to change
-     * the owner status to the selected User of the members view.
-     *
-     * @author Maximilian Lindner
-     * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
-     * @since 2021-04-13
-     */
-    @FXML
-    private void onChangeOwnerButtonPressed() {
-        soundService.button();
-        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (selectedUser == userService.getLoggedInUser()) return;
-        lobbyService.changeOwner(lobbyName, selectedUser);
-    }
-
-    /**
      * Handles a click on the ColourChangeButton
      * <p>
      * Method called when the ColourChangeButton is pressed.
@@ -481,7 +425,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
             turnIndicator.setVisible(false);
-            pauseButton.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
             helpCheckBox.setDisable(true);
@@ -564,8 +507,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             readyCheckBox.setSelected(false);
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
-            kickUserButton.setVisible(true);
-            changeOwnerButton.setVisible(true);
         });
     }
 
@@ -616,7 +557,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
-            kickUserButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -706,7 +646,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
-        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
