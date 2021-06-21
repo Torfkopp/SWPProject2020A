@@ -9,6 +9,7 @@ import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.user.Actor;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 
 import java.util.*;
@@ -334,8 +335,8 @@ public class GameMapManagement implements IGameMapManagement {
         int randomYCoordinate = 0;
         int randomXCoordinate = 0;
         while (true) {
-            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
-            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
+            randomYCoordinate = Util.randomInt(intersectionMap.length);
+            randomXCoordinate = Util.randomInt(intersectionMap[randomYCoordinate].length);
             if (settlementPlaceableInFoundingPhase(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
                                                                                              randomXCoordinate))) {
                 return MapPoint.IntersectionMapPoint(randomYCoordinate, randomXCoordinate);

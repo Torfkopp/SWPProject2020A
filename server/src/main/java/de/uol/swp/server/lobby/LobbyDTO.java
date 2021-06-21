@@ -5,6 +5,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.Computer;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.util.Util;
 
 import java.util.*;
 
@@ -55,7 +56,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
-        userColours.put(creator, Colour.values()[(int) (Math.random() * (Colour.values().length - 1))]);
+        userColours.put(creator, Util.randomColour());
         this.maxTradeDiff = 2;
     }
 
@@ -225,6 +226,19 @@ public class LobbyDTO implements ILobby {
     @Override
     public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
         this.startUpPhaseEnabled = startUpPhaseEnabled;
+    }
+
+    @Override
+    public void joinUser(Actor user) {
+        this.users.add(user);
+        //Give a new user a random colour (except Gold)
+        Colour colour = Util.randomColour();
+        while (userColours.containsValue(colour)) colour = Util.randomColour();
+        userColours.put(user, colour);
+        if (user instanceof Computer) {
+            if (user.getUsername().equals("Temmo")) userColours.put(user, Colour.TEMMO);
+            readyUsers.add(user);
+        }
     }
 
     @Override
