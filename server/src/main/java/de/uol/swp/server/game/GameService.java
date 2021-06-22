@@ -907,7 +907,7 @@ public class GameService extends AbstractService {
         post(returnMessage);
         LOG.debug("Received SystemMessageForTradeMessage");
         ServerMessage serverMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                makeSingularI18nWrapper(req.getUser(), null, offeredResourcesWrapperMap,
+                makeSingularI18nWrapper(req.getUser(), "Bank", offeredResourcesWrapperMap,
                                         respondingResourcesWrapperMap)));
         LOG.debug("Sending TradeWithBankAcceptedResponse to Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
@@ -1131,7 +1131,7 @@ public class GameService extends AbstractService {
         robberMovementPlayer(req, req.getUser());
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.play.card.knightcard", req.getUser())));
+                new I18nWrapper("game.play.card.knight", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1188,7 +1188,7 @@ public class GameService extends AbstractService {
         invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.monopoly", req.getUser())));
+                new I18nWrapper("game.play.card.monopoly", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
@@ -1276,7 +1276,7 @@ public class GameService extends AbstractService {
         game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
         inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.roadbuilding", req.getUser())));
+                new I18nWrapper("game.play.card.roadbuilding", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1330,7 +1330,7 @@ public class GameService extends AbstractService {
         inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.yearofplenty", req.getUser())));
+                new I18nWrapper("game.play.card.yearofplenty", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 

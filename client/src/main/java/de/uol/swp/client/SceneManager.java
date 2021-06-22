@@ -180,7 +180,7 @@ public class SceneManager {
      * @since 2021-05-22
      */
     public void showChangePropertiesScreen() {
-        showScene(changePropertiesScene, ResourceManager.get("changeproperties.window.title"),
+        showScene(changePropertiesScene, ResourceManager.get("changesettings.window.title"),
                   ChangeSettingsPresenter.MIN_WIDTH, ChangeSettingsPresenter.MIN_HEIGHT);
     }
 
