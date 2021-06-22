@@ -2,7 +2,7 @@ package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.Edge;
-import de.uol.swp.common.specialisedUtil.UserOrDummyList;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -13,7 +13,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
 
-    private final UserOrDummyList buildable;
+    private final UserOrDummySet buildable;
 
     /**
      * Instantiates a new Edge.
@@ -25,7 +25,7 @@ public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    public EdgeWithBuildable(Orientation orientation, Player owner, UserOrDummyList buildable) {
+    public EdgeWithBuildable(Orientation orientation, Player owner, UserOrDummySet buildable) {
         super(orientation, owner);
         this.buildable = buildable;
     }

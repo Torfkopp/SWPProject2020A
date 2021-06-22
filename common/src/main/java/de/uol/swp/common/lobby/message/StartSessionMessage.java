@@ -3,8 +3,8 @@ package de.uol.swp.common.lobby.message;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummyList;
 import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
+import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -22,7 +22,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
     private final UserOrDummyColourMap userOrDummyColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
-    private final UserOrDummyList playerList;
+    private final UserOrDummySet playerList;
 
     /**
      * Constructor
@@ -37,7 +37,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
                                boolean startUpPhaseEnabled, UserOrDummyPlayerMap userOrDummyPlayerMap,
-                               UserOrDummyColourMap userOrDummyColourMap, UserOrDummyList playerList) {
+                               UserOrDummyColourMap userOrDummyColourMap, UserOrDummySet playerList) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
@@ -70,7 +70,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public UserOrDummyList getPlayerList() {
+    public UserOrDummySet getPlayerList() {
         return playerList;
     }
 

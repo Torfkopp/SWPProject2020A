@@ -159,7 +159,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected IGameService gameService;
     protected int maxTradeDiff;
     protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
-    protected UserOrDummyList inGameUserList;
+    protected UserOrDummySet inGameUserList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -1161,7 +1161,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             String confirmText = ResourceManager.get("button.confirm");
             String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
-                UserOrDummyList victims = rsp.getVictims();
+                UserOrDummySet victims = rsp.getVictims();
                 ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
                 dialogue.setTitle(title);
                 dialogue.setHeaderText(headerText);

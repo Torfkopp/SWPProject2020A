@@ -16,7 +16,6 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
-import de.uol.swp.common.specialisedUtil.UserOrDummyList;
 import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.AI;
@@ -272,7 +271,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @see de.uol.swp.common.user.UserOrDummy
      * @since 2021-01-05
      */
-    protected void updateUsersList(UserOrDummyList userLobbyList) {
+    protected void updateUsersList(UserOrDummySet userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();

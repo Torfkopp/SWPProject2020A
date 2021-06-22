@@ -44,7 +44,7 @@ public class Game {
     private final VictoryPointOverTimeMap victoryPointsOverTimeMap = new VictoryPointOverTimeMap();
     private final UserOrDummy first;
     private final int maxTradeDiff;
-    private final UserOrDummyList playerList;
+    private final UserOrDummySet playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -79,7 +79,8 @@ public class Game {
         playersStartUpBuiltMap = new UserOrDummyStartUpBuiltMap();
         autoRollEnabled = new UserOrDummyBooleanMap();
         {
-            UserOrDummyList playerList = new UserOrDummyList(lobby.getUserOrDummies());
+            UserOrDummySet playerList = new UserOrDummySet();
+            playerList.addAll(lobby.getUserOrDummies());
             preparePausedMembers();
             victoryPointsOverTimeMap.put(first, new HashMap<>());
             victoryPointsOverTimeMap.get(first).put(0, 0);
@@ -170,8 +171,8 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public UserOrDummyList createPlayerList() {
-        UserOrDummyList playerList = new UserOrDummyList();
+    public UserOrDummySet createPlayerList() {
+        UserOrDummySet playerList = new UserOrDummySet();
         UserOrDummy player = activePlayer;
         playerList.add(activePlayer);
         for (int i = 0; i < players.size() - 1; i++) {
@@ -412,7 +413,7 @@ public class Game {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public UserOrDummyList getPlayerList() {
+    public UserOrDummySet getPlayerList() {
         return playerList;
     }
 
@@ -793,7 +794,7 @@ public class Game {
      * @since 2021-05-21
      */
     private void preparePausedMembers() {
-        UserOrDummyList playerList = new UserOrDummyList(lobby.getUserOrDummies());
+        UserOrDummySet playerList = lobby.getUserOrDummies();
         for (UserOrDummy userOrDummy : playerList) {
             if (userOrDummy instanceof User) pauseGameMap.put(userOrDummy, false);
             else pauseGameMap.put(userOrDummy, true);

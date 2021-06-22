@@ -1439,7 +1439,7 @@ public class GameService extends AbstractService {
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
         Set<Player> players = new HashSet<>(map.getPlayersAroundHex(msg.getPosition()));
-        UserOrDummyList victims = new UserOrDummyList();
+        UserOrDummySet victims = new UserOrDummySet();
         for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
