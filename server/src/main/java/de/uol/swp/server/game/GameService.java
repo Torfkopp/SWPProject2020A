@@ -797,6 +797,7 @@ public class GameService extends AbstractService {
         } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
             return;
         }
+        game.getInventory(game.getActivePlayer()).nextTurn();
         game.setBuildingAllowed(false);
         UserOrDummy nextPlayer;
         UserOrDummy user;
@@ -1115,7 +1116,7 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.KNIGHT_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.KNIGHT_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1168,7 +1169,7 @@ public class GameService extends AbstractService {
             return;
         Inventory invMono = game.getInventory(req.getUser());
 
-        if (invMono.get(DevelopmentCardType.MONOPOLY_CARD) == 0) {
+        if (!invMono.isPlayable(DevelopmentCardType.MONOPOLY_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1236,7 +1237,7 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.ROAD_BUILDING_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1314,7 +1315,7 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.YEAR_OF_PLENTY_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
