@@ -3,7 +3,7 @@ package de.uol.swp.common.specialisedUtil;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.LinkedHashSet;
 
 /**
  * Specialised class for a set
@@ -12,14 +12,23 @@ import java.util.TreeSet;
  * @author Mario Fokken
  * @since 2021-06-16
  */
-public class UserOrDummySet extends TreeSet<UserOrDummy> {
+public class UserOrDummySet extends LinkedHashSet<UserOrDummy> {
 
+    /**
+     * Gets the UserOrDummy at the
+     * specified position
+     *
+     * @param i The UserOrDummy's position in the set
+     *
+     * @return The UserOrDummy at the position
+     *
+     * @since 2021-06-22
+     */
     public UserOrDummy get(int i) {
         Iterator<UserOrDummy> iter = this.iterator();
-        int j = 0;
-        while (j < i) {
+        while (i > 0) {
             iter.next();
-            j++;
+            i--;
         }
         return iter.next();
     }
