@@ -1,8 +1,6 @@
 package de.uol.swp.common.util;
 
 import com.google.common.base.Strings;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,13 +14,10 @@ import java.util.*;
  */
 public class ResourceManager {
 
-    private static ResourceBundle resourceBundle;
+    private static ResourceBundle resourceBundle = null;
     private static final Logger LOG = LogManager.getLogger(ResourceManager.class);
-    @Inject
-    @Named("lang")
-    private static String lang;
 
-    static {
+    public static void initialize(String lang) {
         Locale locale;
         if (Strings.isNullOrEmpty(lang)) locale = Locale.UK;
         else {
