@@ -63,7 +63,7 @@ public abstract class AbstractLobbyMessage extends AbstractServerMessage {
      *
      * @since 2019-10-08
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

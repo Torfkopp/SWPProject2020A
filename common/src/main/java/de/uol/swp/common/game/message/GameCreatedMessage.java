@@ -27,6 +27,6 @@ public class GameCreatedMessage extends AbstractGameMessage {
      * @return The first player
      */
     public Actor getFirst() {
-        return super.getUser();
+        return super.getActor();
     }
 }

@@ -32,7 +32,7 @@ public class BuyDevelopmentCardRequest extends AbstractGameRequest {
      *
      * @return The user who wants to buy a DevelopmentCard
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

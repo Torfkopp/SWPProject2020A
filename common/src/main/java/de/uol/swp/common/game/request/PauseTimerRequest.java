@@ -30,7 +30,7 @@ public class PauseTimerRequest extends AbstractGameRequest {
      *
      * @return The user
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

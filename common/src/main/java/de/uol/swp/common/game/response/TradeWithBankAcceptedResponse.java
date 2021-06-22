@@ -33,7 +33,7 @@ public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
      *
      * @return The User who had a successful trade
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

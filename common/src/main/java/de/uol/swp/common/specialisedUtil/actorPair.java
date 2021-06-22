@@ -30,7 +30,7 @@ public class actorPair {
      *
      * @return Actor
      */
-    public Actor getUser1() {
+    public Actor getActor1() {
         return user1;
     }
 
@@ -39,7 +39,7 @@ public class actorPair {
      *
      * @return Actor
      */
-    public Actor getUser2() {
+    public Actor getActor2() {
         return user2;
     }
 }

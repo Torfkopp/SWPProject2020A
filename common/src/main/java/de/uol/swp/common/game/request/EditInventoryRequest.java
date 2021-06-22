@@ -74,7 +74,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *
      * @return The user whose inventory to update
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 

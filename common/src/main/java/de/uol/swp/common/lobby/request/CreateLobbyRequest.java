@@ -37,7 +37,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * @since 2019-10-08
      */
     public User getOwner() {
-        if (getUser() instanceof User) return (User) getUser();
+        if (getActor() instanceof User) return (User) getActor();
         return null;
     }
 

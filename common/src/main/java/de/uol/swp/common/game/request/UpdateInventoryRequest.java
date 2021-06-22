@@ -35,7 +35,7 @@ public class UpdateInventoryRequest extends AbstractGameRequest {
      *
      * @return The user of the UpdateInventoryRequest
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

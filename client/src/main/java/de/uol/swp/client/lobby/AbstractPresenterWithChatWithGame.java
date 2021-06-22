@@ -753,7 +753,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
         }
-        if (startUpPhaseEnabled && userService.getLoggedInUser().equals(msg.getUser())) {
+        if (startUpPhaseEnabled && userService.getLoggedInUser().equals(msg.getActor())) {
             if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.NONE_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT;
                 LOG.debug("--- First founding Settlement successfully built");
@@ -796,7 +796,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 break;
         }
         final String finalAttr = attr;
-        if (Util.equals(msg.getUser(), userService.getLoggedInUser())) {
+        if (Util.equals(msg.getActor(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
             if (finalAttr != null) {
                 InGameSystemMessageDTO message = new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"));
@@ -805,7 +805,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             if (finalAttr != null) {
                 InGameSystemMessageDTO message = new InGameSystemMessageDTO(
-                        new I18nWrapper(finalAttr + ".other", msg.getUser().toString()));
+                        new I18nWrapper(finalAttr + ".other", msg.getActor().toString()));
                 Platform.runLater(() -> chatMessages.add(message));
             }
         }
@@ -851,7 +851,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
         if ((dice1 + dice2) != 7) {
-            resetButtonStates(msg.getUser());
+            resetButtonStates(msg.getActor());
         }
         gameMapDescription.setDice(msg.getDice1(), msg.getDice2());
         gameRendering.redraw();
@@ -1131,10 +1131,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberAllTaxPayedMessage(RobberAllTaxPaidMessage msg) {
         if (msg.getLobbyName().equals(lobbyName)) {
-            resetButtonStates(msg.getUser());
+            resetButtonStates(msg.getActor());
             if (helpActivated) setHelpText();
         }
-        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getActor());
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         endTurn.setDisable(true);
         tradeWithUserButton.setDisable(true);
@@ -1211,7 +1211,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberPositionMessage(RobberPositionMessage msg) {
         LOG.debug("Received RobberPositionMessage for Lobby {}", msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
-            resetButtonStates(msg.getUser());
+            resetButtonStates(msg.getActor());
             gameService.updateGameMap(msg.getLobbyName());
             if (helpActivated) setHelpText();
         }

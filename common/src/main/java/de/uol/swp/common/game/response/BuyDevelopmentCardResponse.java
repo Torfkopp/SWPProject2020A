@@ -46,7 +46,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      *
      * @return User The User who bought a development card
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

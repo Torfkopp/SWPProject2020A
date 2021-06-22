@@ -422,7 +422,7 @@ public class Game {
     public Map<Player, Actor> getPlayerUserMapping() {
         Map<Player, Actor> temp = new HashMap<>();
         for (Player player : Player.values()) {
-            temp.put(player, getUserFromPlayer(player));
+            temp.put(player, getActorFromPlayer(player));
         }
         return temp;
     }
@@ -601,9 +601,9 @@ public class Game {
      */
     public List<UniqueCard> getUniqueCardsList() {
         List<UniqueCard> returnList = new LinkedList<>();
-        returnList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, getUserFromPlayer(playerWithLongestRoad),
+        returnList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, getActorFromPlayer(playerWithLongestRoad),
                                       longestRoadLength));
-        returnList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, getUserFromPlayer(playerWithLargestArmy),
+        returnList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, getActorFromPlayer(playerWithLargestArmy),
                                       playerWithLargestArmy == null ? 0 :
                                       getInventory(playerWithLargestArmy).getKnights()));
         return returnList;
@@ -628,7 +628,7 @@ public class Game {
      *
      * @return The user needed
      */
-    public Actor getUserFromPlayer(Player player) {
+    public Actor getActorFromPlayer(Player player) {
         return players.getActorFromPlayer(player);
     }
 
@@ -640,7 +640,7 @@ public class Game {
      * @since 2021-05-20
      */
     public Map<Actor, Player> getUserToPlayerMap() {
-        return players.getUserToPlayerMap();
+        return players.getActorToPlayerMap();
     }
 
     /**

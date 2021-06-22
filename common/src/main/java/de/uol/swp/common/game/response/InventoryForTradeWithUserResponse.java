@@ -94,7 +94,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The User wanting to create a trade offer
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 

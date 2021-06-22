@@ -422,7 +422,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         victoryPointsOverTimeMap = msg.getVictoryPointMap();
-        winner = msg.getUser();
+        winner = msg.getActor();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
             uniqueCardView.setMinHeight(0);
@@ -560,7 +560,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 notice.setVisible(true);
                 notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
             }
-            setTurnIndicatorText(msg.getUser());
+            setTurnIndicatorText(msg.getActor());
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
@@ -574,8 +574,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
             currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
-            setRollDiceButtonState(msg.getUser());
-            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
+            setRollDiceButtonState(msg.getActor());
+            if (msg.getActor().equals(userService.getLoggedInUser())) ownTurn = true;
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);

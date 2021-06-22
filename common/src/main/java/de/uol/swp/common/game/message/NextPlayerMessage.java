@@ -29,7 +29,7 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @return User
      */
     public Actor getActivePlayer() {
-        return super.getUser();
+        return super.getActor();
     }
 
     /**

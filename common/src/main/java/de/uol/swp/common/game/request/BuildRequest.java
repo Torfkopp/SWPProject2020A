@@ -44,7 +44,7 @@ public class BuildRequest extends AbstractGameRequest {
      *
      * @return The requesting user
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

@@ -68,7 +68,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The User whose inventory is being updated
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

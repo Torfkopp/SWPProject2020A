@@ -38,7 +38,7 @@ public class RobbingMessage extends AbstractLobbyMessage {
      * @return The encapsulated InGameSystemMessage
      */
     public SystemMessage getMsg() {
-        return new InGameSystemMessageDTO(new I18nWrapper("game.robber.rob", getUser(), victim));
+        return new InGameSystemMessageDTO(new I18nWrapper("game.robber.rob", getActor(), victim));
     }
 
     /**

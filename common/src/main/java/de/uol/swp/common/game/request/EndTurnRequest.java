@@ -37,7 +37,7 @@ public class EndTurnRequest extends AbstractGameRequest {
      *
      * @return The user of the EndTurnRequest
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

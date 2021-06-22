@@ -352,7 +352,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby {}", lobbyName);
-        Actor user = msg.getUser();
+        Actor user = msg.getActor();
         LOG.debug("---- User {} joined", user.getUsername());
         Platform.runLater(() -> {
             if (joinLeaveMsgsOn)
@@ -392,7 +392,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
-        Actor user = msg.getUser();
+        Actor user = msg.getActor();
         if (Util.equals(user, owner)) {
             LOG.debug("---- Owner {} left", user.getUsername());
         } else LOG.debug("---- User {} left", user.getUsername());
@@ -452,7 +452,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                                 for (Actor u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
-                                if (Util.equals(cardsAmount.getUser(), user)) {
+                                if (Util.equals(cardsAmount.getActor(), user)) {
                                     name = ResourceManager
                                             .get("lobby.members.amount", name, cardsAmount.getResourceCardsAmount(),
                                                  cardsAmount.getDevelopmentCardsAmount());

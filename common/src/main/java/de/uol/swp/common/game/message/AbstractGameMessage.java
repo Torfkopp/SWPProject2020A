@@ -46,7 +46,7 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
      *
      * @return user The user
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

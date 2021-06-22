@@ -64,7 +64,7 @@ public class CardsAmount implements Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

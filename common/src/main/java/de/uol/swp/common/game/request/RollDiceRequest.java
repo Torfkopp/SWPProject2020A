@@ -19,7 +19,7 @@ public class RollDiceRequest extends AbstractGameRequest {
         this.user = user;
     }
 
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

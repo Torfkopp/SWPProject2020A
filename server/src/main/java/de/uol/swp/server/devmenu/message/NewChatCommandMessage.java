@@ -56,7 +56,7 @@ public class NewChatCommandMessage extends AbstractServerInternalMessage {
      *
      * @return The user invoking the command
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }

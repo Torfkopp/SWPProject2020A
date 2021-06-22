@@ -25,7 +25,7 @@ public class InventoryMap implements Serializable {
      */
     public Inventory get(Actor actor) {
         for (UserPlayerInventoryMapping entry : map)
-            if (entry.getUser().equals(actor)) {
+            if (entry.getActor().equals(actor)) {
                 return entry.getInventory();
             }
         return null;
@@ -62,7 +62,7 @@ public class InventoryMap implements Serializable {
      */
     public Actor[] getActorArray() {
         List<Actor> returnArray = new LinkedList<>();
-        map.forEach((key -> returnArray.add(key.getUser())));
+        map.forEach((key -> returnArray.add(key.getActor())));
         return returnArray.toArray(new Actor[0]);
     }
 
@@ -75,7 +75,7 @@ public class InventoryMap implements Serializable {
      */
     public Actor getActorFromPlayer(Player player) {
         for (UserPlayerInventoryMapping entry : map)
-            if (Objects.equals(player, entry.getPlayer())) return entry.getUser();
+            if (Objects.equals(player, entry.getPlayer())) return entry.getActor();
         return null;
     }
 
@@ -88,7 +88,7 @@ public class InventoryMap implements Serializable {
      */
     public Player getPlayerFromActor(Actor actor) {
         for (UserPlayerInventoryMapping entry : map)
-            if (Objects.equals(actor, entry.getUser())) return entry.getPlayer();
+            if (Objects.equals(actor, entry.getActor())) return entry.getPlayer();
         return null;
     }
 
@@ -99,10 +99,10 @@ public class InventoryMap implements Serializable {
      *
      * @since 2021-05-20
      */
-    public Map<Actor, Player> getUserToPlayerMap() {
+    public Map<Actor, Player> getActorToPlayerMap() {
         Map<Actor, Player> temp = new HashMap<>();
         for (UserPlayerInventoryMapping entry : map)
-            temp.put(entry.getUser(), entry.getPlayer());
+            temp.put(entry.getActor(), entry.getPlayer());
         return temp;
     }
 
@@ -116,11 +116,11 @@ public class InventoryMap implements Serializable {
     public void put(Actor actor, Player player, Inventory inventory) {
         for (int i = 0; i < map.size(); i++) {
             UserPlayerInventoryMapping entry = map.get(i);
-            if ((Objects.equals(entry.getUser(), actor) && !Objects
+            if ((Objects.equals(entry.getActor(), actor) && !Objects
                     .equals(entry.getPlayer(), player)) || (Objects.equals(entry.getPlayer(), player) && !Objects
-                    .equals(entry.getUser(), actor))) {
+                    .equals(entry.getActor(), actor))) {
                 throw new IllegalArgumentException("Keys are not matching!");
-            } else if (Objects.equals(entry.getUser(), actor) && Objects.equals(entry.getPlayer(), player)) {
+            } else if (Objects.equals(entry.getActor(), actor) && Objects.equals(entry.getPlayer(), player)) {
                 map.set(i, new UserPlayerInventoryMapping(actor, player, inventory));
                 return;
             }
@@ -197,7 +197,7 @@ public class InventoryMap implements Serializable {
          * @author Temmo Junkhoff
          * @since 2021-05-04
          */
-        public Actor getUser() {
+        public Actor getActor() {
             return user;
         }
     }

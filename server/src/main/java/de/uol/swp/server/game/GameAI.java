@@ -167,7 +167,7 @@ public class GameAI {
                                                                              .getResourceAmount()))) victim = p;
                     break;
             }
-            gameService.robRandomResource(game, ai, game.getUserFromPlayer(victim));
+            gameService.robRandomResource(game, ai, game.getActorFromPlayer(victim));
         }
     }
 

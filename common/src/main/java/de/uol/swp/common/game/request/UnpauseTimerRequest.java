@@ -25,12 +25,12 @@ public class UnpauseTimerRequest extends AbstractGameRequest {
     }
 
     /**
-     * Gets the user who canceled a trade or closed a window,
+     * Gets the actor who canceled a trade or closed a window,
      * where the timer should be stopped.
      *
-     * @return The user
+     * @return The actor
      */
-    public Actor getUser() {
+    public Actor getActor() {
         return user;
     }
 }
