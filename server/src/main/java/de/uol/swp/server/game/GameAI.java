@@ -17,9 +17,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.specialisedUtil.UserOrDummyStartUpBuiltMap;
+import de.uol.swp.server.specialisedUtil.UserOrDummyStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;

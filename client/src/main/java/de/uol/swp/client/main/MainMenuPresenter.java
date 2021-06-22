@@ -13,7 +13,7 @@ import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.specialisedUtil.LobbyList;
-import de.uol.swp.client.specialisedUtil.LobbyStringPair;
+import de.uol.swp.client.specialisedUtil.LobbyListItem;
 import de.uol.swp.client.specialisedUtil.UsersList;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -73,7 +73,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private Label randomLobbyState;
     @FXML
-    private ListView<LobbyStringPair> lobbyView;
+    private ListView<LobbyListItem> lobbyView;
     @FXML
     private ListView<String> usersView;
     @FXML
@@ -116,7 +116,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         super.initialize();
         lobbyView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(LobbyStringPair item, boolean empty) {
+            protected void updateItem(LobbyListItem item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
@@ -124,12 +124,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
         });
         if (!soundPack.equals("client/src/main/resources/sounds/default/")) soundService.background();
-        FilteredList<LobbyStringPair> filteredLobbyList = new FilteredList<>(lobbies.get(), p -> true);
+        FilteredList<LobbyListItem> filteredLobbyList = new FilteredList<>(lobbies.get(), p -> true);
 
-        ObjectProperty<Predicate<LobbyStringPair>> nameFilter = new SimpleObjectProperty<>();
-        ObjectProperty<Predicate<LobbyStringPair>> passwordFilter = new SimpleObjectProperty<>();
-        ObjectProperty<Predicate<LobbyStringPair>> inGameFilter = new SimpleObjectProperty<>();
-        ObjectProperty<Predicate<LobbyStringPair>> fullFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<LobbyListItem>> nameFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<LobbyListItem>> passwordFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<LobbyListItem>> inGameFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<LobbyListItem>> fullFilter = new SimpleObjectProperty<>();
 
         nameFilter.bind(Bindings.createObjectBinding(
                 () -> lobby -> lobby.getValue().toLowerCase().contains(lobbyFilterTextField.getText().toLowerCase()),
@@ -836,9 +836,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void updateLobbyList(List<ISimpleLobby> lobbyList) {
         Platform.runLater(() -> {
             List<ISimpleLobby> newLobbies = new ArrayList<>(lobbyList);
-            List<LobbyStringPair> oldLobbies = new ArrayList<>(lobbies.get());
+            List<LobbyListItem> oldLobbies = new ArrayList<>(lobbies.get());
             for (ISimpleLobby lobby : lobbyList) {
-                for (LobbyStringPair pair : lobbies.get()) {
+                for (LobbyListItem pair : lobbies.get()) {
                     newLobbies.removeIf(l -> l.getName().equals(pair.getKey().getName()));
                     oldLobbies.removeIf(p -> p.getKey().getName().equals(lobby.getName()));
                 }
@@ -851,7 +851,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 }
             }
             if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
-                for (LobbyStringPair pair : oldLobbies) {
+                for (LobbyListItem pair : oldLobbies) {
                     I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey().getName());
                     chatMessages.add(new SystemMessageDTO(contentWrapper));
                 }
@@ -863,7 +863,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = ResourceManager.get("mainmenu.lobbylist.full", s);
                 else if (l.hasPassword()) s = ResourceManager.get("mainmenu.lobbylist.haspassword", s);
-                lobbies.add(new LobbyStringPair(l, s));
+                lobbies.add(new LobbyListItem(l, s));
             }
         });
     }

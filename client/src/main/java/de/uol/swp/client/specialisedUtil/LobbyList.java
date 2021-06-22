@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
  */
 public class LobbyList {
 
-    private final ObservableList<LobbyStringPair> lobbies;
+    private final ObservableList<LobbyListItem> lobbies;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class LobbyList {
      *
      * @param pair ISimpleLobby-String-Pairs to be put into the list
      */
-    public void add(LobbyStringPair pair) {lobbies.add(pair);}
+    public void add(LobbyListItem pair) {lobbies.add(pair);}
 
     /**
      * Clears the list
@@ -36,5 +36,5 @@ public class LobbyList {
      *
      * @return An ObservableList of ISimpleLobby-String-Pairs
      */
-    public ObservableList<LobbyStringPair> get() {return lobbies;}
+    public ObservableList<LobbyListItem> get() {return lobbies;}
 }

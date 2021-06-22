@@ -9,7 +9,7 @@ public class LobbyListTest {
     @Test
     void test() {
         LobbyList list = new LobbyList();
-        LobbyStringPair pair = new LobbyStringPair(null, null);
+        LobbyListItem pair = new LobbyListItem(null, null);
         assertTrue(list.get().isEmpty());
         list.add(pair);
         assertFalse(list.get().isEmpty());

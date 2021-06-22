@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LobbyStringPairTest {
+public class LobbyListItemTest {
 
     @Test
     void test() {
         ISimpleLobby lobby = new SimpleLobby(new LobbyName("Test"), false, null, 0, 0, false, false, false, null, null,
                                              0);
         String s = "Test";
-        LobbyStringPair pair = new LobbyStringPair(lobby, s);
+        LobbyListItem pair = new LobbyListItem(lobby, s);
         assertEquals(lobby, pair.getKey());
         assertEquals(s, pair.getValue());
     }

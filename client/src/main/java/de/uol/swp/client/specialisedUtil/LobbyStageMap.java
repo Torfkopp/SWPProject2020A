@@ -18,25 +18,11 @@ import java.util.HashMap;
 public class LobbyStageMap extends HashMap<LobbyName, Stage> {
 
     /**
-     * Closes the stage of a lobby
-     *
-     * @param lobby The name of lobby to close the stage of
-     */
-    public void close(LobbyName lobby) {
-        if (containsKey(lobby)) {
-            Platform.runLater(() -> {
-                get(lobby).close();
-                remove(lobby);
-            });
-        }
-    }
-
-    /**
      * Closes the window of a lobby
      *
      * @param lobby The name of the lobby to close
      */
-    public void closeWindow(LobbyName lobby) {
+    public void close(LobbyName lobby) {
         if (containsKey(lobby)) {
             Platform.runLater(() -> {
                 Window window = get(lobby);

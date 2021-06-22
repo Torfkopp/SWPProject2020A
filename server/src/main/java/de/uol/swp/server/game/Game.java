@@ -1,6 +1,5 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Player;
@@ -19,6 +18,8 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
+import de.uol.swp.server.specialisedUtil.UserOrDummyBooleanMap;
+import de.uol.swp.server.specialisedUtil.UserOrDummyStartUpBuiltMap;
 
 import java.util.*;
 

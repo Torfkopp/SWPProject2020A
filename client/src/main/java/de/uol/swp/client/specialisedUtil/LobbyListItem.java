@@ -4,13 +4,13 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import javafx.util.Pair;
 
 /**
- * Specialised Class for a pair of
- * ISimpleLobby and a String
+ * Specialised Class for a list item
+ * consisting of a ISimpleLobby-String-Pair
  *
  * @author Mario Fokken
  * @since 2021-06-17
  */
-public class LobbyStringPair extends Pair<ISimpleLobby, String> {
+public class LobbyListItem extends Pair<ISimpleLobby, String> {
 
     /**
      * Constructor
@@ -18,7 +18,7 @@ public class LobbyStringPair extends Pair<ISimpleLobby, String> {
      * @param iSimpleLobby The lobby object
      * @param s            The name of the lobby
      */
-    public LobbyStringPair(ISimpleLobby iSimpleLobby, String s) {
+    public LobbyListItem(ISimpleLobby iSimpleLobby, String s) {
         super(iSimpleLobby, s);
     }
 }

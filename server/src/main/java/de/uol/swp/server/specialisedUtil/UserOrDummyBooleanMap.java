@@ -1,4 +1,4 @@
-package de.uol.swp.common.specialisedUtil;
+package de.uol.swp.server.specialisedUtil;
 
 import de.uol.swp.common.user.UserOrDummy;
 

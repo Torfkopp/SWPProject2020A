@@ -22,7 +22,7 @@ import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.specialisedUtil.CommandMap;
+import de.uol.swp.server.specialisedUtil.CommandMap;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.chat.CommandChatService;

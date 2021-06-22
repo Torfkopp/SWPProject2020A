@@ -777,7 +777,7 @@ public class SceneManager {
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
         LOG.debug("Received CloseTradeResponseEvent");
         LobbyName lobbyName = event.getLobbyName();
-        tradingResponseStages.closeWindow(lobbyName);
+        tradingResponseStages.close(lobbyName);
     }
 
     /**
