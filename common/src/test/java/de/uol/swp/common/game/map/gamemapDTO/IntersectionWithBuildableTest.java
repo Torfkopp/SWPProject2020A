@@ -2,6 +2,7 @@ package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.specialisedUtil.UserOrDummyList;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class IntersectionWithBuildableTest {
     void isBuildableBy() {
         User defaultUser = mock(User.class);
         User secondUser = mock(User.class);
-        UserOrDummySet buildableByList = new UserOrDummySet();
+        UserOrDummyList buildableByList = new UserOrDummyList();
         buildableByList.add(defaultUser);
 
         IntersectionWithBuildable intersection = new IntersectionWithBuildable(Player.PLAYER_1,
