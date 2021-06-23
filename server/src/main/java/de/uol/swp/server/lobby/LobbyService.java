@@ -19,6 +19,7 @@ import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
@@ -122,7 +123,8 @@ public class LobbyService extends AbstractService {
         if (lobby.get().getUserOrDummies().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
-                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(), req.getMaxTradeDiff());
+                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(),
+                                            req.getMaxTradeDiff());
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<ILobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
@@ -212,13 +214,11 @@ public class LobbyService extends AbstractService {
             Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
             Message responseMessage;
-            if (Strings.isNullOrEmpty(req.getPassword())) {
-                responseMessage = new CreateLobbyResponse(req.getName(), ILobby.getSimpleLobby(lobby.get()));
-            } else {
+            if (!Strings.isNullOrEmpty(req.getPassword())) {
                 lobby.get().setHasPassword(true);
-                responseMessage = new CreateLobbyWithPasswordResponse(req.getName(), ILobby.getSimpleLobby(lobby.get()),
-                                                                      req.getPassword());
             }
+            responseMessage = new CreateLobbyResponse(req.getName(), ILobby.getSimpleLobby(lobby.get()),
+                                                      req.getPassword());
             responseMessage.initWithMessage(req);
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
@@ -409,7 +409,7 @@ public class LobbyService extends AbstractService {
             }
         });
         if (!filteredLobbies.isEmpty()) {
-            int i = (int) (Math.random() * filteredLobbies.size());
+            int i = Util.randomInt(filteredLobbies.size());
             ILobby randomLobby = filteredLobbies.get(i);
 
             randomLobby.joinUser(req.getUser());
