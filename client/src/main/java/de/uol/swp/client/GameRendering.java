@@ -1101,11 +1101,11 @@ public class GameRendering {
         if (text == null) return;
         Font centerTextFont = Font.font(centerTextFontSize);
         double centerTextX = width / 2.0;
-        double centerTextY = height / 2.0;
+        double centerTextY = height / 15.0;
         Platform.runLater(() -> {
             gfxCtx.setTextAlign(TextAlignment.CENTER);
             gfxCtx.setTextBaseline(VPos.CENTER);
-            gfxCtx.setFill(Color.BLACK);
+            gfxCtx.setFill(Color.RED);
             gfxCtx.setFont(centerTextFont);
             gfxCtx.fillText(text, centerTextX, centerTextY);
         });
