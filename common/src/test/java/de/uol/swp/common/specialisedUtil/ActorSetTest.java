@@ -1,19 +1,19 @@
 package de.uol.swp.common.specialisedUtil;
 
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserOrDummySetTest {
+public class ActorSetTest {
 
     @Test
     void test() {
-        UserOrDummySet set = new UserOrDummySet();
-        UserOrDummy user = new AIDTO("Iggy");
-        UserOrDummy user2 = new AIDTO("Danny");
-        UserOrDummy user3 = new AIDTO("Coco Jumbo");
+        ActorSet set = new ActorSet();
+        Actor user = new AIDTO("Iggy");
+        Actor user2 = new AIDTO("Danny");
+        Actor user3 = new AIDTO("Coco Jumbo");
 
         set.add(user);
         set.add(user2);

@@ -3,7 +3,9 @@ package de.uol.swp.server.game;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.game.map.IGameMapManagement;
@@ -157,13 +159,17 @@ public class GameTest {
     void gameTest() {
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        List<Actor> list = Arrays.asList(user, user2, user3, user4);
+        ActorSet set = new ActorSet();
+        set.add(user);
+        set.add(user2);
+        set.add(user3);
+        set.add(user4);
         Actor[] u = game.getPlayers();
-        //order is random, so just check that everyone is somewhere in the list of users in the Game
-        assertTrue(list.contains(u[0]));
-        assertTrue(list.contains(u[1]));
-        assertTrue(list.contains(u[2]));
-        assertTrue(list.contains(u[3]));
+        //order is random, so just check that everyone is somewhere in the set of users in the Game
+        assertTrue(set.contains(u[0]));
+        assertTrue(set.contains(u[1]));
+        assertTrue(set.contains(u[2]));
+        assertTrue(set.contains(u[3]));
         assertEquals(lobby, game.getLobby());
     }
 
@@ -184,7 +190,7 @@ public class GameTest {
 
     @Test
     void getUserColoursMapTest() {
-        UserOrDummyColourMap userColoursMap = game.getUserColoursMap();
+        ActorColourMap userColoursMap = game.getUserColoursMap();
         // values are random, so just check all users have an associated Colour
         assertTrue(userColoursMap.containsKey(user));
         assertTrue(userColoursMap.containsKey(user2));

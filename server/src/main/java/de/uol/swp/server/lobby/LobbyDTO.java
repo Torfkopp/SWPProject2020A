@@ -2,8 +2,8 @@ package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.Computer;
 import de.uol.swp.common.user.User;
@@ -28,10 +28,10 @@ import java.util.TreeSet;
 public class LobbyDTO implements ILobby {
 
     private final LobbyName name;
-    private final UserOrDummySet users = new UserOrDummySet();
-    private final UserOrDummySet readyUsers = new UserOrDummySet();
+    private final ActorSet users = new ActorSet();
+    private final ActorSet readyUsers = new ActorSet();
     private final String password;
-    private final UserOrDummyColourMap userColours = new UserOrDummyColourMap();
+    private final ActorColourMap userColours = new ActorColourMap();
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -169,7 +169,7 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public UserOrDummySet getReadyUsers() {
+    public ActorSet getReadyUsers() {
         return readyUsers;
     }
 
@@ -185,12 +185,12 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public UserOrDummyColourMap getUserColourMap() {
+    public ActorColourMap getUserColourMap() {
         return userColours;
     }
 
     @Override
-    public UserOrDummySet getUserOrDummies() { return users; }
+    public ActorSet getActors() { return users; }
 
     @Override
     public boolean hasPassword() {

@@ -32,6 +32,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.specialisedUtil.*;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
@@ -153,12 +154,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
-    protected UserOrDummyPlayerMap userOrDummyPlayerMap = null;
-    protected UserOrDummyColourMap userColoursMap = null;
+    protected ActorPlayerMap actorPlayerMap = null;
+    protected ActorColourMap userColoursMap = null;
     protected IGameService gameService;
     protected int maxTradeDiff;
     protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
-    protected UserOrDummySet inGameUserList;
+    protected ActorSet inGameUserList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -1160,8 +1161,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             String confirmText = ResourceManager.get("button.confirm");
             String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
-                UserOrDummySet victims = rsp.getVictims();
-                ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
+                ActorSet victims = rsp.getVictims();
+                ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
                 dialogue.setTitle(title);
                 dialogue.setHeaderText(headerText);
                 dialogue.setContentText(contentText);

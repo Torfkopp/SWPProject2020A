@@ -9,20 +9,20 @@ import de.uol.swp.common.user.Actor;
  * @author Mario Fokken
  * @since 2021-06-11
  */
-public class actorPair {
+public class ActorPair {
 
-    private final Actor user1;
-    private final Actor user2;
+    private final Actor actor1;
+    private final Actor actor2;
 
     /**
      * Constructor
      *
-     * @param user1 The pair's first Actor
-     * @param user2 The pair's second Actor
+     * @param actor1 The pair's first Actor
+     * @param actor2 The pair's second Actor
      */
-    public actorPair(Actor user1, Actor user2) {
-        this.user1 = user1;
-        this.user2 = user2;
+    public ActorPair(Actor actor1, Actor actor2) {
+        this.actor1 = actor1;
+        this.actor2 = actor2;
     }
 
     /**
@@ -31,7 +31,7 @@ public class actorPair {
      * @return Actor
      */
     public Actor getActor1() {
-        return user1;
+        return actor1;
     }
 
     /**
@@ -40,6 +40,6 @@ public class actorPair {
      * @return Actor
      */
     public Actor getActor2() {
-        return user2;
+        return actor2;
     }
 }

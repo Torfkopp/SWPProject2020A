@@ -3,18 +3,18 @@ package de.uol.swp.server.specialisedUtil;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserOrDummyStartUpBuiltMapTest {
+public class ActorStartUpBuiltMapTest {
 
     @Test
     void test() {
-        UserOrDummyStartUpBuiltMap map = new UserOrDummyStartUpBuiltMap();
-        UserOrDummy user = new AIDTO(AI.Difficulty.EASY);
+        ActorStartUpBuiltMap map = new ActorStartUpBuiltMap();
+        Actor user = new AIDTO(AI.Difficulty.EASY);
         map.put(user);
         assertTrue(map.containsKey(user));
         assertTrue(map.containsValue(StartUpPhaseBuiltStructures.NONE_BUILT));

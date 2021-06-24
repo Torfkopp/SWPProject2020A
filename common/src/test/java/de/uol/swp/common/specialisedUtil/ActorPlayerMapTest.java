@@ -3,17 +3,17 @@ package de.uol.swp.common.specialisedUtil;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserOrDummyPlayerMapTest {
+public class ActorPlayerMapTest {
 
     @Test
     void test() {
-        UserOrDummyPlayerMap map = new UserOrDummyPlayerMap();
-        UserOrDummy user = new AIDTO(AI.Difficulty.EASY);
+        ActorPlayerMap map = new ActorPlayerMap();
+        Actor user = new AIDTO(AI.Difficulty.EASY);
         map.put(user, Player.PLAYER_1);
         assertTrue(map.containsKey(user));
         assertTrue(map.containsValue(Player.PLAYER_1));

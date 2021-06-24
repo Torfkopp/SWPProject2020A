@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 
 import java.io.Serializable;
@@ -65,7 +65,7 @@ public class InventoryMap implements Serializable {
      * @return The array of Actor objects
      */
     public Actor[] getActorArray() {
-        List<Actor> returnArray = new LinkedList<>();
+        ActorSet returnArray = new ActorSet();
         map.forEach((key -> returnArray.add(key.getActor())));
         return returnArray.toArray(new Actor[0]);
     }
@@ -84,18 +84,7 @@ public class InventoryMap implements Serializable {
     }
 
     /**
-     * Gets an array of the UserOrDummy objects
-     *
-     * @return The array of UserOrDummy objects
-     */
-    public UserOrDummy[] getUserOrDummyArray() {
-        UserOrDummySet returnArray = new UserOrDummySet();
-        map.forEach((key -> returnArray.add(key.getUser())));
-        return returnArray.toArray(new UserOrDummy[0]);
-    }
-
-    /**
-     * Gets the UserOrDummy for a given player
+     * Gets the player for a given actor
      *
      * @param actor The actor whose matching Player is needed
      *
@@ -114,8 +103,8 @@ public class InventoryMap implements Serializable {
      *
      * @since 2021-05-20
      */
-    public UserOrDummyPlayerMap getUserToPlayerMap() {
-        UserOrDummyPlayerMap temp = new UserOrDummyPlayerMap();
+    public ActorPlayerMap getUserToPlayerMap() {
+        ActorPlayerMap temp = new ActorPlayerMap();
         for (UserPlayerInventoryMapping entry : map)
             temp.put(entry.getActor(), entry.getPlayer());
         return temp;

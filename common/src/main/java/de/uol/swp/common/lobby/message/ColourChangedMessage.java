@@ -1,8 +1,8 @@
 package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Response to a SetColourRequest.
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ColourChangedMessage extends AbstractLobbyMessage {
 
-    private final UserOrDummyColourMap userColours;
+    private final ActorColourMap userColours;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class ColourChangedMessage extends AbstractLobbyMessage {
      *
      * @since 2019-10-08
      */
-    public ColourChangedMessage(LobbyName name, UserOrDummy user, UserOrDummyColourMap userColours) {
+    public ColourChangedMessage(LobbyName name, Actor user, ActorColourMap userColours) {
         super(name, user);
         this.userColours = userColours;
     }
@@ -34,7 +34,7 @@ public class ColourChangedMessage extends AbstractLobbyMessage {
      *
      * @return Map of users and their colours
      */
-    public UserOrDummyColourMap getUserColours() {
+    public ActorColourMap getUserColours() {
         return userColours;
     }
 }

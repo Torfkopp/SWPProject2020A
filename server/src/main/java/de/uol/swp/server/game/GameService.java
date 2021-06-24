@@ -48,7 +48,7 @@ import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
-import de.uol.swp.server.specialisedUtil.UserOrDummyStartUpBuiltMap;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -195,7 +195,7 @@ public class GameService extends AbstractService {
      * @since 2021-06-11
      */
     void robRandomResource(Game game, Actor receiver, Actor victim) {
-        game.setRobResourceReceiverVictimPair(new actorPair(receiver, victim));
+        game.setRobResourceReceiverVictimPair(new ActorPair(receiver, victim));
         robRandomResource(game);
     }
 
@@ -223,9 +223,9 @@ public class GameService extends AbstractService {
      */
     void updateVictoryPoints(LobbyName originLobby) {
         Game game = gameManagement.getGame(originLobby);
-        UserOrDummy[] players = game.getPlayers();
-        UserOrDummyIntegerMap victoryPointsMap = new UserOrDummyIntegerMap();
-        for (UserOrDummy player : players) {
+        Actor[] players = game.getPlayers();
+        ActorIntegerMap victoryPointsMap = new ActorIntegerMap();
+        for (Actor player : players) {
             if (player instanceof User) {
                 victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
             }
@@ -544,7 +544,7 @@ public class GameService extends AbstractService {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                    UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                    ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                     StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                     if (built == NONE_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
                         boolean success = gameMap.placeFoundingSettlement(player, mapPoint);
@@ -608,7 +608,7 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
                     } else if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-                        UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                        ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
                         StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
                         if (built == FIRST_SETTLEMENT_BUILT && currentPhase == Game.StartUpPhase.PHASE_1) {
                             boolean success = gameMap.placeRoad(player, mapPoint);
@@ -699,9 +699,9 @@ public class GameService extends AbstractService {
             }
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().isStartUpPhaseEnabled()) {
-                gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getActor().size());
+                gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getActors().size());
             }
-            UserOrDummySet users = msg.getLobby().getUserOrDummies();
+            ActorSet users = msg.getLobby().getActors();
             int randomNbr = Util.randomInt(users.size());
             Actor[] playerArray = users.toArray(new Actor[0]);
             Actor firstPlayer = playerArray[randomNbr];
@@ -721,7 +721,7 @@ public class GameService extends AbstractService {
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
         }
-        for (Actor ai : msg.getLobby().getActor())
+        for (Actor ai : msg.getLobby().getActors())
             if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, lobbyName, AI.WriteType.START);
         Game game = gameManagement.getGame(lobbyName);
         Actor first = game.getFirst();
@@ -1440,8 +1440,8 @@ public class GameService extends AbstractService {
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
         Set<Player> players = new HashSet<>(map.getPlayersAroundHex(msg.getPosition()));
-        UserOrDummySet victims = new UserOrDummySet();
-        for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
+        ActorSet victims = new ActorSet();
+        for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getActorFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
             ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
@@ -1511,7 +1511,7 @@ public class GameService extends AbstractService {
         if (numberOfPips == 7) {
             //Robber things
             LOG.debug("---- Robber things");
-            UserOrDummyIntegerMap players = new UserOrDummyIntegerMap();
+            ActorIntegerMap players = new ActorIntegerMap();
             Game g = gameManagement.getGame(req.getOriginLobby());
             for (Actor p : g.getPlayers()) {
                 if (g.getInventory(p).getResourceAmount() > 7) {
@@ -1524,8 +1524,8 @@ public class GameService extends AbstractService {
                     }
                 }
             }
-            UserOrDummyResourceListMap inventories = new UserOrDummyResourceListMap();
-            for (UserOrDummy user : players.keySet()) {
+            ActorResourceListMap inventories = new ActorResourceListMap();
+            for (Actor user : players.keySet()) {
                 ResourceList resourceMap = new ResourceList();
                 Inventory inv = game.getInventory(user);
                 for (ResourceType resource : ResourceType.values())
@@ -1778,7 +1778,7 @@ public class GameService extends AbstractService {
      * @since 2021-06-11
      */
     private void robRandomResource(Game game) {
-        actorPair pair = game.getRobResourceReceiverVictimPair();
+        ActorPair pair = game.getRobResourceReceiverVictimPair();
         if (pair == null || !game.getTaxPayers().isEmpty()) return;
         robRandomResourceExecutive(game.getLobby().getName(), pair.getActor1(), pair.getActor2());
         game.setRobResourceReceiverVictimPair(null);
@@ -1843,7 +1843,7 @@ public class GameService extends AbstractService {
         lobbyService.sendToAllInLobby(lobby, msg);
         LOG.debug("{} moves the robber to position: {}|{}", dummy, 3, 3);
         List<Player> players = map.getPlayersAroundHex(mapPoint);
-        if (players.size() > 0) robRandomResource(game, dummy, game.getUserFromPlayer((Player) players.toArray()[0]));
+        if (players.size() > 0) robRandomResource(game, dummy, game.getActorFromPlayer((Player) players.toArray()[0]));
     }
 
     /**
@@ -1918,9 +1918,9 @@ public class GameService extends AbstractService {
             if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
                 onRollDiceRequest(new RollDiceRequest(computer, game.getLobby().getName()));
             else {
-                UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-                dummyTurnInFoundingPhase(game, npc);
-                startUpBuiltMap.nextPhase(npc);
+                ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                dummyTurnInFoundingPhase(game, computer);
+                startUpBuiltMap.nextPhase(computer);
             }
             turnEndDummy(game, (Dummy) computer);
         }

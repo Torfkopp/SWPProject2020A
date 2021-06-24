@@ -30,15 +30,6 @@ public class UsersList {
     public void add(String s) { users.add(s); }
 
     /**
-     * Remove a User from the list
-     *
-     * @param s The name of the User to remove
-     *
-     * @return If the removal was successful
-     */
-    public boolean remove(String s) { return users.remove(s);}
-
-    /**
      * Gets the list
      *
      * @return ObservableList of strings
@@ -46,6 +37,15 @@ public class UsersList {
     public ObservableList<String> get() {
         return users;
     }
+
+    /**
+     * Remove a User from the list
+     *
+     * @param s The name of the User to remove
+     *
+     * @return If the removal was successful
+     */
+    public boolean remove(String s) { return users.remove(s);}
 
     /**
      * Clears the list and puts every

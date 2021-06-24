@@ -30,7 +30,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      * @param resourceList        The resource list
      * @param harbourResourceList The List containing all the types of harbours the Player owns
      */
-    public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
+    public InventoryForTradeResponse(Actor user, LobbyName lobbyName, ResourceList resourceList,
                                      List<HarbourResource> harbourResourceList) {
         super(lobbyName);
         this.user = user;

@@ -16,7 +16,7 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
@@ -123,7 +123,7 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received ChangeLobbySettingsRequest");
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getActor())) return;
-        if (lobby.get().getActor().size() > req.getAllowedPlayers()) return;
+        if (lobby.get().getActors().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
                                             req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(),
@@ -248,8 +248,8 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received LobbyJoinUserRequest for Lobby {}", req.getName());
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
-            if (lobby.get().getActor().size() < lobby.get().getMaxPlayers()) {
-                if (!lobby.get().getActor().contains(req.getActor())) {
+            if (lobby.get().getActors().size() < lobby.get().getMaxPlayers()) {
+                if (!lobby.get().getActors().contains(req.getActor())) {
                     if (!lobby.get().isInGame()) {
                         if (lobby.get().hasPassword() && req.getActor() instanceof User) {
                             Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(),
@@ -261,7 +261,7 @@ public class LobbyService extends AbstractService {
                             Actor user = req.getActor();
                             //To ensure that the AI's name is unique for that lobby
                             if (user instanceof AI) {
-                                for (Actor u : lobby.get().getActor()) {
+                                for (Actor u : lobby.get().getActors()) {
                                     if (u instanceof AI) {
                                         AI.Difficulty diff = ((AI) user).getDifficulty();
                                         while (u.getUsername().equals(user.getUsername())) user = new AIDTO(diff);
@@ -402,7 +402,7 @@ public class LobbyService extends AbstractService {
         List<ILobby> filteredLobbies = new ArrayList<>();
 
         lobbies.forEach((String, lobby) -> {
-            if (lobby.getActor().size() < lobby.getMaxPlayers() && !lobby.getActor().contains(req.getActor()) && !lobby
+            if (lobby.getActors().size() < lobby.getMaxPlayers() && !lobby.getActors().contains(req.getActor()) && !lobby
                     .isInGame() && !lobby.hasPassword()) {
                 filteredLobbies.add(lobby);
             }
@@ -478,7 +478,7 @@ public class LobbyService extends AbstractService {
         LobbyMap lobbies = lobbyManagement.getLobbies();
         SimpleLobbyMap lobbiesWithUser = new SimpleLobbyMap();
         for (ILobby lobby : lobbies.values()) {
-            if (lobby.getUserOrDummies().contains(user)) {
+            if (lobby.getActors().contains(user)) {
                 LobbyName name = lobby.getName();
                 lobbiesWithUser.put(name, ILobby.getSimpleLobby(lobby));
 
@@ -533,7 +533,7 @@ public class LobbyService extends AbstractService {
         LobbyName lobbyName = req.getLobbyName();
         Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
-            UserOrDummySet lobbyMembers = lobby.get().getUserOrDummies();
+            ActorSet lobbyMembers = lobby.get().getActors();
             int maxPlayers = lobby.get().getMaxPlayers();
             Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
                                                            lobby.get().getReadyUsers(), maxPlayers);
@@ -618,7 +618,7 @@ public class LobbyService extends AbstractService {
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (!req.getActor().equals(lobby.get().getOwner())) return;
-        if (lobby.get().getActor().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActor()))) return;
+        if (lobby.get().getActors().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActors()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getActor(), req.getMoveTime());
         post(msg);

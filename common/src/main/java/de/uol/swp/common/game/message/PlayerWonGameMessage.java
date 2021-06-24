@@ -2,7 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.specialisedUtil.VictoryPointOverTimeMap;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message sent to declare a winner and end the game.
@@ -22,7 +22,7 @@ public class PlayerWonGameMessage extends AbstractGameMessage {
      * @param user            The user that won the game.
      * @param victoryPointMap VictoryPointOverTimeMap
      */
-    public PlayerWonGameMessage(LobbyName lobbyName, UserOrDummy user,
+    public PlayerWonGameMessage(LobbyName lobbyName, Actor user,
                                 VictoryPointOverTimeMap victoryPointMap) {
         super(lobbyName, user);
         this.victoryPointMap = victoryPointMap;

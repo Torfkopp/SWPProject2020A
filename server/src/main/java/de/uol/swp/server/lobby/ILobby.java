@@ -3,8 +3,9 @@ package de.uol.swp.server.lobby;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
-import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 
 import java.io.Serializable;
@@ -35,8 +36,19 @@ public interface ILobby extends Serializable {
     static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.getMaxPlayers(),
                                lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled(),
-                               lobby.hasPassword(), lobby.getActor(), lobby.getReadyUsers(), lobby.getMaxTradeDiff());
+                               lobby.hasPassword(), lobby.getActors(), lobby.getReadyUsers(), lobby.getMaxTradeDiff());
     }
+
+    /**
+     * Gets all users and dummies in the lobby
+     *
+     * @return A Set containing all users and dummies in this lobby
+     *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
+     */
+    ActorSet getActors();
 
     /**
      * Gets the maximum amount of players for a lobby.
@@ -72,8 +84,6 @@ public interface ILobby extends Serializable {
 
     /**
      * Sets the maximum trade difference for a lobby
-     *
-     * @return Maximum trade difference
      *
      * @author Aldin Dervisi
      * @since 2021-08-06
@@ -131,15 +141,15 @@ public interface ILobby extends Serializable {
     String getPassword();
 
     /**
-     * Gets all users and dummies in the lobby
+     * Gets a set of all users marked as ready.
      *
-     * @return A Set containing all users and dummies in this lobby
+     * @return A Set containing all ready users
      *
-     * @author Alwin Bossert
-     * @author Temmo Junkhoff
-     * @since 2021-03-13
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
      */
-    UserOrDummySet getReadyUsers();
+    ActorSet getReadyUsers();
 
     /**
      * Gets all real users in the lobby
@@ -153,17 +163,6 @@ public interface ILobby extends Serializable {
     Set<User> getRealUsers();
 
     /**
-     * Gets a set of all users marked as ready.
-     *
-     * @return A Set containing all ready users
-     *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-01-19
-     */
-    Set<Actor> getReadyUsers();
-
-    /**
      * Gets a map of Actors and their chosen colour
      *
      * @return A map containing Actors and their chosen colour
@@ -171,18 +170,7 @@ public interface ILobby extends Serializable {
      * @author Mario Fokken
      * @since 2021-06-02
      */
-    UserOrDummyColourMap getUserColourMap();
-
-    /**
-     * Gets all users and dummies in the lobby
-     *
-     * @return A Set containing all users and dummies in this lobby
-     *
-     * @author Alwin Bossert
-     * @author Temmo Junkhoff
-     * @since 2021-03-13
-     */
-    UserOrDummySet getUserOrDummies();
+    ActorColourMap getUserColourMap();
 
     /**
      * Gets whether the Lobby has a password or not

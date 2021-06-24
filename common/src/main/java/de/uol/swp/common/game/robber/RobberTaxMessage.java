@@ -2,8 +2,9 @@ package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.specialisedUtil.UserOrDummyIntegerMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummyResourceListMap;
+import de.uol.swp.common.specialisedUtil.ActorIntegerMap;
+import de.uol.swp.common.specialisedUtil.ActorResourceListMap;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 
 /**
@@ -19,8 +20,8 @@ import de.uol.swp.common.user.User;
  */
 public class RobberTaxMessage extends AbstractGameMessage {
 
-    private final UserOrDummyIntegerMap players;
-    private final UserOrDummyResourceListMap inventories;
+    private final ActorIntegerMap players;
+    private final ActorResourceListMap inventories;
 
     /**
      * Constructor
@@ -30,8 +31,8 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * @param players     Map of User to pay the tax and the amount of card to pay
      * @param inventories Map of user and the inventory as map with resources and its amount
      */
-    public RobberTaxMessage(LobbyName lobbyName, UserOrDummy user, UserOrDummyIntegerMap players,
-                            UserOrDummyResourceListMap inventories) {
+    public RobberTaxMessage(LobbyName lobbyName, Actor user, ActorIntegerMap players,
+                            ActorResourceListMap inventories) {
         super(lobbyName, user);
         this.players = players;
         this.inventories = inventories;
@@ -52,7 +53,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and a map of a resource and its amount
      */
-    public UserOrDummyResourceListMap getInventories() {
+    public ActorResourceListMap getInventories() {
         return inventories;
     }
 
@@ -61,7 +62,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and the amount to pay
      */
-    public UserOrDummyIntegerMap getPlayers() {
+    public ActorIntegerMap getPlayers() {
         return players;
     }
 }

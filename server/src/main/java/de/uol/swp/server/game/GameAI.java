@@ -17,7 +17,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.server.specialisedUtil.UserOrDummyStartUpBuiltMap;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
@@ -299,7 +299,7 @@ public class GameAI {
                 startUpPhaseAIHard(game, ai);
                 break;
         }
-        UserOrDummyStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
         startUpBuiltMap.nextPhase(ai);
 
         gameService.turnEndAI(game, ai);
@@ -797,7 +797,7 @@ public class GameAI {
      * @since 2021-06-05
      */
     private void startUpPhaseAIHard(Game game, AI ai) {
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
         Player player = game.getPlayer(ai);
         IGameMapManagement map = game.getMap();
         LobbyName lobbyName = game.getLobby().getName();
@@ -941,7 +941,7 @@ public class GameAI {
     private void turnBuildAIHard(Game game, AI ai) {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
 
         useHarbour(game, ai);
 

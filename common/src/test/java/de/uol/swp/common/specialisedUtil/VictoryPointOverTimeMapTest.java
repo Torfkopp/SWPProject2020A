@@ -2,7 +2,7 @@ package de.uol.swp.common.specialisedUtil;
 
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class VictoryPointOverTimeMapTest {
     @Test
     void test() {
         VictoryPointOverTimeMap map = new VictoryPointOverTimeMap();
-        UserOrDummy user = new AIDTO(AI.Difficulty.EASY);
+        Actor user = new AIDTO(AI.Difficulty.EASY);
         Map<Integer, Integer> numbers = new HashMap<>();
         map.put(user, numbers);
         assertTrue(map.containsKey(user));

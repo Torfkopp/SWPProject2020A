@@ -8,7 +8,7 @@ import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
@@ -1007,8 +1007,8 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    private UserOrDummySet getWhoCanBuildAt(IEdge edge, Map<Player, UserOrDummy> playerUserMapping) {
-        var temp = new UserOrDummySet();
+    private ActorSet getWhoCanBuildAt(IEdge edge, Map<Player, Actor> playerUserMapping) {
+        var temp = new ActorSet();
         for (Player player : Player.values()) {
             if (roadPlaceable(player, edge)) temp.add(playerUserMapping.get(player));
         }
@@ -1026,8 +1026,8 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    private UserOrDummySet getWhoCanBuildAt(MapPoint mapPoint, Map<Player, UserOrDummy> playerUserMapping) {
-        var temp = new UserOrDummySet();
+    private ActorSet getWhoCanBuildAt(MapPoint mapPoint, Map<Player, Actor> playerUserMapping) {
+        var temp = new ActorSet();
         for (Player player : Player.values()) {
             if (settlementPlaceable(player, mapPoint) || settlementUpgradeable(player, mapPoint))
                 temp.add(playerUserMapping.get(player));

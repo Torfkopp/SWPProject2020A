@@ -133,7 +133,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getActor().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
                 for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
             }
@@ -166,7 +166,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getActor().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
                     post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
@@ -367,7 +367,7 @@ public class CommandService extends AbstractService {
      * <p>
      * Usage: {@code /kick <player>}
      * <p>
-     * Takes the given UserOrDummy and posts the fitting KickUserRequest onto the Eventbus.
+     * Takes the given actor and posts the fitting KickUserRequest onto the Eventbus.
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}

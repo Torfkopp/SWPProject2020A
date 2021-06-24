@@ -99,6 +99,6 @@ class LobbyMap extends HashMap<LobbyName, ILobby> {
      * @return Whether the user is in one of the lobbies
      */
     boolean isInALobby(User user) {
-        return values().stream().anyMatch(l -> l.getUserOrDummies().contains(user));
+        return values().stream().anyMatch(l -> l.getActors().contains(user));
     }
 }

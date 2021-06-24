@@ -16,8 +16,8 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
-import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
-import de.uol.swp.common.specialisedUtil.UserOrDummySet;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.Actor;
@@ -63,7 +63,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected UserOrDummySet readyUsers;
+    protected ActorSet readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -271,7 +271,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @see de.uol.swp.common.user.Actor
      * @since 2021-01-05
      */
-    protected void updateUsersList(UserOrDummySet userLobbyList) {
+    protected void updateUsersList(ActorSet userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
@@ -355,13 +355,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
-        UserOrDummyPlayerMap map = new UserOrDummyPlayerMap();
+        ActorPlayerMap map = new ActorPlayerMap();
         int i = 0;
         for (Actor u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
         actorPlayerMap = map;
         userColoursMap = msg.getUserColours();
-        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(userOrDummyPlayerMap));
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
         Platform.runLater(this::prepareColourComboBox);
     }
@@ -535,9 +535,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         inGameUserList = msg.getPlayerList();
-        userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
-        userColoursMap = msg.getUserOrDummyColourMap();
-        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(userOrDummyPlayerMap));
+        actorPlayerMap = msg.getActorPlayerMap();
+        userColoursMap = msg.getActorColourMap();
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
