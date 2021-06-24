@@ -1,10 +1,14 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A class to store the mapping of Actor, Player and Inventory
@@ -61,7 +65,7 @@ public class InventoryMap implements Serializable {
      * @return The array of Actor objects
      */
     public Actor[] getActorArray() {
-        List<Actor> returnArray = new LinkedList<>();
+        ActorSet returnArray = new ActorSet();
         map.forEach((key -> returnArray.add(key.getActor())));
         return returnArray.toArray(new Actor[0]);
     }
@@ -80,7 +84,7 @@ public class InventoryMap implements Serializable {
     }
 
     /**
-     * Gets the player for a given Actor
+     * Gets the player for a given actor
      *
      * @param actor The actor whose matching Player is needed
      *
@@ -99,8 +103,8 @@ public class InventoryMap implements Serializable {
      *
      * @since 2021-05-20
      */
-    public Map<Actor, Player> getActorToPlayerMap() {
-        Map<Actor, Player> temp = new HashMap<>();
+    public ActorPlayerMap getUserToPlayerMap() {
+        ActorPlayerMap temp = new ActorPlayerMap();
         for (UserPlayerInventoryMapping entry : map)
             temp.put(entry.getActor(), entry.getPlayer());
         return temp;
