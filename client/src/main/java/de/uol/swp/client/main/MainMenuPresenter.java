@@ -147,10 +147,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                         .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
 
         fullFilter.bind(Bindings.createObjectBinding(
-                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getUserOrDummies()
-                                                                                .size() == lobby.getKey()
-                                                                                                .getMaxPlayers())) || (!lobbyListFilteredFullBox
-                        .isSelected()), lobbyListFilteredFullBox.selectedProperty()));
+                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getActor().size() == lobby
+                        .getKey().getMaxPlayers())) || (!lobbyListFilteredFullBox.isSelected()), lobbyListFilteredFullBox.selectedProperty()));
 
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
@@ -389,28 +387,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
-        post(new ShowLobbyViewEvent(rsp.getLobby()));
-    }
-
-    /**
-     * Handles a CreateLobbyWithPasswordResponse found on the EventBus
-     * <p>
-     * If a new CreateLobbyWithPasswordResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent onto the EventBus the SceneManager is
-     * subscribed to. Then it calls the LobbyService to retrieve
-     * all members of that new lobby enabling the lobby window to
-     * display all members from the beginning.
-     *
-     * @param rsp The CreateLobbyWithPasswordResponse object found on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
-     * @since 2021-04-22
-     */
-    @Subscribe
-    private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
-        LOG.debug("Received CreateLobbyWithPasswordResponse");
         post(new ShowLobbyViewEvent(rsp.getLobby()));
     }
 
@@ -888,9 +864,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             lobbies.clear();
             for (ISimpleLobby l : lobbyList) {
-                String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
+                String s = l.getName() + " (" + l.getActor().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = ResourceManager.get("mainmenu.lobbylist.ingame", s);
-                else if (l.getUserOrDummies().size() == l.getMaxPlayers())
+                else if (l.getActor().size() == l.getMaxPlayers())
                     s = ResourceManager.get("mainmenu.lobbylist.full", s);
                 else if (l.hasPassword()) s = ResourceManager.get("mainmenu.lobbylist.haspassword", s);
                 lobbies.add(new Pair<>(l, s));

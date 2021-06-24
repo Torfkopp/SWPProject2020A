@@ -1,6 +1,6 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.io.Serializable;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class CardsAmount implements Serializable {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final int resourceCardsAmount;
     private final int developmentCardsAmount;
 
@@ -26,7 +26,7 @@ public class CardsAmount implements Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    public CardsAmount(UserOrDummy user, int resourceCardsAmount, int developmentCardsAmount) {
+    public CardsAmount(Actor user, int resourceCardsAmount, int developmentCardsAmount) {
         this.user = user;
         this.resourceCardsAmount = resourceCardsAmount;
         this.developmentCardsAmount = developmentCardsAmount;
@@ -64,7 +64,7 @@ public class CardsAmount implements Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

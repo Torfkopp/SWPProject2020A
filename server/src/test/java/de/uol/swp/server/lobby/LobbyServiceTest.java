@@ -107,13 +107,13 @@ class LobbyServiceTest {
         // check if lobby has a password
         assertTrue(createdLobby.get().hasPassword());
         // check if only 4 users are joined
-        assertEquals(4, createdLobby.get().getUserOrDummies().size());
+        assertEquals(4, createdLobby.get().getActor().size());
         // check if every user joined except user5
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user1));
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user2));
-        assertFalse(createdLobby.get().getUserOrDummies().contains(user3));
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user4));
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user5));
+        assertTrue(createdLobby.get().getActor().contains(user1));
+        assertTrue(createdLobby.get().getActor().contains(user2));
+        assertFalse(createdLobby.get().getActor().contains(user3));
+        assertTrue(createdLobby.get().getActor().contains(user4));
+        assertTrue(createdLobby.get().getActor().contains(user5));
     }
 
     @Test
@@ -137,11 +137,11 @@ class LobbyServiceTest {
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());
         // check if only 3 or less users are joined
-        assertEquals(3, createdLobby.get().getUserOrDummies().size());
+        assertEquals(3, createdLobby.get().getActor().size());
         // check if every user joined except user4
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user1));
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user2));
-        assertTrue(createdLobby.get().getUserOrDummies().contains(user3));
-        assertFalse(createdLobby.get().getUserOrDummies().contains(user4));
+        assertTrue(createdLobby.get().getActor().contains(user1));
+        assertTrue(createdLobby.get().getActor().contains(user2));
+        assertTrue(createdLobby.get().getActor().contains(user3));
+        assertFalse(createdLobby.get().getActor().contains(user4));
     }
 }

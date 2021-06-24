@@ -55,7 +55,7 @@ public class AIDTO implements AI {
     }
 
     @Override
-    public int compareTo(UserOrDummy o) {
+    public int compareTo(Actor o) {
         if (o instanceof AI) return name.compareTo(o.getUsername());
         else if (o instanceof User) return 1;
         else return -1;
@@ -93,7 +93,7 @@ public class AIDTO implements AI {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof UserOrDummy) return compareTo((UserOrDummy) o) == 0;
+        if (o instanceof Actor) return compareTo((Actor) o) == 0;
         return false;
     }
 

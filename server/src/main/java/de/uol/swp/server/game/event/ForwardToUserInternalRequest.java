@@ -1,7 +1,7 @@
 package de.uol.swp.server.game.event;
 
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
 /**
@@ -17,7 +17,7 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
  */
 public class ForwardToUserInternalRequest extends AbstractServerInternalMessage {
 
-    private final UserOrDummy targetUser;
+    private final Actor targetUser;
     private final ResponseMessage responseMessage;
 
     /**
@@ -26,7 +26,7 @@ public class ForwardToUserInternalRequest extends AbstractServerInternalMessage 
      * @param targetUser      User object of the targetUser
      * @param responseMessage Stored ResponseMessage
      */
-    public ForwardToUserInternalRequest(UserOrDummy targetUser, ResponseMessage responseMessage) {
+    public ForwardToUserInternalRequest(Actor targetUser, ResponseMessage responseMessage) {
         this.responseMessage = responseMessage;
         this.targetUser = targetUser;
     }
@@ -45,7 +45,7 @@ public class ForwardToUserInternalRequest extends AbstractServerInternalMessage 
      *
      * @return A User-Object of the target User
      */
-    public UserOrDummy getTargetUser() {
+    public Actor getTargetUser() {
         return targetUser;
     }
 }

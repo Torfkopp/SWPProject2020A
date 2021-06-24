@@ -1,6 +1,6 @@
 package de.uol.swp.server.game.event;
 
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
@@ -17,7 +17,7 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
 public class CreateGameInternalRequest extends AbstractServerInternalMessage {
 
     private final ILobby lobby;
-    private final UserOrDummy first;
+    private final Actor first;
     private final int moveTime;
 
     /**
@@ -27,7 +27,7 @@ public class CreateGameInternalRequest extends AbstractServerInternalMessage {
      * @param first    The User who started the game
      * @param moveTime The moveTime for the Game
      */
-    public CreateGameInternalRequest(ILobby lobby, UserOrDummy first, int moveTime) {
+    public CreateGameInternalRequest(ILobby lobby, Actor first, int moveTime) {
         super();
         this.lobby = lobby;
         this.first = first;
@@ -39,7 +39,7 @@ public class CreateGameInternalRequest extends AbstractServerInternalMessage {
      *
      * @return The first player in the game
      */
-    public UserOrDummy getFirst() {
+    public Actor getFirst() {
         return first;
     }
 

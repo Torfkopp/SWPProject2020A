@@ -1,7 +1,7 @@
 package de.uol.swp.client.trade.event;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Event used to show the window for the trading with another user
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class ShowTradeWithUserViewEvent {
 
     private final LobbyName lobbyName;
-    private final UserOrDummy respondingUser;
+    private final Actor respondingUser;
     private final boolean isCounterOffer;
 
     /**
@@ -27,7 +27,7 @@ public class ShowTradeWithUserViewEvent {
      * @param respondingUser User who the offer will be made to
      * @param isCounterOffer Whether the trade is a counter offer or not
      */
-    public ShowTradeWithUserViewEvent(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
+    public ShowTradeWithUserViewEvent(LobbyName lobbyName, Actor respondingUser, boolean isCounterOffer) {
         this.lobbyName = lobbyName;
         this.respondingUser = respondingUser;
         this.isCounterOffer = isCounterOffer;
@@ -48,7 +48,7 @@ public class ShowTradeWithUserViewEvent {
      *
      * @return Name of the responding user
      */
-    public UserOrDummy getRespondingUser() {
+    public Actor getRespondingUser() {
         return respondingUser;
     }
 

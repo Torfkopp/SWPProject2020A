@@ -8,7 +8,7 @@ import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -55,7 +55,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private Button offerTradeButton;
 
     private LobbyName lobbyName;
-    private UserOrDummy respondingUser;
+    private Actor respondingUser;
     private int traderInventorySize;
     private ResourceList selectedOwnResourceList;
     private ResourceList selectedPartnersResourceList;

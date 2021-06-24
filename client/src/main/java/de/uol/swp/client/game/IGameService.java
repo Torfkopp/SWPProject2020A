@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * An interface for all methods of the GameService
@@ -112,7 +112,7 @@ public interface IGameService {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-06
      */
-    void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim);
+    void robberChooseVictim(LobbyName lobbyName, Actor victim);
 
     /**
      * Posts a RobberNewPositionMessage

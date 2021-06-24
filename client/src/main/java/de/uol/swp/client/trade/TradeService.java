@@ -10,7 +10,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,7 +47,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceList demandedResources,
+    public void acceptUserTrade(LobbyName lobbyName, Actor offeringUser, ResourceList demandedResources,
                                 ResourceList offeredResources) {
         LOG.debug("Sending AcceptUserTradeRequest");
         Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
@@ -63,7 +63,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void cancelTrade(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public void cancelTrade(LobbyName lobbyName, Actor respondingUser) {
         LOG.debug("Sending TradeWithUserCancelRequest");
         Message request = new TradeWithUserCancelRequest(lobbyName, respondingUser);
         eventBus.post(request);
@@ -98,7 +98,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
+    public void offerTrade(LobbyName lobbyName, Actor respondingUser, ResourceList offeredResources,
                            ResourceList demandedResources, boolean counterOffer) {
         LOG.debug("Sending OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
@@ -107,7 +107,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void resetOfferTradeButton(LobbyName lobbyName, UserOrDummy offeringUser) {
+    public void resetOfferTradeButton(LobbyName lobbyName, Actor offeringUser) {
         LOG.debug("Sending ResetOfferTradeButtonRequest");
         Message request = new ResetOfferTradeButtonRequest(lobbyName, offeringUser);
         eventBus.post(request);
@@ -120,7 +120,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
+    public void showOfferWindow(LobbyName lobbyName, Actor offeringUser, TradeWithUserOfferResponse rsp) {
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
     }
@@ -132,7 +132,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
+    public void showUserTradeWindow(LobbyName lobbyName, Actor respondingUser, boolean isCounterOffer) {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
         eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser, isCounterOffer));
     }
@@ -145,7 +145,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer) {
+    public void tradeWithUser(LobbyName lobbyName, Actor respondingUser, boolean counterOffer) {
         LOG.debug("Sending TradeWithUserRequest");
         Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser,
                                                    counterOffer);

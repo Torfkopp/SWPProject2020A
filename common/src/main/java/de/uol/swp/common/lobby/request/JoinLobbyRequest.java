@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to join a lobby
@@ -21,7 +21,7 @@ public class JoinLobbyRequest extends AbstractLobbyRequest {
      *
      * @since 2019-10-08
      */
-    public JoinLobbyRequest(LobbyName lobbyName, UserOrDummy user) {
+    public JoinLobbyRequest(LobbyName lobbyName, Actor user) {
         super(lobbyName, user);
     }
 }

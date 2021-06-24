@@ -16,16 +16,19 @@ import de.uol.swp.common.lobby.LobbyName;
 public class CreateLobbyResponse extends AbstractLobbyResponse {
 
     private final ISimpleLobby lobby;
+    private final String password;
 
     /**
      * Constructor
      *
      * @param lobbyName The name for the new lobby
      * @param lobby     The object of the created lobby
+     * @param password  The password of the created lobby
      **/
-    public CreateLobbyResponse(LobbyName lobbyName, ISimpleLobby lobby) {
+    public CreateLobbyResponse(LobbyName lobbyName, ISimpleLobby lobby, String password) {
         super(lobbyName);
         this.lobby = lobby;
+        this.password = password;
     }
 
     /**
@@ -39,5 +42,17 @@ public class CreateLobbyResponse extends AbstractLobbyResponse {
      */
     public ISimpleLobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets the password of the created lobby
+     *
+     * @return The password of the lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-06-19
+     */
+    public String getPassword() {
+        return password;
     }
 }
