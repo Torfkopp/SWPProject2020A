@@ -36,7 +36,7 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
-    private final LinkedList<UserOrDummy> startUpPlayerOrder = new LinkedList<>();
+    private final LinkedList<Actor> startUpPlayerOrder = new LinkedList<>();
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<Actor, Boolean> autoRollEnabled;
     private final Map<Actor, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
@@ -232,7 +232,7 @@ public class Game {
      * @author Eric Vuong
      * @since 2021-06-10
      */
-    private void setActivePlayer(UserOrDummy newActivePlayer) {
+    private void setActivePlayer(Actor newActivePlayer) {
         activePlayer = newActivePlayer;
     }
 
@@ -763,7 +763,7 @@ public class Game {
      * @author Eric Vuong
      * @since 2021-06-10
      */
-    public void replaceUser(UserOrDummy userToReplace, UserOrDummy userToReplaceWith) {
+    public void replaceUser(Actor userToReplace, Actor userToReplaceWith) {
         if (Objects.equals(getActivePlayer(), userToReplace)) setActivePlayer(userToReplaceWith);
         players.replace(userToReplace, userToReplaceWith);
         pauseGameMap.remove(userToReplace);
@@ -771,7 +771,7 @@ public class Game {
         StartUpPhaseBuiltStructures build = playersStartUpBuiltMap.remove(userToReplace);
         playersStartUpBuiltMap.put(userToReplaceWith, build);
         for (int i = 0; i < startUpPlayerOrder.size(); i++) {
-            UserOrDummy user = startUpPlayerOrder.get(i);
+            Actor user = startUpPlayerOrder.get(i);
             if (Objects.equals(user, userToReplace)) {
                 startUpPlayerOrder.remove(user);
                 startUpPlayerOrder.add(i, userToReplaceWith);

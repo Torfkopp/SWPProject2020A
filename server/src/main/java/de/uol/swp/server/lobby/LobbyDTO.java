@@ -267,7 +267,7 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public void replaceUser(UserOrDummy userToReplace, UserOrDummy userToReplaceWith, Colour oldColour) {
+    public void replaceUser(Actor userToReplace, Actor userToReplaceWith, Colour oldColour) {
         users.remove(userToReplace);
         users.add(userToReplaceWith);
         readyUsers.remove(userToReplace);
@@ -299,14 +299,4 @@ public class LobbyDTO implements ILobby {
         this.owner = user;
     }
 
-    @Override
-    public int getMaxTradeDiff() {
-        return maxTradeDiff;
-    }
-
-    @Override
-    public void setMaxTradeDiff(int newTradeDiff) {
-        this.maxTradeDiff = newTradeDiff;
-
-    }
 }

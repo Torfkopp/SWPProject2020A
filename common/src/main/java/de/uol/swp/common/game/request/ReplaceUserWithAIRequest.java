@@ -2,7 +2,8 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
+
 
 /**
  * Request is send when the user leaves a lobby that is in a Game and it tries to replace the User with an AI
@@ -13,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ReplaceUserWithAIRequest extends AbstractGameRequest {
 
-    private final UserOrDummy userToReplace;
+    private final Actor userToReplace;
     private final Colour oldColour;
 
     /**
@@ -26,7 +27,7 @@ public class ReplaceUserWithAIRequest extends AbstractGameRequest {
      * @param userOrDummy The User to replace with the AI
      * @param oldColour   The Colour of the User who left the Lobby while inGame
      */
-    public ReplaceUserWithAIRequest(LobbyName originLobby, UserOrDummy userOrDummy, Colour oldColour) {
+    public ReplaceUserWithAIRequest(LobbyName originLobby, Actor userOrDummy, Colour oldColour) {
         super(originLobby);
         this.userToReplace = userOrDummy;
         this.oldColour = oldColour;
@@ -46,7 +47,7 @@ public class ReplaceUserWithAIRequest extends AbstractGameRequest {
      *
      * @return The User that is to be replaced
      */
-    public UserOrDummy getUserToReplace() {
+    public Actor getUserToReplace() {
         return userToReplace;
     }
 }

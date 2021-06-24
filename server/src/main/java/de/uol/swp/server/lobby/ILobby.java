@@ -275,7 +275,7 @@ public interface ILobby extends Serializable {
      * @author Eric Vuong
      * @since 2021-06-10
      */
-    void replaceUser(UserOrDummy userToReplace, UserOrDummy userToReplaceWith, Colour oldColour);
+    void replaceUser(Actor userToReplace, Actor userToReplaceWith, Colour oldColour);
 
     /**
      * Sets whether the Lobby currently has a password according to the boolean provided

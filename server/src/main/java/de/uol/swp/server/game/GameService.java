@@ -1361,7 +1361,7 @@ public class GameService extends AbstractService {
         LobbyName originLobby = req.getOriginLobby();
         Game game = gameManagement.getGame(originLobby);
         if (game == null) return;
-        UserOrDummy activePlayer = game.getActivePlayer();
+        Actor activePlayer = game.getActivePlayer();
         AIDTO userToReplaceWith = new AIDTO(AI.Difficulty.EASY);
         game.replaceUser(req.getUserToReplace(), userToReplaceWith);
         Optional<ILobby> lobby = lobbyManagement.getLobby(originLobby);
