@@ -91,7 +91,7 @@ class LobbyServiceTest {
         AddAIRequest request = (AddAIRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(ai, request.getUser());
+        assertEquals(ai, request.getActor());
     }
 
     @Test
@@ -105,9 +105,9 @@ class LobbyServiceTest {
         ChangeOwnerRequest request = (ChangeOwnerRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(secondUser, request.getNewOwner());
         assertEquals(secondUser.getID(), request.getNewOwner().getID());
         assertEquals(secondUser.getUsername(), request.getNewOwner().getUsername());
@@ -183,9 +183,9 @@ class LobbyServiceTest {
         JoinLobbyRequest request = (JoinLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -199,9 +199,9 @@ class LobbyServiceTest {
         JoinRandomLobbyRequest request = (JoinRandomLobbyRequest) event;
 
         assertEquals(new LobbyName(""), request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     /**
@@ -228,9 +228,9 @@ class LobbyServiceTest {
         KickUserRequest request = (KickUserRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(secondUser, request.getToBeKickedUser());
         assertEquals(secondUser.getID(), request.getToBeKickedUser().getID());
         assertEquals(secondUser.getUsername(), request.getToBeKickedUser().getUsername());
@@ -260,9 +260,9 @@ class LobbyServiceTest {
         LeaveLobbyRequest request = (LeaveLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     /**
@@ -411,7 +411,7 @@ class LobbyServiceTest {
         SetColourRequest request = (SetColourRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
+        assertEquals(defaultUser, request.getActor());
         assertEquals(colour, request.getColour());
     }
 
@@ -453,9 +453,9 @@ class LobbyServiceTest {
         ChangeLobbySettingsRequest request = (ChangeLobbySettingsRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(4, request.getAllowedPlayers());
         assertTrue(request.isStartUpPhaseEnabled());
         assertEquals(60, request.getMoveTime());
@@ -486,9 +486,9 @@ class LobbyServiceTest {
         UserReadyRequest request = (UserReadyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertTrue(request.isReady());
     }
 

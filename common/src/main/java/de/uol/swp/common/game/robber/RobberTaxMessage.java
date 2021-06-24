@@ -3,8 +3,8 @@ package de.uol.swp.common.game.robber;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,11 +29,11 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * Constructor
      *
      * @param lobbyName   The lobby's name
-     * @param user        The UserOrDummy who triggered this message
+     * @param user        The Actor who triggered this message
      * @param players     Map of User to pay the tax and the amount of card to pay
      * @param inventories Map of user and the inventory as map with resources and its amount
      */
-    public RobberTaxMessage(LobbyName lobbyName, UserOrDummy user, Map<User, Integer> players,
+    public RobberTaxMessage(LobbyName lobbyName, Actor user, Map<User, Integer> players,
                             Map<User, ResourceList> inventories) {
         super(lobbyName, user);
         this.players = players;

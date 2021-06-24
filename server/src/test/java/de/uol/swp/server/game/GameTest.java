@@ -4,9 +4,9 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.LobbyDTO;
@@ -158,8 +158,8 @@ public class GameTest {
     void gameTest() {
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        List<UserOrDummy> list = Arrays.asList(user, user2, user3, user4);
-        UserOrDummy[] u = game.getPlayers();
+        List<Actor> list = Arrays.asList(user, user2, user3, user4);
+        Actor[] u = game.getPlayers();
         //order is random, so just check that everyone is somewhere in the list of users in the Game
         assertTrue(list.contains(u[0]));
         assertTrue(list.contains(u[1]));
@@ -185,7 +185,7 @@ public class GameTest {
 
     @Test
     void getUserColoursMapTest() {
-        Map<UserOrDummy, Colour> userColoursMap = game.getUserColoursMap();
+        Map<Actor, Colour> userColoursMap = game.getUserColoursMap();
         // values are random, so just check all users have an associated Colour
         assertTrue(userColoursMap.containsKey(user));
         assertTrue(userColoursMap.containsKey(user2));
@@ -195,7 +195,7 @@ public class GameTest {
 
     @Test
     void nextPlayerTest() {
-        UserOrDummy[] players = game.getPlayers();
+        Actor[] players = game.getPlayers();
         assertEquals(players[1], game.nextPlayer());
         assertEquals(players[2], game.nextPlayer());
         assertEquals(players[3], game.nextPlayer());

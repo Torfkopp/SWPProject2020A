@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to update his Inventory
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class UpdateInventoryRequest extends AbstractGameRequest {
 
-    private final UserOrDummy user;
+    private final Actor user;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ public class UpdateInventoryRequest extends AbstractGameRequest {
      * @param user        The User wanting to update his Inventory
      * @param originLobby The Lobby from which a request originated from
      */
-    public UpdateInventoryRequest(UserOrDummy user, LobbyName originLobby) {
+    public UpdateInventoryRequest(Actor user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }
@@ -35,7 +35,7 @@ public class UpdateInventoryRequest extends AbstractGameRequest {
      *
      * @return The user of the UpdateInventoryRequest
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

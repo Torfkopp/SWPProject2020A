@@ -30,7 +30,7 @@ class UserReadyMessageTest {
         UserReadyMessage userReadyMessage = new UserReadyMessage(defaultLobbyName, defaultUser);
 
         assertEquals(defaultLobbyName, userReadyMessage.getName());
-        assertEquals(defaultUser, userReadyMessage.getUser());
-        assertEquals(defaultUser.getUsername(), userReadyMessage.getUser().getUsername());
+        assertEquals(defaultUser, userReadyMessage.getActor());
+        assertEquals(defaultUser.getUsername(), userReadyMessage.getActor().getUsername());
     }
 }

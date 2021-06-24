@@ -4,7 +4,7 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * An interface for all methods of the LobbyService
@@ -38,7 +38,7 @@ public interface ILobbyService {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-15
      */
-    void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
+    void changeOwner(LobbyName lobbyName, Actor newOwner);
 
     /**
      * Posts a request to check if the user is currently in a lobby
@@ -95,7 +95,7 @@ public interface ILobbyService {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-23
      */
-    void kickUser(LobbyName lobbyName, UserOrDummy userToKick);
+    void kickUser(LobbyName lobbyName, Actor userToKick);
 
     /**
      * Posts a request to leave a specified lobby onto the EventBus

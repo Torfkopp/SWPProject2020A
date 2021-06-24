@@ -2,9 +2,9 @@ package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.NPC;
+import de.uol.swp.common.user.Actor;
+import de.uol.swp.common.user.Computer;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Util;
 
 import java.util.*;
@@ -24,10 +24,10 @@ import java.util.*;
 public class LobbyDTO implements ILobby {
 
     private final LobbyName name;
-    private final Set<UserOrDummy> users = new TreeSet<>();
-    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final Set<Actor> users = new TreeSet<>();
+    private final Set<Actor> readyUsers = new TreeSet<>();
     private final String password;
-    private final Map<UserOrDummy, Colour> userColours = new LinkedHashMap<>();
+    private final Map<Actor, Colour> userColours = new LinkedHashMap<>();
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -85,6 +85,7 @@ public class LobbyDTO implements ILobby {
      * @param startUpPhaseEnabled    The start up phase enabled
      * @param randomPlayFieldEnabled The random playfield enabled
      * @param maxTradeDiff           The maximum Resource difference
+     *
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
@@ -154,34 +155,29 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Set<UserOrDummy> getReadyUsers() {
-        return readyUsers;
+    public Set<Actor> getActor() {
+        return Collections.unmodifiableSet(users);
     }
 
     @Override
     public Set<User> getRealUsers() {
         Set<User> userSet = new TreeSet<>();
-        for (UserOrDummy userOrDummy : users) {
-            if (userOrDummy instanceof User) {
-                userSet.add((User) userOrDummy);
+        for (Actor actor : users) {
+            if (actor instanceof User) {
+                userSet.add((User) actor);
             }
         }
         return Collections.unmodifiableSet(userSet);
     }
 
     @Override
-    public Map<UserOrDummy, Colour> getUserColourMap() {
+    public Set<Actor> getReadyUsers() {
+        return readyUsers;
+    }
+
+    @Override
+    public Map<Actor, Colour> getUserColourMap() {
         return userColours;
-    }
-
-    @Override
-    public void setUserColour(UserOrDummy user, Colour colour) {
-        userColours.put(user, colour);
-    }
-
-    @Override
-    public Set<UserOrDummy> getUserOrDummies() {
-        return Collections.unmodifiableSet(users);
     }
 
     @Override
@@ -220,20 +216,20 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public void joinUser(UserOrDummy user) {
+    public void joinUser(Actor user) {
         this.users.add(user);
         //Give a new user a random colour (except Gold)
         Colour colour = Util.randomColour();
         while (userColours.containsValue(colour)) colour = Util.randomColour();
         userColours.put(user, colour);
-        if (user instanceof NPC) {
+        if (user instanceof Computer) {
             if (user.getUsername().equals("Temmo")) userColours.put(user, Colour.TEMMO);
             readyUsers.add(user);
         }
     }
 
     @Override
-    public void leaveUser(UserOrDummy user) {
+    public void leaveUser(Actor user) {
         if (users.size() == 1) {
             throw new IllegalArgumentException("Lobby must contain at least one user!");
         }
@@ -243,7 +239,7 @@ public class LobbyDTO implements ILobby {
             unsetUserReady(user);
             if (this.owner.equals(user)) {
                 boolean foundUser = false;
-                for (UserOrDummy nextOwner : users) {
+                for (Actor nextOwner : users) {
                     if (nextOwner instanceof User) {
                         foundUser = true;
                         updateOwner((User) nextOwner);
@@ -256,17 +252,22 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
+    public void setUserColour(Actor user, Colour colour) {
+        userColours.put(user, colour);
+    }
+
+    @Override
     public void setHasPassword(boolean hasPassword) {
         this.hasPassword = hasPassword;
     }
 
     @Override
-    public void setUserReady(UserOrDummy user) {
+    public void setUserReady(Actor user) {
         this.readyUsers.add(user);
     }
 
     @Override
-    public void unsetUserReady(UserOrDummy user) {
+    public void unsetUserReady(Actor user) {
         this.readyUsers.remove(user);
     }
 
@@ -287,6 +288,5 @@ public class LobbyDTO implements ILobby {
     @Override
     public void setMaxTradeDiff(int newTradeDiff) {
         this.maxTradeDiff = newTradeDiff;
-
     }
 }

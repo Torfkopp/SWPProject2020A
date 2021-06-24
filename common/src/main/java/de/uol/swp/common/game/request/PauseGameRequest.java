@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to change the
@@ -12,17 +12,17 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class PauseGameRequest extends AbstractGameRequest {
 
-    private final UserOrDummy userOrDummy;
+    private final Actor actor;
 
     /**
      * Constructor
      *
      * @param originLobby The name of the lobby where the user wants to change the pause status of the game
-     * @param userOrDummy The User who wants the change the pause status of the game
+     * @param actor       The User who wants the change the pause status of the game
      */
-    public PauseGameRequest(LobbyName originLobby, UserOrDummy userOrDummy) {
+    public PauseGameRequest(LobbyName originLobby, Actor actor) {
         super(originLobby);
-        this.userOrDummy = userOrDummy;
+        this.actor = actor;
     }
 
     /**
@@ -30,7 +30,7 @@ public class PauseGameRequest extends AbstractGameRequest {
      *
      * @return The User who wants the change the pause status of the game
      */
-    public UserOrDummy getUserOrDummy() {
-        return userOrDummy;
+    public Actor getActor() {
+        return actor;
     }
 }

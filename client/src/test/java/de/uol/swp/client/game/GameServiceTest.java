@@ -76,9 +76,9 @@ class GameServiceTest {
         BuildRequest request = (BuildRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(edgeMapPoint, request.getMapPoint());
         assertEquals(MapPoint.Type.EDGE, request.getMapPoint().getType());
         assertEquals(hexMapPointL, request.getMapPoint().getL());
@@ -113,9 +113,9 @@ class GameServiceTest {
         EndTurnRequest request = (EndTurnRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -129,7 +129,7 @@ class GameServiceTest {
         PauseGameRequest request = (PauseGameRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUserOrDummy());
+        assertEquals(defaultUser, request.getActor());
     }
 
     @Test
@@ -250,9 +250,9 @@ class GameServiceTest {
         RollDiceRequest request = (RollDiceRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -266,9 +266,9 @@ class GameServiceTest {
         StartSessionRequest request = (StartSessionRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -319,9 +319,9 @@ class GameServiceTest {
         UpdateInventoryRequest request = (UpdateInventoryRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Subscribe

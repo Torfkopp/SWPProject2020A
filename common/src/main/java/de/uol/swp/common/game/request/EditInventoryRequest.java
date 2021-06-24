@@ -3,7 +3,7 @@ package de.uol.swp.common.game.request;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request used to change the amount of a resource in a player's inventory
@@ -15,7 +15,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class EditInventoryRequest extends AbstractGameRequest {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final ResourceType resource;
     private final DevelopmentCardType developmentCard;
     private final int amount;
@@ -31,7 +31,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *                     to/from the resource
      * @param giveAllCards Whether the user should get every resource or not
      */
-    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, ResourceType resource,
+    public EditInventoryRequest(LobbyName originLobby, Actor user, ResourceType resource,
                                 DevelopmentCardType developmentCard, int amount, boolean giveAllCards) {
         super(originLobby);
         this.user = user;
@@ -74,7 +74,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *
      * @return The user whose inventory to update
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 

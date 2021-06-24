@@ -2,8 +2,8 @@ package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ class IntersectionWithBuildableTest {
     void isBuildableBy() {
         User defaultUser = mock(User.class);
         User secondUser = mock(User.class);
-        List<UserOrDummy> buildableByList = new ArrayList<>();
+        List<Actor> buildableByList = new ArrayList<>();
         buildableByList.add(defaultUser);
 
         IntersectionWithBuildable intersection = new IntersectionWithBuildable(Player.PLAYER_1,

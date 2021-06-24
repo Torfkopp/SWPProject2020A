@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when the responding user wants to accept the trade offer.
@@ -14,8 +14,8 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class AcceptUserTradeRequest extends AbstractGameRequest {
 
-    private final UserOrDummy respondingUser;
-    private final UserOrDummy offeringUser;
+    private final Actor respondingUser;
+    private final Actor offeringUser;
     private final ResourceList demandedResources;
     private final ResourceList offeredResources;
 
@@ -28,7 +28,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param demandedResources The demanded resources
      * @param offeredResources  The offered resources
      */
-    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
+    public AcceptUserTradeRequest(Actor respondingUser, Actor offeringUser, LobbyName lobbyName,
                                   ResourceList demandedResources, ResourceList offeredResources) {
         super(lobbyName);
         this.respondingUser = respondingUser;
@@ -60,7 +60,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Name of the offering user
      */
-    public UserOrDummy getOfferingUser() {
+    public Actor getOfferingUser() {
         return offeringUser;
     }
 
@@ -69,7 +69,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Name of the responding user
      */
-    public UserOrDummy getRespondingUser() {
+    public Actor getRespondingUser() {
         return respondingUser;
     }
 }
