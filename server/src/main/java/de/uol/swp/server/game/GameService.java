@@ -1120,8 +1120,8 @@ public class GameService extends AbstractService {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
-            post(returnMessage);
             LOG.debug("Sending PlayCardFailureResponse");
+            post(returnMessage);
             LOG.debug("---- Not enough Knight cards");
             return;
         }

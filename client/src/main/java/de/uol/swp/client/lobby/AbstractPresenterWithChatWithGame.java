@@ -1029,6 +1029,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.showAndWait();
             soundService.button();
         });
+        resetButtonStates(rsp.getUser());
     }
 
     /**
