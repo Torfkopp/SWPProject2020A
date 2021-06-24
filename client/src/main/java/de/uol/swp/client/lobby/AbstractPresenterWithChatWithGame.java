@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
 import de.uol.swp.client.changeSettings.event.ShowChangeGameSettingsViewEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
@@ -126,7 +125,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label currentRound;
     @FXML
-    protected Button helpCheckBox;
+    protected Button helpButton;
 
     protected ObservableList<Actor> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
@@ -311,6 +310,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onHelpButtonPressed() {
+        if (helpButton.isDisabled()) {
+            LOG.trace("onHelpButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
@@ -344,24 +347,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a click on the Pause/Unpause Button
-     * <p>
-     * Calls the pauseGame method of the gameService to
-     * start or participate in a voting to pause/unpause the
-     * game
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-21
-     */
-    @FXML
-    protected void onPauseButtonPressed() {
-        soundService.button();
-        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
-        else Platform.runLater(
-                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
-    }
-
-    /**
      * Handles a click on the PlayCardButton
      * <p>
      * Method called when the PlayCardButton is pushed
@@ -374,6 +359,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onPlayCardButtonPressed() {
+        if (playCard.isDisabled()) {
+            LOG.trace("onPlayCardButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -470,6 +459,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithBankButtonPressed() {
+        if (tradeWithBankButton.isDisabled()) {
+            LOG.trace("onTradeWithBankButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
@@ -489,6 +482,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithUserButtonPressed() {
+        if (tradeWithUserButton.isDisabled()) {
+            LOG.trace("onTradeWithUserButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         Actor user = membersView.getSelectionModel().getSelectedItem();

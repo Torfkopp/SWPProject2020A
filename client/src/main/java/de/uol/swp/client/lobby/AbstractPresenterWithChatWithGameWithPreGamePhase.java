@@ -241,12 +241,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (userService.getLoggedInUser().equals(owner)) {
-            startSession.setVisible(true);
-            startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
-        } else {
-            startSession.setDisable(true);
-            startSession.setVisible(false);
+        if (!inGame) {
+            if (userService.getLoggedInUser().equals(owner)) {
+                startSession.setVisible(true);
+                startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
+            } else {
+                startSession.setDisable(true);
+                startSession.setVisible(false);
+            }
         }
     }
 
@@ -446,8 +448,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
+            helpButton.setDisable(true);
+            helpButton.setVisible(false);
             turnIndicator.setAccessibleText("");
             buildingCosts.setVisible(false);
             victoryPointsLabel.setVisible(false);
@@ -692,8 +694,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        helpCheckBox.setDisable(false);
-        helpCheckBox.setVisible(true);
+        helpButton.setDisable(false);
+        helpButton.setVisible(true);
     }
 
     /**
