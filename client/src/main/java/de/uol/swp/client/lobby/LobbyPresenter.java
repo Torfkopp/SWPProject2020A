@@ -17,6 +17,7 @@ import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.ResourceManager;
@@ -31,7 +32,9 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the lobby's menu
@@ -122,7 +125,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
         this.owner = (User) rsp.getOwner();
-        if (this.readyUsers == null) this.readyUsers = new HashSet<>();
+        if (this.readyUsers == null) this.readyUsers = new ActorSet();
         this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
         updateUsersList(rsp.getUsers());
@@ -195,7 +198,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             window = membersView.getScene().getWindow();
         }
         if (readyUsers == null) {
-            readyUsers = new HashSet<>();
+            readyUsers = new ActorSet();
         }
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 

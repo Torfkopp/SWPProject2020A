@@ -1,10 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.lobby.ISimpleLobby;
-import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
-
-import java.util.Map;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 
 /**
  * Response sent by the server when a user wants to be removed from all lobbies
@@ -17,14 +14,14 @@ import java.util.Map;
  */
 public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
 
-    private final Map<LobbyName, ISimpleLobby> lobbiesWithUser;
+    private final SimpleLobbyMap lobbiesWithUser;
 
     /**
      * Constructor
      *
      * @param lobbiesWithUser The Map with the Lobbies
      **/
-    public RemoveFromLobbiesResponse(Map<LobbyName, ISimpleLobby> lobbiesWithUser) {
+    public RemoveFromLobbiesResponse(SimpleLobbyMap lobbiesWithUser) {
         this.lobbiesWithUser = lobbiesWithUser;
     }
 
@@ -33,7 +30,7 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
      *
      * @return Map getLobbiesWithUser
      */
-    public Map<LobbyName, ISimpleLobby> getLobbiesWithUser() {
+    public SimpleLobbyMap getLobbiesWithUser() {
         return lobbiesWithUser;
     }
 }

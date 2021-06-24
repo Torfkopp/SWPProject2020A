@@ -2,9 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
-import de.uol.swp.common.user.Actor;
-
-import java.util.Map;
+import de.uol.swp.common.specialisedUtil.ActorIntegerMap;
 
 /**
  * Message send to update the UniqueCardsList
@@ -15,7 +13,7 @@ import java.util.Map;
 public class UpdateVictoryPointsMessage extends AbstractServerMessage {
 
     private final LobbyName lobbyName;
-    private final Map<Actor, Integer> victoryPointMap;
+    private final ActorIntegerMap victoryPointMap;
 
     /**
      * Constructor
@@ -23,7 +21,7 @@ public class UpdateVictoryPointsMessage extends AbstractServerMessage {
      * @param lobbyName       The name of the lobby
      * @param victoryPointMap The Map of the Actor and it's Victory Points
      */
-    public UpdateVictoryPointsMessage(LobbyName lobbyName, Map<Actor, Integer> victoryPointMap) {
+    public UpdateVictoryPointsMessage(LobbyName lobbyName, ActorIntegerMap victoryPointMap) {
         this.lobbyName = lobbyName;
         this.victoryPointMap = victoryPointMap;
     }
@@ -42,7 +40,7 @@ public class UpdateVictoryPointsMessage extends AbstractServerMessage {
      *
      * @return the Map Actor and it's Victory Points
      */
-    public Map<Actor, Integer> getVictoryPointMap() {
+    public ActorIntegerMap getVictoryPointMap() {
         return victoryPointMap;
     }
 }

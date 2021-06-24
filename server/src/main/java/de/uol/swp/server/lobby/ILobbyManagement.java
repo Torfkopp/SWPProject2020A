@@ -1,10 +1,9 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 import de.uol.swp.common.user.User;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -48,7 +47,7 @@ public interface ILobbyManagement {
      *
      * @since 2020-12-12
      */
-    Map<LobbyName, ILobby> getLobbies();
+    LobbyMap getLobbies();
 
     /**
      * Searches for the lobby with the requested name
@@ -68,7 +67,7 @@ public interface ILobbyManagement {
      * @param name     String containing the name of the lobby to search for
      * @param password String containing the password of the lobby to search for
      *
-     * @return Either an empty Optional or an Optional conaining the lobby
+     * @return Either an empty Optional or an Optional containing the lobby
      *
      * @author Alwin Bossert
      * @see java.util.Optional
@@ -83,7 +82,7 @@ public interface ILobbyManagement {
      *
      * @since 2020-12-12
      */
-    Map<LobbyName, ISimpleLobby> getSimpleLobbies();
+    SimpleLobbyMap getSimpleLobbies();
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided

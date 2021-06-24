@@ -270,12 +270,12 @@ public interface IGameMapManagement {
      *
      * @param mapPoint The hex
      *
-     * @return Set of Players around said hex
+     * @return List of Players around said hex
      *
      * @author Mario Fokken
      * @since 2021-04-07
      */
-    Set<Player> getPlayersAroundHex(MapPoint mapPoint);
+    List<Player> getPlayersAroundHex(MapPoint mapPoint);
 
     /**
      * Builds a Settlement on a random Intersection during the Founding Phase
