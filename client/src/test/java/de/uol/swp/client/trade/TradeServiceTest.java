@@ -41,6 +41,7 @@ class TradeServiceTest {
     private ITradeService tradeService;
     private IUserService userService;
     private Object event;
+    private Object event2;
 
     @BeforeAll
     static void fillLists() {
@@ -105,9 +106,9 @@ class TradeServiceTest {
         BuyDevelopmentCardRequest request = (BuyDevelopmentCardRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -137,9 +138,9 @@ class TradeServiceTest {
         ExecuteTradeWithBankRequest request = (ExecuteTradeWithBankRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(defaultGainedResource, request.getGetResource());
         assertEquals(defaultLostResource, request.getGiveResource());
     }
@@ -192,9 +193,9 @@ class TradeServiceTest {
         TradeWithBankRequest request = (TradeWithBankRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
     }
 
     @Test
@@ -208,9 +209,9 @@ class TradeServiceTest {
         TradeWithUserRequest request = (TradeWithUserRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
-        assertEquals(defaultUser, request.getUser());
-        assertEquals(defaultUser.getID(), request.getUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser, request.getActor());
+        assertEquals(defaultUser.getID(), request.getActor().getID());
+        assertEquals(defaultUser.getUsername(), request.getActor().getUsername());
         assertEquals(secondUser, request.getRespondingUser());
         assertEquals(secondUser.getID(), request.getRespondingUser().getID());
         assertEquals(secondUser.getUsername(), request.getRespondingUser().getUsername());
@@ -218,7 +219,11 @@ class TradeServiceTest {
 
     @Subscribe
     private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
+        if (this.event == null) {
+            this.event = e.getEvent();
+        } else {
+            this.event2 = e.getEvent();
+        }
         System.out.print(e.getEvent());
         lock.countDown();
     }

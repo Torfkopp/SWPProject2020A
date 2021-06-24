@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * This request contains the necessary information for a trade
@@ -15,8 +15,8 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
-    private final UserOrDummy offeringUser;
-    private final UserOrDummy respondingUser;
+    private final Actor offeringUser;
+    private final Actor respondingUser;
     private final ResourceList offeredResources;
     private final ResourceList demandedResources;
     private final boolean counterOffer;
@@ -31,7 +31,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param demandedResources The responded resources
      * @param counterOffer      Whether the offer is a counter offer or not
      */
-    public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
+    public OfferingTradeWithUserRequest(Actor offeringUser, Actor respondingUser, LobbyName lobbyName,
                                         ResourceList offeredResources, ResourceList demandedResources,
                                         boolean counterOffer) {
         super(lobbyName);
@@ -65,7 +65,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return User-Object of the offering User
      */
-    public UserOrDummy getOfferingUser() {
+    public Actor getOfferingUser() {
         return offeringUser;
     }
 
@@ -74,7 +74,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return User-Object of the responding User
      */
-    public UserOrDummy getRespondingUser() {
+    public Actor getRespondingUser() {
         return respondingUser;
     }
 

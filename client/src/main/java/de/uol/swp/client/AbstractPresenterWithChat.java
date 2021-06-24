@@ -12,6 +12,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.robber.RobbingMessage;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -299,11 +300,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
-                if (msg.getUser().equals(userService.getLoggedInUser())) {
-                    String title = resourceBundle.getString("error.title");
-                    String headerText = resourceBundle.getString("error.header");
-                    String contentText = resourceBundle.getString("game.robber.error");
-                    String confirmText = resourceBundle.getString("button.confirm");
+                if (msg.getActor().equals(userService.getLoggedInUser())) {
+                    String title = ResourceManager.get("error.title");
+                    String headerText = ResourceManager.get("error.header");
+                    String contentText = ResourceManager.get("game.robber.error");
+                    String confirmText = ResourceManager.get("button.confirm");
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle(title);

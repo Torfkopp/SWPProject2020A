@@ -11,7 +11,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +48,14 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
+    public void addAI(LobbyName name, AI ai) {
+        LOG.debug("Sending AddAIRequest");
+        Message addAIRequest = new AddAIRequest(name, ai);
+        eventBus.post(addAIRequest);
+    }
+
+    @Override
+    public void changeOwner(LobbyName lobbyName, Actor newOwner) {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
         eventBus.post(req);
@@ -76,21 +83,14 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void addAI(LobbyName name, AI ai) {
-        LOG.debug("Sending AddAIRequest");
-        Message addAIRequest = new AddAIRequest(name, ai);
-        eventBus.post(addAIRequest);
-    }
-
-    @Override
     public void joinRandomLobby() {
         LOG.debug("Sending JoinRandomLobbyRequest");
-        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
+        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(new LobbyName(""), userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
     }
 
     @Override
-    public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
+    public void kickUser(LobbyName lobbyName, Actor userToKick) {
         LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
         eventBus.post(kickUserRequest);
@@ -117,13 +117,6 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void setColour(LobbyName lobbyName, Colour colour) {
-        LOG.debug("Sending SetColourRequest");
-        Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
-        eventBus.post(setColourRequest);
-    }
-
-    @Override
     public void retrieveAllLobbies() {
         LOG.debug("Sending RetrieveAllLobbiesRequest");
         Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
@@ -145,11 +138,19 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        LOG.debug("Sending SetColourRequest");
+        Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
+        eventBus.post(setColourRequest);
+    }
+
+    @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
                                     boolean randomPlayFieldEnabled, int maxTradeDiff) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled, maxTradeDiff));
+                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled,
+                                                     maxTradeDiff));
     }
 
     @Override

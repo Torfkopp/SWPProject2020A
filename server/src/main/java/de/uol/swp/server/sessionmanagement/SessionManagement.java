@@ -2,8 +2,8 @@ package de.uol.swp.server.sessionmanagement;
 
 import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.sessions.Session;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ public class SessionManagement implements ISessionManagement {
     }
 
     @Override
-    public Optional<Session> getSession(UserOrDummy user) {
+    public Optional<Session> getSession(Actor user) {
         Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
                                                                .filter(e -> e.getValue().equals(user)).findFirst();
         return entry.map(Map.Entry::getKey);

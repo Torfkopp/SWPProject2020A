@@ -6,6 +6,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -179,7 +180,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
-            sceneService.showError(resourceBundle.getString("changeaccdetails.error.empty.changepw"));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.changepw"));
         }
 
         User user = userService.getLoggedInUser();
@@ -192,17 +193,17 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         if (Strings.isNullOrEmpty(newUsernameField.getText()) && Strings
                 .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                     .isNullOrEmpty(newPasswordField2.getText())) {
-            sceneService.showError(resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails"));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.changeaccdetails"));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
-            sceneService.showError(resourceBundle.getString("register.error.invalid.email"));
+            sceneService.showError(ResourceManager.get("register.error.invalid.email"));
         } else if (Strings.isNullOrEmpty(newPasswordField.getText()) && !Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            sceneService.showError(resourceBundle.getString("changeaccdetails.error.empty.newpw"));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpw"));
         } else if (!Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            sceneService.showError(resourceBundle.getString("changeaccdetails.error.empty.newpw"));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpw"));
         } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
-            sceneService.showError(resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm"));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpasswordconfirm"));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
                 newPassword = userService.hash(newPasswordField.getText());

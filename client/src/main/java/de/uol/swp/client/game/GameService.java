@@ -15,7 +15,7 @@ import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -108,7 +108,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim) {
+    public void robberChooseVictim(LobbyName lobbyName, Actor victim) {
         LOG.debug("Sending RobberChosenVictimRequest");
         Message msg = new RobberChosenVictimRequest(lobbyName, userService.getLoggedInUser(), victim);
         eventBus.post(msg);

@@ -2,7 +2,7 @@ package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Response of the server is sent to the lobby where a trade with the bank
@@ -15,7 +15,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy user;
+    private final Actor user;
 
     /**
      * Constructor
@@ -23,7 +23,7 @@ public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
      * @param user      user who had a successful trade with the bank
      * @param lobbyName name of the lobby where the trade happened
      */
-    public TradeWithBankAcceptedResponse(UserOrDummy user, LobbyName lobbyName) {
+    public TradeWithBankAcceptedResponse(Actor user, LobbyName lobbyName) {
         super(lobbyName);
         this.user = user;
     }
@@ -33,7 +33,7 @@ public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
      *
      * @return The User who had a successful trade
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

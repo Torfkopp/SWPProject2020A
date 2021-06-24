@@ -18,6 +18,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.*;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -138,10 +139,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                         .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
 
         fullFilter.bind(Bindings.createObjectBinding(
-                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getUserOrDummies()
-                                                                                .size() == lobby.getKey()
-                                                                                                .getMaxPlayers())) || (!lobbyListFilteredFullBox
-                        .isSelected()), lobbyListFilteredFullBox.selectedProperty()));
+                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getActor().size() == lobby
+                        .getKey().getMaxPlayers())) || (!lobbyListFilteredFullBox.isSelected()), lobbyListFilteredFullBox.selectedProperty()));
 
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
@@ -268,6 +267,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
      *
      * @author Alwin Bossert
+     * @see de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent
      * @since 2021-05-22
      */
     @FXML
@@ -294,7 +294,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
         LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
-            sceneService.showError(resourceBundle.getString("lobby.error.in.lobby"));
+            sceneService.showError(ResourceManager.get("lobby.error.in.lobby"));
         } else {
             sceneService.showChangeAccountDetailsScreen();
         }
@@ -317,24 +317,23 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onCreateLobbyButtonPressed() {
         soundService.button();
         //give the lobby a default name
-        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
-                                    userService.getLoggedInUser().getUsername());
+        String name = ResourceManager.get("lobby.window.defaulttitle", userService.getLoggedInUser().getUsername());
 
         //create Dialogue, only allow alphanumeric characters plus _',- and space
         UnaryOperator<TextFormatter.Change> filter = s ->
                 s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
-        dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
-        dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
+        dialogue.setTitle(ResourceManager.get("lobby.dialog.title"));
+        dialogue.setHeaderText(ResourceManager.get("lobby.dialog.header"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
-        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        Label lbl = new Label(ResourceManager.get("lobby.dialog.content"));
         lbl.setPrefHeight(25);
         lbl.setLabelFor(lobbyName);
         lbl.setMnemonicParsing(true);
         HBox box = new HBox(10, lbl, lobbyName);
-        CheckBox lobbyPasswordCheckBox = new CheckBox(resourceBundle.getString("lobby.dialog.password"));
+        CheckBox lobbyPasswordCheckBox = new CheckBox(ResourceManager.get("lobby.dialog.password"));
         lobbyPasswordCheckBox.setPrefHeight(25);
         PasswordField lobbyPassword = new PasswordField();
         HBox box1 = new HBox(10, lobbyPasswordCheckBox, lobbyPassword);
@@ -342,9 +341,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
                                                                            lobbyPasswordCheckBox.selectedProperty()));
         dialogue.getDialogPane().setContent(vBox);
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType confirm = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
         dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
                 () -> lobbyName.getText().isBlank() || !lobbyName.getText().matches("[ A-Za-z0-9_',-]+"),
@@ -383,27 +381,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles a CreateLobbyWithPasswordResponse found on the EventBus
-     * <p>
-     * If a new CreateLobbyWithPasswordResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent onto the EventBus the SceneManager is
-     * subscribed to. Then it calls the LobbyService to retrieve
-     * all members of that new lobby enabling the lobby window to
-     * display all members from the beginning.
-     *
-     * @param rsp The CreateLobbyWithPasswordResponse object found on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
-     * @since 2021-04-22
-     */
-    @Subscribe
-    private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
-        LOG.debug("Received CreateLobbyWithPasswordResponse");
-        sceneService.showLobbyWindow(rsp.getLobby());
-    }
-
-    /**
      * Method called when the DeleteUserButton is pressed
      * <p>
      * This method is called when the DeleteUserButton is pressed. It first asks
@@ -418,22 +395,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onDeleteButtonPressed() {
         soundService.button();
         TextInputDialog dialogue = new TextInputDialog();
-        dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
-        dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
+        dialogue.setTitle(ResourceManager.get("mainmenu.settings.deleteaccount.title"));
+        dialogue.setHeaderText(ResourceManager.get("mainmenu.settings.deleteaccount.header"));
         PasswordField confirmPasswordField = new PasswordField();
-        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
+        Label lbl = new Label(ResourceManager.get("mainmenu.settings.deleteaccount.content"));
         lbl.setPrefHeight(25);
         lbl.setLabelFor(confirmPasswordField);
         lbl.setMnemonicParsing(true);
         CheckBox userDeletionConfirmCheckBox = new CheckBox(
-                resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
+                ResourceManager.get("mainmenu.settings.deleteaccount.confirm"));
         userDeletionConfirmCheckBox.setMnemonicParsing(true);
         HBox hbox = new HBox(10, lbl, confirmPasswordField);
         VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
         dialogue.getDialogPane().setContent(box);
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType confirm = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
         dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
                 () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
@@ -481,7 +457,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         soundService.button();
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (lobbyView.getSelectionModel().isEmpty()) {
-            sceneService.showError(resourceBundle.getString("lobby.error.invalidlobby"));
+            sceneService.showError(ResourceManager.get("lobby.error.invalidlobby"));
         } else {
             ISimpleLobby lobby = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobby.getName());
@@ -524,19 +500,17 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
-            dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
+            dialogue.setTitle(ResourceManager.get("lobby.dialog.password.title"));
             PasswordField lobbyPasswordField = new PasswordField();
-            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
+            Label confirmPasswordLabel = new Label(ResourceManager.get("lobby.dialog.password.confirmation"));
             confirmPasswordLabel.setPrefHeight(25);
             confirmPasswordLabel.setLabelFor(lobbyPasswordField);
             confirmPasswordLabel.setMnemonicParsing(true);
             HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
             VBox box = new VBox(10, box3);
             dialogue.getDialogPane().setContent(box);
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            ButtonType confirm = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
             dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
@@ -745,11 +719,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         String username = userService.getLoggedInUser().getUsername();
         sceneService.showLoginScreen();
         logout();
-        ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        String bundleString = resourceBundle.getString("mainmenu.settings.deleteaccount.success");
+        ButtonType ok = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        String bundleString = ResourceManager.get("mainmenu.settings.deleteaccount.success");
         String contentText = String.format(bundleString, username);
-        String title = resourceBundle.getString("information.title");
-        String headerText = resourceBundle.getString("information.header");
+        String title = ResourceManager.get("information.title");
+        String headerText = ResourceManager.get("information.header");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, contentText, ok);
             alert.setTitle(title);
@@ -876,12 +850,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             lobbies.clear();
             for (ISimpleLobby l : lobbyList) {
-                String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
-                if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
-                else if (l.getUserOrDummies().size() == l.getMaxPlayers())
-                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
-                else if (l.hasPassword())
-                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
+                String s = l.getName() + " (" + l.getActor().size() + "/" + l.getMaxPlayers() + ")";
+                if (l.isInGame()) s = ResourceManager.get("mainmenu.lobbylist.ingame", s);
+                else if (l.getActor().size() == l.getMaxPlayers())
+                    s = ResourceManager.get("mainmenu.lobbylist.full", s);
+                else if (l.hasPassword()) s = ResourceManager.get("mainmenu.lobbylist.haspassword", s);
                 lobbies.add(new Pair<>(l, s));
             }
         });

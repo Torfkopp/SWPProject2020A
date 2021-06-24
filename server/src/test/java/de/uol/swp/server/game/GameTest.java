@@ -1,11 +1,12 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.LobbyDTO;
@@ -113,6 +114,17 @@ public class GameTest {
     }
 
     @Test
+    void changePauseStatusTest() {
+        game.changePauseStatus(user);
+
+        assertEquals(1, game.getPausedMembers());
+
+        game.changePauseStatus(user);
+
+        assertEquals(0, game.getPausedMembers());
+    }
+
+    @Test
     void distributesResourceTest() {
         //Testing a hex
         game.distributeResources(6);
@@ -146,8 +158,8 @@ public class GameTest {
     void gameTest() {
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        List<UserOrDummy> list = Arrays.asList(user, user2, user3, user4);
-        UserOrDummy[] u = game.getPlayers();
+        List<Actor> list = Arrays.asList(user, user2, user3, user4);
+        Actor[] u = game.getPlayers();
         //order is random, so just check that everyone is somewhere in the list of users in the Game
         assertTrue(list.contains(u[0]));
         assertTrue(list.contains(u[1]));
@@ -157,12 +169,58 @@ public class GameTest {
     }
 
     @Test
+    void getActivePlayerTest() {
+        assertEquals(user, game.getActivePlayer());
+    }
+
+    @Test
+    void getBankInventoryTest() {
+        BankInventory bankInventory = game.getBankInventory();
+        assertEquals(14, bankInventory.get(KNIGHT_CARD));
+        assertEquals(2, bankInventory.get(ROAD_BUILDING_CARD));
+        assertEquals(2, bankInventory.get(YEAR_OF_PLENTY_CARD));
+        assertEquals(2, bankInventory.get(MONOPOLY_CARD));
+        assertEquals(5, bankInventory.get(VICTORY_POINT_CARD));
+    }
+
+    @Test
+    void getUserColoursMapTest() {
+        Map<Actor, Colour> userColoursMap = game.getUserColoursMap();
+        // values are random, so just check all users have an associated Colour
+        assertTrue(userColoursMap.containsKey(user));
+        assertTrue(userColoursMap.containsKey(user2));
+        assertTrue(userColoursMap.containsKey(user3));
+        assertTrue(userColoursMap.containsKey(user4));
+    }
+
+    @Test
     void nextPlayerTest() {
-        UserOrDummy[] players = game.getPlayers();
+        Actor[] players = game.getPlayers();
         assertEquals(players[1], game.nextPlayer());
         assertEquals(players[2], game.nextPlayer());
         assertEquals(players[3], game.nextPlayer());
         assertEquals(players[0], game.nextPlayer());
+    }
+
+    @Test
+    void pauseGameTest() {
+        assertFalse(game.isPausedByVoting());
+        game.changePauseStatus(user);
+        game.changePauseStatus(user2);
+        game.changePauseStatus(user3);
+        game.changePauseStatus(user4);
+
+        game.updatePauseByVotingStatus();
+
+        assertTrue(game.isPausedByVoting());
+
+        game.changePauseStatus(user);
+        game.changePauseStatus(user2);
+        game.changePauseStatus(user3);
+        game.changePauseStatus(user4);
+        game.updatePauseByVotingStatus();
+
+        assertFalse(game.isPausedByVoting());
     }
 
     @Test
@@ -173,5 +231,23 @@ public class GameTest {
             assertTrue(1 <= dices[0] && dices[0] <= 6);
             assertTrue(1 <= dices[1] && dices[1] <= 6);
         }
+    }
+
+    @Test
+    void setBuildingAllowedTest() {
+        assertFalse(game.isBuildingAllowed());
+
+        game.setBuildingAllowed(true);
+
+        assertTrue(game.isBuildingAllowed());
+    }
+
+    @Test
+    void setRiceRolledAlreadyTest() {
+        assertFalse(game.isDiceRolledAlready());
+
+        game.setDiceRolledAlready(true);
+
+        assertTrue(game.isDiceRolledAlready());
     }
 }

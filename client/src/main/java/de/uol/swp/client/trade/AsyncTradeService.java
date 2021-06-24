@@ -1,11 +1,11 @@
 package de.uol.swp.client.trade;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
+import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +32,7 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceList demandedResources,
+    public void acceptUserTrade(LobbyName lobbyName, Actor offeringUser, ResourceList demandedResources,
                                 ResourceList offeredResources) {
         ThreadManager.runNow(() -> syncTradeService
                 .acceptUserTrade(lobbyName, offeringUser, demandedResources, offeredResources));
@@ -44,7 +44,7 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void cancelTrade(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public void cancelTrade(LobbyName lobbyName, Actor respondingUser) {
         ThreadManager.runNow(() -> syncTradeService.cancelTrade(lobbyName, respondingUser));
     }
 
@@ -54,14 +54,14 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
+    public void offerTrade(LobbyName lobbyName, Actor respondingUser, ResourceList offeredResources,
                            ResourceList demandedResources, boolean counterOffer) {
         ThreadManager.runNow(() -> syncTradeService
                 .offerTrade(lobbyName, respondingUser, offeredResources, demandedResources, counterOffer));
     }
 
     @Override
-    public void resetOfferTradeButton(LobbyName lobbyName, UserOrDummy offeringUser) {
+    public void resetOfferTradeButton(LobbyName lobbyName, Actor offeringUser) {
         ThreadManager.runNow(() -> syncTradeService.resetOfferTradeButton(lobbyName, offeringUser));
     }
 
@@ -71,7 +71,7 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer) {
+    public void tradeWithUser(LobbyName lobbyName, Actor respondingUser, boolean counterOffer) {
         ThreadManager.runNow(() -> syncTradeService.tradeWithUser(lobbyName, respondingUser, counterOffer));
     }
 }

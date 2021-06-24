@@ -6,9 +6,7 @@ import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.scene.ISceneService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
-
-import java.util.ResourceBundle;
+import de.uol.swp.common.util.ThreadManager;
 
 /**
  * This class is the base for creating a new Presenter.
@@ -26,9 +24,8 @@ public abstract class AbstractPresenter {
     protected ISoundService soundService;
     protected IUserService userService;
     protected ILobbyService lobbyService;
-    protected ResourceBundle resourceBundle;
 
-    private EventBus eventBus;
+    protected EventBus eventBus;
 
     /**
      * Clears the field EventBus
@@ -66,11 +63,10 @@ public abstract class AbstractPresenter {
      * This method sets the injected fields via parameters.
      * It additionally registers this class to the EventBus.
      *
-     * @param eventBus       The EventBus this class should use.
-     * @param soundService   The SoundService this class should use.
-     * @param userService    The UserService this class should use.
-     * @param lobbyService   The LobbyService this class should use.
-     * @param resourceBundle The ResourceBundle this class should use.
+     * @param eventBus     The EventBus this class should use.
+     * @param soundService The SoundService this class should use.
+     * @param userService  The UserService this class should use.
+     * @param lobbyService The LobbyService this class should use.
      *
      * @implNote This method does not unregister this class from any EventBus it
      * may already be registered to.
@@ -79,11 +75,10 @@ public abstract class AbstractPresenter {
      */
     @Inject
     private void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
-                            ResourceBundle resourceBundle, ISceneService sceneService, EventBus eventBus) {
+                            ISceneService sceneService, EventBus eventBus) {
         this.soundService = soundService;
         this.userService = userService;
         this.lobbyService = lobbyService;
-        this.resourceBundle = resourceBundle;
         this.sceneService = sceneService;
         this.eventBus = eventBus;
         eventBus.register(this);

@@ -14,7 +14,7 @@ import de.uol.swp.client.scene.SceneManagerFactory;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
+import de.uol.swp.common.util.ThreadManager;
 import io.netty.channel.Channel;
 import javafx.application.Application;
 import javafx.stage.Stage;

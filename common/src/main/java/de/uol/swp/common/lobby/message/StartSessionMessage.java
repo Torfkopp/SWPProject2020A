@@ -4,8 +4,9 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,29 +20,32 @@ import java.util.Map;
  */
 public class StartSessionMessage extends AbstractLobbyMessage {
 
-    private final Map<UserOrDummy, Player> userOrDummyPlayerMap;
-    private final Map<UserOrDummy, Colour> userOrDummyColourMap;
+    private final Map<Actor, Player> actorPlayerMap;
+    private final Map<Actor, Colour> actorColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
+    private final List<Actor> playerList;
 
     /**
      * Constructor
      *
-     * @param name                 The Name of the Lobby
-     * @param user                 The User who started the Session
-     * @param configuration        The field configuration used in the game
-     * @param startUpPhaseEnabled  Whether the game has the startup phase enabled
-     * @param userOrDummyPlayerMap The Map with userOrDummyPlayer
-     * @param userOrDummyColourMap The Map with userOrDummyColour
+     * @param name                The Name of the Lobby
+     * @param user                The User who started the Session
+     * @param configuration       The field configuration used in the game
+     * @param startUpPhaseEnabled Whether the game has the startup phase enabled
+     * @param actorPlayerMap      The Map with actorPlayer
+     * @param actorColourMap      The Map with actorColour
+     * @param playerList          List of the players order
      */
-    public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
-                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap,
-                               Map<UserOrDummy, Colour> userOrDummyColourMap) {
+    public StartSessionMessage(LobbyName name, Actor user, IConfiguration configuration, boolean startUpPhaseEnabled,
+                               Map<Actor, Player> actorPlayerMap, Map<Actor, Colour> actorColourMap,
+                               List<Actor> playerList) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.userOrDummyPlayerMap = userOrDummyPlayerMap;
-        this.userOrDummyColourMap = userOrDummyColourMap;
+        this.actorPlayerMap = actorPlayerMap;
+        this.actorColourMap = actorColourMap;
+        this.playerList = playerList;
     }
 
     /**
@@ -61,17 +65,29 @@ public class StartSessionMessage extends AbstractLobbyMessage {
     }
 
     /**
-     * Gets the Map of UserOrDummies and Colours
+     * Gets the Map of Actor and Colours
      */
-    public Map<UserOrDummy, Colour> getUserOrDummyColourMap() {
-        return userOrDummyColourMap;
+    public Map<Actor, Colour> getActorColourMap() {
+        return actorColourMap;
     }
 
     /**
-     * Gets the Map of UserOrDummies and Players
+     * Gets the Map of Actor and Players
      */
-    public Map<UserOrDummy, Player> getUserOrDummyPlayerMap() {
-        return userOrDummyPlayerMap;
+    public Map<Actor, Player> getActorPlayerMap() {
+        return actorPlayerMap;
+    }
+
+    /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<Actor> getPlayerList() {
+        return playerList;
     }
 
     /**

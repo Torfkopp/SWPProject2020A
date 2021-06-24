@@ -1,12 +1,12 @@
 package de.uol.swp.client.game;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
+import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,7 +73,7 @@ public class AsyncGameService implements IGameService {
     }
 
     @Override
-    public void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim) {
+    public void robberChooseVictim(LobbyName lobbyName, Actor victim) {
         ThreadManager.runNow(() -> syncGameService.robberChooseVictim(lobbyName, victim));
     }
 

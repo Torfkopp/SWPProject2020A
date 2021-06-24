@@ -35,10 +35,6 @@
             <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage"/>
         </VBox>
         <VBox minHeight="150.0" spacing="5.0">
-            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0" prefWidth="150.0"
-                    text="%lobby.buttons.kickuser" visible="false"/>
-            <Button fx:id="changeOwnerButton" onAction="#onChangeOwnerButtonPressed" prefWidth="150.0"
-                    text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false" wrapText="true"/>
             <Button onAction="#onLeaveLobbyButtonPressed" prefHeight="25.0" prefWidth="150.0"
                     text="%lobby.buttons.leavelobby"/>
         </VBox>
@@ -49,9 +45,15 @@
 
     <VBox alignment="TOP_CENTER" spacing="10" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
           GridPane.vgrow="ALWAYS">
-        <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
-                text="%game.won.button.returnPreLobby" visible="false"/>
+        <HBox spacing="10">
+            <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                    minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
+                    text="%game.won.button.returnPreLobby" visible="false"/>
+            <Button fx:id="displayVictoryPointChartButton" maxHeight="-Infinity" maxWidth="-Infinity"
+                    minHeight="-Infinity"
+                    minWidth="-Infinity" onAction="#onDisplayVictoryPointChartPressed" prefHeight="0" prefWidth="0"
+                    text="%game.won.victorypointchart.button" visible="false"/>
+        </HBox>
         <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
@@ -127,7 +129,7 @@
                 </children>
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
-                <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
+                <ComboBox fx:id="colourComboBox" prefHeight="25.0" prefWidth="140.0" promptText="%colours.boxtext"/>
                 <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
                         prefWidth="90.0" text="%colours.button"/>
             </HBox>
@@ -201,8 +203,6 @@
         <Button onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
             <MenuItem text="%lobby.menu.rules.overview"/>
         </Button>
-        <!--fixme needs parsing-->
-        <Button fx:id="pauseButton" onAction="#onPauseButtonPressed" text="%game.menu.pause" visible="false"/>
         <Button fx:id="helpCheckBox" disable="true" onAction="#onHelpButtonPressed" text="%game.help.checkbox"
                 visible="false"/>
         <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>

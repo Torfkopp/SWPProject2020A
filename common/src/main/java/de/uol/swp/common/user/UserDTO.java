@@ -88,7 +88,7 @@ public class UserDTO implements User {
     }
 
     @Override
-    public int compareTo(UserOrDummy o) {
+    public int compareTo(Actor o) {
         Integer id_obj = id; // compareTo is only defined on the wrapper class, so we make one here
         if (o instanceof User) return id_obj.compareTo(o.getID());
         else return -1;
@@ -101,7 +101,7 @@ public class UserDTO implements User {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof UserOrDummy) return compareTo((UserOrDummy) o) == 0;
+        if (o instanceof Actor) return compareTo((Actor) o) == 0;
         return false;
     }
 

@@ -4,7 +4,7 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * An interface for all methods of the LobbyService
@@ -16,6 +16,19 @@ import de.uol.swp.common.user.UserOrDummy;
 public interface ILobbyService {
 
     /**
+     * Posts a AddAIRequest to a specified lobby onto the EventBus
+     * in order to let an AI join the lobby
+     *
+     * @param name The name of the lobby
+     * @param ai   The AI to join the lobby
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    void addAI(LobbyName name, AI ai);
+
+    /**
      * Posts a request to change the owner status of a user in a lobby
      *
      * @param lobbyName The name of the lobby the user wants to change the owner
@@ -25,7 +38,7 @@ public interface ILobbyService {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-15
      */
-    void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
+    void changeOwner(LobbyName lobbyName, Actor newOwner);
 
     /**
      * Posts a request to check if the user is currently in a lobby
@@ -61,19 +74,6 @@ public interface ILobbyService {
     void joinLobby(LobbyName name);
 
     /**
-     * Posts a AddAIRequest to a specified lobby onto the EventBus
-     * in order to let an AI join the lobby
-     *
-     * @param name The name of the lobby
-     * @param ai   The AI to join the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @author Mario Fokken
-     * @since 2021-05-21
-     */
-    void addAI(LobbyName name, AI ai);
-
-    /**
      * Posts a request to join a random lobby onto the EventBus
      *
      * @author Finn Haase
@@ -95,7 +95,7 @@ public interface ILobbyService {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-23
      */
-    void kickUser(LobbyName lobbyName, UserOrDummy userToKick);
+    void kickUser(LobbyName lobbyName, Actor userToKick);
 
     /**
      * Posts a request to leave a specified lobby onto the EventBus
@@ -187,7 +187,8 @@ public interface ILobbyService {
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
-     * @param maxTradeDiff
+     * @param maxTradeDiff           The maximum allowed net resource difference in a trade
+     *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
