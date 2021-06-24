@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
 import de.uol.swp.client.changeSettings.event.ShowChangeGameSettingsViewEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
