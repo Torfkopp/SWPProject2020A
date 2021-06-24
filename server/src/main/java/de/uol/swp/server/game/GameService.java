@@ -1447,7 +1447,7 @@ public class GameService extends AbstractService {
         boolean newRobberPositionIsSameAsOldPosition = newRobberPositionY == oldRobberPositionY && newRobberPositionX == oldRobberPositionX;
         if (newRobberPositionIsSameAsOldPosition || newRobberPositionIsInWater) {
             LOG.debug("Sending RobberMovementFailedResponse for Lobby {}", msg.getLobby());
-            RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer());
+            RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer(), msg.getLobby());
             rsp.initWithMessage(msg);
             post(rsp);
             return;

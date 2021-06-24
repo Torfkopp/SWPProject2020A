@@ -1187,7 +1187,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberMovementFailedResponse(RobberMovementFailedResponse rsp) {
-        LOG.debug("Received RobberMovementFailedResponse");
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        if (!userService.getLoggedInUser().equals(rsp.getPlayer())) return;
+        LOG.debug("Received RobberMovementFailedResponse for Lobby" + rsp.getLobbyName().toString());
         robberNewPosition = true;
         notice.setVisible(true);
         if (helpActivated) setHelpText();
