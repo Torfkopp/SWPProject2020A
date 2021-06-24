@@ -13,6 +13,7 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
@@ -1439,8 +1440,12 @@ public class GameService extends AbstractService {
         int newRobberPositionX = msg.getPosition().getX();
         int oldRobberPositionY = map.getRobberPosition().getY();
         int oldRobberPositionX = map.getRobberPosition().getX();
+        boolean newRobberPositionIsInWater = map.getHex(msg.getPosition()).getType()
+                                                .equals(IGameHex.HexType.WATER) || map.getHex(msg.getPosition())
+                                                                                      .getType()
+                                                                                      .equals(IGameHex.HexType.HARBOUR);
         boolean newRobberPositionIsSameAsOldPosition = newRobberPositionY == oldRobberPositionY && newRobberPositionX == oldRobberPositionX;
-        if (newRobberPositionIsSameAsOldPosition) {
+        if (newRobberPositionIsSameAsOldPosition || newRobberPositionIsInWater) {
             LOG.debug("Sending RobberMovementFailedResponse for Lobby {}", msg.getLobby());
             RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer());
             rsp.initWithMessage(msg);
