@@ -57,6 +57,7 @@ import java.util.function.Consumer;
 
 import static de.uol.swp.common.game.RoadBuildingCardPhase.*;
 import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
+import static de.uol.swp.common.game.map.management.MapPoint.HexMapPoint;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
@@ -1434,6 +1435,19 @@ public class GameService extends AbstractService {
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
         LOG.debug("Received RobberNewPositionChosenRequest for Lobby {}", msg.getLobby());
         IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
+        int newRobberPositionY = msg.getPosition().getY();
+        int newRobberPositionX = msg.getPosition().getX();
+        int oldRobberPositionY = map.getRobberPosition().getY();
+        int oldRobberPositionX = map.getRobberPosition().getX();
+        boolean newRobberPositionIsSameAsOldPosition = newRobberPositionY == oldRobberPositionY && newRobberPositionX == oldRobberPositionX;
+        if (newRobberPositionIsSameAsOldPosition) {
+            LOG.debug("Sending RobberMovementFailedResponse for Lobby {}", msg.getLobby());
+            RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer());
+            rsp.initWithMessage(msg);
+            post(rsp);
+            return;
+        }
+
         map.moveRobber(msg.getPosition());
         LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
@@ -1835,7 +1849,7 @@ public class GameService extends AbstractService {
     private void robberMovementDummy(Dummy dummy, LobbyName lobby) {
         Game game = gameManagement.getGame(lobby);
         IGameMapManagement map = game.getMap();
-        MapPoint mapPoint = MapPoint.HexMapPoint(3, 3);
+        MapPoint mapPoint = HexMapPoint(3, 3);
         map.moveRobber(mapPoint);
         LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
