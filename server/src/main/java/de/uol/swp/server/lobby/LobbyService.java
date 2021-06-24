@@ -8,7 +8,6 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -16,6 +15,8 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
@@ -29,7 +30,9 @@ import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles the lobby requests sent by the users
@@ -120,7 +123,7 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received ChangeLobbySettingsRequest");
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getActor())) return;
-        if (lobby.get().getActor().size() > req.getAllowedPlayers()) return;
+        if (lobby.get().getActors().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
                                             req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(),
@@ -169,25 +172,22 @@ public class LobbyService extends AbstractService {
 
     /**
      * Handles a CheckUserInLobbyRequest found on the EventBus
+     * <p>
      * If a CheckUserInLobbyRequest is detected on the EventBus, this method is
      * called. It checks if the logged in user is currently in a lobby.
      *
      * @param req The CheckUserInLobbyRequest on the EventBus
      *
      * @author Alwin Bossert
-     * @author Finn Haase
+     * @author Mario Fokken
      * @see de.uol.swp.common.user.request.CheckUserInLobbyRequest
      * @since 2021-04-09
      */
     @Subscribe
     private void onCheckUserInLobbyRequest(CheckUserInLobbyRequest req) {
         LOG.debug("Received CheckUserInLobbyRequest");
-        boolean isInLobby = false;
         User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            isInLobby = entry.getValue().getActor().contains(user);
-        }
+        boolean isInLobby = lobbyManagement.getLobbies().isInALobby(user);
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
         post(responseMessage);
@@ -248,8 +248,8 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received LobbyJoinUserRequest for Lobby {}", req.getName());
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
-            if (lobby.get().getActor().size() < lobby.get().getMaxPlayers()) {
-                if (!lobby.get().getActor().contains(req.getActor())) {
+            if (lobby.get().getActors().size() < lobby.get().getMaxPlayers()) {
+                if (!lobby.get().getActors().contains(req.getActor())) {
                     if (!lobby.get().isInGame()) {
                         if (lobby.get().hasPassword() && req.getActor() instanceof User) {
                             Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(),
@@ -261,7 +261,7 @@ public class LobbyService extends AbstractService {
                             Actor user = req.getActor();
                             //To ensure that the AI's name is unique for that lobby
                             if (user instanceof AI) {
-                                for (Actor u : lobby.get().getActor()) {
+                                for (Actor u : lobby.get().getActors()) {
                                     if (u instanceof AI) {
                                         AI.Difficulty diff = ((AI) user).getDifficulty();
                                         while (u.getUsername().equals(user.getUsername())) user = new AIDTO(diff);
@@ -398,11 +398,11 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onLobbyJoinRandomUserRequest(JoinRandomLobbyRequest req) {
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
+        LobbyMap lobbies = lobbyManagement.getLobbies();
         List<ILobby> filteredLobbies = new ArrayList<>();
 
         lobbies.forEach((String, lobby) -> {
-            if (lobby.getActor().size() < lobby.getMaxPlayers() && !lobby.getActor().contains(req.getActor()) && !lobby
+            if (lobby.getActors().size() < lobby.getMaxPlayers() && !lobby.getActors().contains(req.getActor()) && !lobby
                     .isInGame() && !lobby.hasPassword()) {
                 filteredLobbies.add(lobby);
             }
@@ -475,23 +475,23 @@ public class LobbyService extends AbstractService {
     private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest req) {
         LOG.debug("Received RemoveFromLobbiesRequest");
         User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        Map<LobbyName, ISimpleLobby> lobbiesWithUser = new HashMap<>();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getActor().contains(user)) {
-                ILobby lobby = entry.getValue();
-                LobbyName lobbyName = entry.getKey();
-                lobbiesWithUser.put(entry.getKey(), ILobby.getSimpleLobby(lobby));
+        LobbyMap lobbies = lobbyManagement.getLobbies();
+        SimpleLobbyMap lobbiesWithUser = new SimpleLobbyMap();
+        for (ILobby lobby : lobbies.values()) {
+            if (lobby.getActors().contains(user)) {
+                LobbyName name = lobby.getName();
+                lobbiesWithUser.put(name, ILobby.getSimpleLobby(lobby));
+
                 try {
                     lobby.leaveUser(user);
-                    sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, user));
+                    sendToAllInLobby(name, new UserLeftLobbyMessage(name, user));
                 } catch (IllegalArgumentException exception) {
-                    lobbyManagement.dropLobby(lobbyName);
-                    sendToAll(new LobbyDeletedMessage(lobbyName));
+                    lobbyManagement.dropLobby(name);
+                    sendToAll(new LobbyDeletedMessage(name));
                 }
             }
         }
-        Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
+        Message response = new RemoveFromLobbiesResponse(lobbiesWithUser);
         post(response);
         post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
@@ -533,7 +533,7 @@ public class LobbyService extends AbstractService {
         LobbyName lobbyName = req.getLobbyName();
         Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
-            Set<Actor> lobbyMembers = lobby.get().getActor();
+            ActorSet lobbyMembers = lobby.get().getActors();
             int maxPlayers = lobby.get().getMaxPlayers();
             Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
                                                            lobby.get().getReadyUsers(), maxPlayers);
@@ -618,7 +618,7 @@ public class LobbyService extends AbstractService {
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (!req.getActor().equals(lobby.get().getOwner())) return;
-        if (lobby.get().getActor().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActor()))) return;
+        if (lobby.get().getActors().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActors()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getActor(), req.getMoveTime());
         post(msg);

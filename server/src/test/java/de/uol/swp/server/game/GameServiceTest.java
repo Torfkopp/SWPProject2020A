@@ -262,7 +262,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getActor().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     /**
@@ -290,7 +290,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(2, lobby2.get().getActor().size());
+        assertEquals(2, lobby2.get().getActors().size());
     }
 
     /**
@@ -318,7 +318,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getActor().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     /**
@@ -344,7 +344,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getActor().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     @Test

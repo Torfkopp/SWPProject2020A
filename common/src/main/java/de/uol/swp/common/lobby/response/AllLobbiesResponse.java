@@ -3,10 +3,10 @@ package de.uol.swp.common.lobby.response;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Response message for the RetrieveAllLobbiesRequest
@@ -32,7 +32,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      *
      * @since 2020-12-12
      */
-    public AllLobbiesResponse(Map<LobbyName, ISimpleLobby> lobbies) {
+    public AllLobbiesResponse(SimpleLobbyMap lobbies) {
         lobbies.forEach((lobbyName, lobby) -> {
             this.lobbyNames.add(lobbyName);
             this.lobbies.add(lobby);

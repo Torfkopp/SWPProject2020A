@@ -29,6 +29,8 @@ import de.uol.swp.client.rules.RulesOverviewPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.sound.ISoundService;
+import de.uol.swp.client.specialisedUtil.LobbySceneMap;
+import de.uol.swp.client.specialisedUtil.LobbyStageMap;
 import de.uol.swp.client.trade.*;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
@@ -51,13 +53,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -77,10 +82,10 @@ public class SceneManager {
     private static String styleSheet;
 
     private final Stage primaryStage;
-    private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
-    private final Map<LobbyName, Stage> tradingResponseStages = new HashMap<>();
-    private final Map<LobbyName, Stage> robberTaxStages = new HashMap<>();
-    private final Map<LobbyName, Scene> lobbyScenes = new HashMap<>();
+    private final LobbyStageMap tradingStages = new LobbyStageMap();
+    private final LobbyStageMap tradingResponseStages = new LobbyStageMap();
+    private final LobbyStageMap robberTaxStages = new LobbyStageMap();
+    private final LobbySceneMap lobbyScenes = new LobbySceneMap();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
     private final IUserService userService;
@@ -103,13 +108,13 @@ public class SceneManager {
     /**
      * Constructor
      *
-     * @param userService    The UserService this class should use.
-     * @param lobbyService   The LobbyService this class should use.
-     * @param tradeService   The TradeService this class should use.
-     * @param soundService   The SoundService this class should use.
-     * @param eventBus       The EventBus this class should use.
-     * @param primaryStage   The created PrimaryStage.
-     * @param styleSheet     The used StyleSheet.
+     * @param userService  The UserService this class should use.
+     * @param lobbyService The LobbyService this class should use.
+     * @param tradeService The TradeService this class should use.
+     * @param soundService The SoundService this class should use.
+     * @param eventBus     The EventBus this class should use.
+     * @param primaryStage The created PrimaryStage.
+     * @param styleSheet   The used StyleSheet.
      */
     @Inject
     public SceneManager(IUserService userService, ILobbyService lobbyService, ITradeService tradeService,
@@ -619,9 +624,7 @@ public class SceneManager {
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
-        for (LobbyName name : rsp.getLobbyNames()) {
-            if (!lobbyScenes.containsKey(name)) lobbyScenes.put(name, null); //do not overwrite existing lobbyScene
-        }
+        lobbyScenes.update(rsp.getLobbyNames());
     }
 
     /**
@@ -755,12 +758,7 @@ public class SceneManager {
     private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
         LOG.debug("Received CloseRobberTaxViewEvent");
         LobbyName lobby = event.getLobbyName();
-        if (robberTaxStages.containsKey(lobby)) {
-            Platform.runLater(() -> {
-                robberTaxStages.get(lobby).close();
-                robberTaxStages.remove(lobby);
-            });
-        }
+        robberTaxStages.close(lobby);
     }
 
     /**
@@ -779,13 +777,7 @@ public class SceneManager {
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
         LOG.debug("Received CloseTradeResponseEvent");
         LobbyName lobbyName = event.getLobbyName();
-        if (tradingResponseStages.containsKey(lobbyName)) {
-            Platform.runLater(() -> {
-                Window window = tradingResponseStages.get(lobbyName);
-                if (window != null) window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
-                tradingResponseStages.remove(lobbyName);
-            });
-        }
+        tradingResponseStages.close(lobbyName);
     }
 
     /**
@@ -1217,11 +1209,8 @@ public class SceneManager {
         LobbyName lobbyName = event.getLobbyName();
         String bundleString = ResourceManager.get("game.trade.window.receiving.title");
         String title = String.format(bundleString, event.getOfferingUser());
+        tradingStages.close(lobbyName);
         Platform.runLater(() -> {
-            if (tradingStages.containsKey(lobbyName)) {
-                tradingStages.get(lobbyName).close();
-                tradingStages.remove(lobbyName);
-            }
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(title);
             tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
@@ -1297,13 +1286,8 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-
-            Platform.runLater(() -> {
-                if (!tradingStages.containsKey(lobby)) return;
-                tradingStages.get(lobby).close();
-                tradingStages.remove(lobby);
-            });
-        }
+        tradingStages.close(lobby);
+    }
 
     /**
      * Handles the TradeErrorEvent detected on the EventBus
@@ -1338,12 +1322,7 @@ public class SceneManager {
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         LOG.debug("Received TradeWithUserCancelResponse");
         LobbyName lobby = rsp.getLobbyName();
-        if (tradingResponseStages.containsKey(lobby)) {
-            Platform.runLater(() -> {
-                tradingResponseStages.get(lobby).close();
-                tradingResponseStages.remove(lobby);
-            });
-        }
+        tradingResponseStages.close(lobby);
     }
 
     /**

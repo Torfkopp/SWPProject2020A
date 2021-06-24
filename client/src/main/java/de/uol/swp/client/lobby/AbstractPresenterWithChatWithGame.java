@@ -15,7 +15,6 @@ import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -32,6 +31,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
+import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.ResourceManager;
@@ -154,12 +154,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
-    protected Map<Actor, Player> actorPlayerMap = null;
-    protected Map<Actor, Colour> userColoursMap = null;
+    protected ActorPlayerMap actorPlayerMap = null;
+    protected ActorColourMap userColoursMap = null;
     protected IGameService gameService;
     protected int maxTradeDiff;
-    protected Map<Actor, Map<Integer, Integer>> victoryPointsOverTimeMap;
-    protected List<Actor> inGameUserList;
+    protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
+    protected ActorSet inGameUserList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -1159,7 +1159,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             String confirmText = ResourceManager.get("button.confirm");
             String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
-                List<Actor> victims = new ArrayList<>(rsp.getVictims());
+                ActorSet victims = rsp.getVictims();
                 ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
                 dialogue.setTitle(title);
                 dialogue.setHeaderText(headerText);
