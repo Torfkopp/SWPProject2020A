@@ -3,7 +3,7 @@ package de.uol.swp.common.game.map.gamemapDTO;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.Intersection;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * The type Intersection with buildable.
@@ -31,7 +31,7 @@ public class IntersectionWithBuildable extends Intersection implements IIntersec
     }
 
     @Override
-    public boolean isBuildableBy(UserOrDummy user) {
+    public boolean isBuildableBy(Actor user) {
         return buildable.contains(user);
     }
 }

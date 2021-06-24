@@ -6,7 +6,6 @@ import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.specialisedUtil.UserOrDummyColourMap;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -36,8 +35,7 @@ public interface ILobby extends Serializable {
     static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.getMaxPlayers(),
                                lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled(),
-                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers(),
-                               lobby.getMaxTradeDiff());
+                               lobby.hasPassword(), lobby.getActor(), lobby.getReadyUsers(), lobby.getMaxTradeDiff());
     }
 
     /**
@@ -133,13 +131,13 @@ public interface ILobby extends Serializable {
     String getPassword();
 
     /**
-     * Gets a set of all users marked as ready.
+     * Gets all users and dummies in the lobby
      *
-     * @return A Set containing all ready users
+     * @return A Set containing all users and dummies in this lobby
      *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-01-19
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
      */
     UserOrDummySet getReadyUsers();
 
@@ -155,9 +153,20 @@ public interface ILobby extends Serializable {
     Set<User> getRealUsers();
 
     /**
-     * Gets a map of UserOrDummies and their chosen colour
+     * Gets a set of all users marked as ready.
      *
-     * @return A map containing UserOrDummies and their chosen colour
+     * @return A Set containing all ready users
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    Set<Actor> getReadyUsers();
+
+    /**
+     * Gets a map of Actors and their chosen colour
+     *
+     * @return A map containing Actors and their chosen colour
      *
      * @author Mario Fokken
      * @since 2021-06-02
@@ -256,7 +265,7 @@ public interface ILobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void joinUser(UserOrDummy user);
+    void joinUser(Actor user);
 
     /**
      * Removes a user from the lobby
@@ -265,7 +274,7 @@ public interface ILobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void leaveUser(UserOrDummy user);
+    void leaveUser(Actor user);
 
     /**
      * Sets whether the Lobby currently has a password according to the boolean provided
@@ -286,7 +295,7 @@ public interface ILobby extends Serializable {
      * @author Mario Fokken
      * @since 2012-06-02
      */
-    void setUserColour(UserOrDummy user, Colour colour);
+    void setUserColour(Actor user, Colour colour);
 
     /**
      * Sets a user as ready
@@ -297,7 +306,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void setUserReady(UserOrDummy user);
+    void setUserReady(Actor user);
 
     /**
      * Marks a user as not ready.
@@ -308,7 +317,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void unsetUserReady(UserOrDummy user);
+    void unsetUserReady(Actor user);
 
     /**
      * Changes the owner of the lobby

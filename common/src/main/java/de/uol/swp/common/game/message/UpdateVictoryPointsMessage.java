@@ -19,7 +19,7 @@ public class UpdateVictoryPointsMessage extends AbstractServerMessage {
      * Constructor
      *
      * @param lobbyName       The name of the lobby
-     * @param victoryPointMap The Map of the UserOrDummy and it's Victory Points
+     * @param victoryPointMap The Map of the Actor and it's Victory Points
      */
     public UpdateVictoryPointsMessage(LobbyName lobbyName, UserOrDummyIntegerMap victoryPointMap) {
         this.lobbyName = lobbyName;
@@ -36,9 +36,9 @@ public class UpdateVictoryPointsMessage extends AbstractServerMessage {
     }
 
     /**
-     * Gets the Map of the UserOrDummy and it's Victory Points
+     * Gets the Map of the Actor and it's Victory Points
      *
-     * @return the Map UserOrDummy and it's Victory Points
+     * @return the Map Actor and it's Victory Points
      */
     public UserOrDummyIntegerMap getVictoryPointMap() {
         return victoryPointMap;

@@ -300,7 +300,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
-                if (msg.getUser().equals(userService.getLoggedInUser())) {
+                if (msg.getActor().equals(userService.getLoggedInUser())) {
                     String title = ResourceManager.get("error.title");
                     String headerText = ResourceManager.get("error.header");
                     String contentText = ResourceManager.get("game.robber.error");

@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards;
 
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.io.Serializable;
 
@@ -40,7 +40,7 @@ public interface IUniqueCard extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    UserOrDummy getOwner();
+    Actor getOwner();
 
     /**
      * Sets owner of this Unique Card.
@@ -50,7 +50,7 @@ public interface IUniqueCard extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    void setOwner(UserOrDummy owner);
+    void setOwner(Actor owner);
 
     /**
      * Gets type.

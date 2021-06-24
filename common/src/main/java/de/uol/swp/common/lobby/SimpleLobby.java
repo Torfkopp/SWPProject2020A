@@ -80,7 +80,7 @@ public class SimpleLobby implements ISimpleLobby {
     }
 
     @Override
-    public UserOrDummySet getUserOrDummies() {
+    public UserOrDummySet getActor() {
         return users;
     }
 

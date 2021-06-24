@@ -133,7 +133,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActor().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
                 for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
             }
@@ -166,7 +166,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActor().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
                     post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
@@ -195,7 +195,7 @@ public class CommandService extends AbstractService {
     private void command_ChangeOwner(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /changeowner command");
         if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
-        UserOrDummy newOwner = getUserOrDummy(args.get(1));
+        Actor newOwner = getActor(args.get(1));
         User user = (User) originalMessage.getAuthor();
         if (originalMessage.isFromLobby()) {
             LobbyName lobbyName = originalMessage.getOriginLobby();
@@ -251,7 +251,7 @@ public class CommandService extends AbstractService {
                                  Optional.of(originalMessage.getAuthor()));
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
-            UserOrDummy user = getUserOrDummy(args.get(0));
+            Actor user = getActor(args.get(0));
             post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
@@ -270,7 +270,7 @@ public class CommandService extends AbstractService {
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
         if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
-        UserOrDummy user = getUserOrDummy(args.get(1));
+        Actor user = getActor(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
         ResourceType resource = null;
@@ -380,7 +380,7 @@ public class CommandService extends AbstractService {
     private void command_Kick(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /kick command");
         if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
-        UserOrDummy toBeKickedUser = getUserOrDummy(args.get(1));
+        Actor toBeKickedUser = getActor(args.get(1));
         User user = (User) originalMessage.getAuthor();
         if (originalMessage.isFromLobby()) {
             LobbyName lobbyName = originalMessage.getOriginLobby();
@@ -478,6 +478,38 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Helper method used to find an Actor, depending on the input
+     * String
+     * <p>
+     * This method looks up the provided name in the UserManagement and returns the
+     * found User, if one exists. If no matching user is found and the name happens
+     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
+     * instead.
+     * If neither case happens, the returned value will be null.
+     *
+     * @param name The name of the actor to look up
+     *
+     * @return Actor object representing the found result (null if nothing found)
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private Actor getActor(String name) {
+        Optional<User> userOptional = userManagement.getUser(name);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            if (name.matches("^Dummy\\d+")) {
+                StringBuilder x = new StringBuilder();
+                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
+                return new DummyDTO(Integer.parseInt(x.toString()));
+            }
+            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
+            return null;
+        }
+    }
+
+    /**
      * Helper method that filters through all classes in the project modules
      * and returns a list that contains only classes the Developer Menu is
      * allowed to request an instantiation and posting of.
@@ -501,38 +533,6 @@ public class CommandService extends AbstractService {
                   .filter(cls -> !AbstractServerInternalMessage.class.isAssignableFrom(cls)) // No server-only Messages
                   .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException ignored) {}
-    }
-
-    /**
-     * Helper method used to find either a User or a Dummy, depending on the input
-     * String
-     * <p>
-     * This method looks up the provided name in the UserManagement and returns the
-     * found User, if one exists. If no matching user is found and the name happens
-     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
-     * instead.
-     * If neither case happens, the returned value will be null.
-     *
-     * @param name The name of the User or Dummy to look up
-     *
-     * @return UserOrDummy object representing the found result (null if nothing found)
-     *
-     * @author Phillip-André Suhr
-     * @since 2021-03-30
-     */
-    private UserOrDummy getUserOrDummy(String name) {
-        Optional<User> userOptional = userManagement.getUser(name);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        } else {
-            if (name.matches("^Dummy\\d+")) {
-                StringBuilder x = new StringBuilder();
-                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
-                return new DummyDTO(Integer.parseInt(x.toString()));
-            }
-            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
-            return null;
-        }
     }
 
     /**
@@ -678,14 +678,14 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     private Message parseArguments(List<String> args, Constructor<?> constr,
-                                   Optional<UserOrDummy> currentUser) throws ReflectiveOperationException {
+                                   Optional<Actor> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
             if (args.get(i).equals("§null") || args.get(i).equals("§n")) argList.add(null);
             else switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
-                case "de.uol.swp.common.user.UserOrDummy":
+                case "de.uol.swp.common.user.Actor":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
                         if (currentUser.get() instanceof User) currentUser.ifPresent(argList::add);
                     } else {

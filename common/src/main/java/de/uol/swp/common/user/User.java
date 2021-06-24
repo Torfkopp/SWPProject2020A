@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @see java.lang.Comparable
  * @since 2019-08-05
  */
-public interface User extends UserOrDummy, Serializable {
+public interface User extends Actor, Serializable {
 
     /**
      * Gets the e-mail variable

@@ -146,10 +146,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                         .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
 
         fullFilter.bind(Bindings.createObjectBinding(
-                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getUserOrDummies()
-                                                                                .size() == lobby.getKey()
-                                                                                                .getMaxPlayers())) || (!lobbyListFilteredFullBox
-                        .isSelected()), lobbyListFilteredFullBox.selectedProperty()));
+                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getActor().size() == lobby
+                        .getKey().getMaxPlayers())) || (!lobbyListFilteredFullBox.isSelected()), lobbyListFilteredFullBox.selectedProperty()));
 
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
@@ -858,9 +856,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             lobbies.clear();
             for (ISimpleLobby l : lobbyList) {
-                String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
+                String s = l.getName() + " (" + l.getActor().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = ResourceManager.get("mainmenu.lobbylist.ingame", s);
-                else if (l.getUserOrDummies().size() == l.getMaxPlayers())
+                else if (l.getActor().size() == l.getMaxPlayers())
                     s = ResourceManager.get("mainmenu.lobbylist.full", s);
                 else if (l.hasPassword()) s = ResourceManager.get("mainmenu.lobbylist.haspassword", s);
                 lobbies.add(new LobbyListItem(l, s));

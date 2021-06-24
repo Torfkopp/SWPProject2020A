@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final ResourceList resourceList;
     private final List<HarbourResource> harbourResourceList;
 
@@ -67,7 +67,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      *
      * @return The User who wants to get his inventory
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

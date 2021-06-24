@@ -5,7 +5,6 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.specialisedUtil.UserOrDummyIntegerMap;
 import de.uol.swp.common.specialisedUtil.UserOrDummyResourceListMap;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Gets sent to all players with more than seven resource
@@ -27,7 +26,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * Constructor
      *
      * @param lobbyName   The lobby's name
-     * @param user        The UserOrDummy who triggered this message
+     * @param user        The Actor who triggered this message
      * @param players     Map of User to pay the tax and the amount of card to pay
      * @param inventories Map of user and the inventory as map with resources and its amount
      */

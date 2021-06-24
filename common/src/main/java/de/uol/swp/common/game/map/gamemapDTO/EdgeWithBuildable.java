@@ -3,7 +3,7 @@ package de.uol.swp.common.game.map.gamemapDTO;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.Edge;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * A Class to store an edge with the players that can build on it.
@@ -31,7 +31,7 @@ public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
     }
 
     @Override
-    public boolean isBuildableBy(UserOrDummy user) {
+    public boolean isBuildableBy(Actor user) {
         return buildable.contains(user);
     }
 }

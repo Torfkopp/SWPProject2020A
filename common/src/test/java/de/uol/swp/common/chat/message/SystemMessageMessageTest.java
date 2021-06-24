@@ -17,7 +17,7 @@ class SystemMessageMessageTest {
         SystemMessageMessage message = new SystemMessageMessage(lobbyName, systemMessage);
 
         assertEquals(lobbyName, message.getName());
-        assertNull(message.getUser());
+        assertNull(message.getActor());
         assertEquals(systemMessage, message.getMsg());
     }
 }

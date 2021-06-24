@@ -20,7 +20,7 @@ import de.uol.swp.common.specialisedUtil.UserOrDummyPlayerMap;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import de.uol.swp.common.util.Util;
@@ -162,7 +162,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void onKickUserButtonPressed() {
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        Actor selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
@@ -268,7 +268,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserOrDummy
+     * @see de.uol.swp.common.user.Actor
      * @since 2021-01-05
      */
     protected void updateUsersList(UserOrDummySet userLobbyList) {
@@ -308,6 +308,25 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Method called when the ChangeOwnerButtonPressed is pressed
+     * <p>
+     * If the ChangeOwnerButton is pressed, this method requests to change
+     * the owner status to the selected User of the members view.
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
+     * @since 2021-04-13
+     */
+    @FXML
+    private void onChangeOwnerButtonPressed() {
+        soundService.button();
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Actor selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.changeOwner(lobbyName, selectedUser);
+    }
+
+    /**
      * Handles a click on the ColourChangeButton
      * <p>
      * Method called when the ColourChangeButton is pressed.
@@ -338,9 +357,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
         UserOrDummyPlayerMap map = new UserOrDummyPlayerMap();
         int i = 0;
-        for (UserOrDummy u : msg.getUserColours().keySet())
+        for (Actor u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
-        userOrDummyPlayerMap = map;
+        actorPlayerMap = map;
         userColoursMap = msg.getUserColours();
         gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(userOrDummyPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
@@ -388,7 +407,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         victoryPointsOverTimeMap = msg.getVictoryPointMap();
-        winner = msg.getUser();
+        winner = msg.getActor();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
             uniqueCardView.setMinHeight(0);
@@ -526,7 +545,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 notice.setVisible(true);
                 notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
             }
-            setTurnIndicatorText(msg.getUser());
+            setTurnIndicatorText(msg.getActor());
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
@@ -540,8 +559,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
             currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
-            setRollDiceButtonState(msg.getUser());
-            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
+            setRollDiceButtonState(msg.getActor());
+            if (msg.getActor().equals(userService.getLoggedInUser())) ownTurn = true;
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);

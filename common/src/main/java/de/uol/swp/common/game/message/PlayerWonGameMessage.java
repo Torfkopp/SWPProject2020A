@@ -30,6 +30,7 @@ public class PlayerWonGameMessage extends AbstractGameMessage {
 
     /**
      * Gets the current Victory Point Map
+     *
      * @return Map of Victory Point Map
      *
      * @author Aldin Dervisi

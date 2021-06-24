@@ -27,13 +27,13 @@ public class StartSessionMessage extends AbstractLobbyMessage {
     /**
      * Constructor
      *
-     * @param name                 The Name of the Lobby
-     * @param user                 The User who started the Session
-     * @param configuration        The field configuration used in the game
-     * @param startUpPhaseEnabled  Whether the game has the startup phase enabled
-     * @param userOrDummyPlayerMap The Map with userOrDummyPlayer
-     * @param userOrDummyColourMap The Map with userOrDummyColour
-     * @param playerList           List of the players order
+     * @param name                The Name of the Lobby
+     * @param user                The User who started the Session
+     * @param configuration       The field configuration used in the game
+     * @param startUpPhaseEnabled Whether the game has the startup phase enabled
+     * @param actorPlayerMap      The Map with actorPlayer
+     * @param actorColourMap      The Map with actorColour
+     * @param playerList          List of the players order
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
                                boolean startUpPhaseEnabled, UserOrDummyPlayerMap userOrDummyPlayerMap,
@@ -41,8 +41,8 @@ public class StartSessionMessage extends AbstractLobbyMessage {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.userOrDummyPlayerMap = userOrDummyPlayerMap;
-        this.userOrDummyColourMap = userOrDummyColourMap;
+        this.actorPlayerMap = actorPlayerMap;
+        this.actorColourMap = actorColourMap;
         this.playerList = playerList;
     }
 

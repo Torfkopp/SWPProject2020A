@@ -6,7 +6,6 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.specialisedUtil.UserOrDummySet;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Response to the AllLobbyMembersRequest
@@ -46,13 +45,13 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     public AllLobbyMembersResponse(LobbyName lobbyName, UserOrDummySet users, UserOrDummy owner,
                                    UserOrDummySet readyUsers, int maxPlayers) {
         super(lobbyName);
-        for (UserOrDummy user : users) {
+        for (Actor user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
             else this.users.add(user);
         }
         if (owner instanceof User) this.owner = UserDTO.createWithoutPassword((User) owner);
         else this.owner = owner;
-        for (UserOrDummy user : readyUsers) {
+        for (Actor user : readyUsers) {
             if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
             else this.readyUsers.add(user);
         }
@@ -72,7 +71,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-05
      */
-    public UserOrDummy getOwner() {
+    public Actor getOwner() {
         return owner;
     }
 

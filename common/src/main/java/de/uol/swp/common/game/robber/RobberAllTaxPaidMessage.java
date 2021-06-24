@@ -2,7 +2,7 @@ package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Gets sent when every player payed their taxes
@@ -18,7 +18,7 @@ public class RobberAllTaxPaidMessage extends AbstractGameMessage {
      * @param lobbyName The lobby name
      * @param user      The user
      */
-    public RobberAllTaxPaidMessage(LobbyName lobbyName, UserOrDummy user) {
+    public RobberAllTaxPaidMessage(LobbyName lobbyName, Actor user) {
         super(lobbyName, user);
     }
 }
