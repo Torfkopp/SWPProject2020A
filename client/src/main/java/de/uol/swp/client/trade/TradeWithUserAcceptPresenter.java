@@ -9,7 +9,7 @@ import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -53,7 +53,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private Label tradeResponseLabel;
     private LobbyName lobbyName;
-    private UserOrDummy offeringUser;
+    private Actor offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
 

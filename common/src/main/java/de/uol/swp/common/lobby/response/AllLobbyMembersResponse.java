@@ -3,9 +3,9 @@ package de.uol.swp.common.lobby.response;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.*;
 
@@ -21,9 +21,9 @@ import java.util.*;
  */
 public class AllLobbyMembersResponse extends AbstractLobbyResponse {
 
-    private final List<UserOrDummy> users = new ArrayList<>();
-    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
-    private final UserOrDummy owner;
+    private final List<Actor> users = new ArrayList<>();
+    private final Set<Actor> readyUsers = new TreeSet<>();
+    private final Actor owner;
     private final ReadySystemMessageDTO ownerNotice;
 
     /**
@@ -44,16 +44,16 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(LobbyName lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
-                                   Set<UserOrDummy> readyUsers, int maxPlayers) {
+    public AllLobbyMembersResponse(LobbyName lobbyName, Set<Actor> users, Actor owner, Set<Actor> readyUsers,
+                                   int maxPlayers) {
         super(lobbyName);
-        for (UserOrDummy user : users) {
+        for (Actor user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
             else this.users.add(user);
         }
         if (owner instanceof User) this.owner = UserDTO.createWithoutPassword((User) owner);
         else this.owner = owner;
-        for (UserOrDummy user : readyUsers) {
+        for (Actor user : readyUsers) {
             if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
             else this.readyUsers.add(user);
         }
@@ -73,7 +73,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-05
      */
-    public UserOrDummy getOwner() {
+    public Actor getOwner() {
         return owner;
     }
 
@@ -103,7 +103,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    public Set<UserOrDummy> getReadyUsers() {
+    public Set<Actor> getReadyUsers() {
         return this.readyUsers;
     }
 
@@ -114,7 +114,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2020-12-21
      */
-    public List<UserOrDummy> getUsers() {
+    public List<Actor> getUsers() {
         return users;
     }
 }

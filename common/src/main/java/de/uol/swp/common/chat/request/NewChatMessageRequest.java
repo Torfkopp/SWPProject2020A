@@ -1,7 +1,7 @@
 package de.uol.swp.common.chat.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent by the client to the server when a new message was typed by the user.
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class NewChatMessageRequest extends AbstractChatMessageRequest {
 
-    private final UserOrDummy author;
+    private final Actor author;
     private final String content;
 
     /**
@@ -26,7 +26,7 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      * @param author  The author of the ChatMessage that should be saved
      * @param content The content of the ChatMessage that should be saved
      */
-    public NewChatMessageRequest(UserOrDummy author, String content) {
+    public NewChatMessageRequest(Actor author, String content) {
         super(null);
         this.author = author;
         this.content = content;
@@ -45,7 +45,7 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @since 2020-12-30
      */
-    public NewChatMessageRequest(UserOrDummy author, String content, LobbyName originLobby) {
+    public NewChatMessageRequest(Actor author, String content, LobbyName originLobby) {
         super(originLobby);
         this.author = author;
         this.content = content;
@@ -56,7 +56,7 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @return The author of the ChatMessage that should be saved
      */
-    public UserOrDummy getAuthor() {
+    public Actor getAuthor() {
         return author;
     }
 

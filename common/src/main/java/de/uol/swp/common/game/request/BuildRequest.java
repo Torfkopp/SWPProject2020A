@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server, when the user wants to build something
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class BuildRequest extends AbstractGameRequest {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final MapPoint mapPoint;
 
     /**
@@ -24,7 +24,7 @@ public class BuildRequest extends AbstractGameRequest {
      * @param user      The requesting user
      * @param mapPoint  The MapPoint at which should be build
      */
-    public BuildRequest(LobbyName lobbyName, UserOrDummy user, MapPoint mapPoint) {
+    public BuildRequest(LobbyName lobbyName, Actor user, MapPoint mapPoint) {
         super(lobbyName);
         this.user = user;
         this.mapPoint = mapPoint;
@@ -44,7 +44,7 @@ public class BuildRequest extends AbstractGameRequest {
      *
      * @return The requesting user
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

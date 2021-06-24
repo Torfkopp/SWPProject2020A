@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * This message gets sent when the player
@@ -23,7 +23,7 @@ public class DiceCastMessage extends AbstractGameMessage {
      * @param dice1     Eyes of the first dice rolled
      * @param dice2     Eyes of the second dice rolled
      */
-    public DiceCastMessage(LobbyName lobbyName, UserOrDummy user, int dice1, int dice2) {
+    public DiceCastMessage(LobbyName lobbyName, Actor user, int dice1, int dice2) {
         super(lobbyName, user);
         this.dice1 = dice1;
         this.dice2 = dice2;

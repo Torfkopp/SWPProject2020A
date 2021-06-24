@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby;
 
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Set;
 
@@ -15,8 +15,8 @@ import java.util.Set;
 public class SimpleLobby implements ISimpleLobby {
 
     private final LobbyName name;
-    private final Set<UserOrDummy> users;
-    private final Set<UserOrDummy> readyUsers;
+    private final Set<Actor> users;
+    private final Set<Actor> readyUsers;
     private final boolean inGame;
     private final User owner;
     private final int maxPlayers;
@@ -24,7 +24,7 @@ public class SimpleLobby implements ISimpleLobby {
     private final boolean startUpPhaseEnabled;
     private final boolean randomPlayFieldEnabled;
     private final boolean hasPassword;
-    private int maxTradeDiff;
+    private final int maxTradeDiff;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ public class SimpleLobby implements ISimpleLobby {
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, int maxPlayers, int moveTime,
                        boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
-                       Set<UserOrDummy> users, Set<UserOrDummy> readyUsers, int maxTradeDiff) {
+                       Set<Actor> users, Set<Actor> readyUsers, int maxTradeDiff) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -78,13 +78,13 @@ public class SimpleLobby implements ISimpleLobby {
     }
 
     @Override
-    public Set<UserOrDummy> getReadyUsers() {
-        return readyUsers;
+    public Set<Actor> getActor() {
+        return users;
     }
 
     @Override
-    public Set<UserOrDummy> getUserOrDummies() {
-        return users;
+    public Set<Actor> getReadyUsers() {
+        return readyUsers;
     }
 
     @Override

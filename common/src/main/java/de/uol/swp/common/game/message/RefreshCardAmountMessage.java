@@ -2,7 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class RefreshCardAmountMessage extends AbstractGameMessage {
      * @param user            The user who caused a change in inventories
      * @param cardAmountsList List of CardsAmount objects
      */
-    public RefreshCardAmountMessage(LobbyName lobbyName, UserOrDummy user, List<CardsAmount> cardAmountsList) {
+    public RefreshCardAmountMessage(LobbyName lobbyName, Actor user, List<CardsAmount> cardAmountsList) {
         super(lobbyName, user);
         this.cardAmountsList = cardAmountsList;
     }

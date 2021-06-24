@@ -31,8 +31,8 @@ class UserReadyRequestTest {
         UserReadyRequest userReadyRequest = new UserReadyRequest(defaultLobbyName, defaultUser, false);
 
         assertEquals(defaultLobbyName, userReadyRequest.getName());
-        assertEquals(defaultUser, userReadyRequest.getUser());
-        assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
+        assertEquals(defaultUser, userReadyRequest.getActor());
+        assertEquals(defaultUser.getUsername(), userReadyRequest.getActor().getUsername());
         assertFalse(userReadyRequest.isReady());
     }
 
@@ -46,8 +46,8 @@ class UserReadyRequestTest {
         UserReadyRequest userReadyRequest = new UserReadyRequest(defaultLobbyName, defaultUser, true);
 
         assertEquals(defaultLobbyName, userReadyRequest.getName());
-        assertEquals(defaultUser, userReadyRequest.getUser());
-        assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
+        assertEquals(defaultUser, userReadyRequest.getActor());
+        assertEquals(defaultUser.getUsername(), userReadyRequest.getActor().getUsername());
         assertTrue(userReadyRequest.isReady());
     }
 }

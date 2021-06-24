@@ -2,7 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message sent to pause the roundTimer.
@@ -18,7 +18,7 @@ public class PauseTimerMessage extends AbstractLobbyMessage {
      * @param lobbyName The lobby this game is taking place in
      * @param user      The user who wants to trade
      */
-    public PauseTimerMessage(LobbyName lobbyName, UserOrDummy user) {
+    public PauseTimerMessage(LobbyName lobbyName, Actor user) {
         super(lobbyName, user);
     }
 }

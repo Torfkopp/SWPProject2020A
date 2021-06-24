@@ -13,7 +13,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,7 +57,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
+    public void changeOwner(LobbyName lobbyName, Actor newOwner) {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
         eventBus.post(req);
@@ -92,7 +92,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
+    public void kickUser(LobbyName lobbyName, Actor userToKick) {
         LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
         eventBus.post(kickUserRequest);

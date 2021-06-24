@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.management.IEdge;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * The interface Edge with buildable.
@@ -21,5 +21,5 @@ public interface IEdgeWithBuildable extends IEdge {
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    boolean isBuildableBy(UserOrDummy user);
+    boolean isBuildableBy(Actor user);
 }

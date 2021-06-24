@@ -2,7 +2,7 @@ package de.uol.swp.server.chat;
 
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public interface IChatManagement {
      *
      * @return The created ChatMessage object
      */
-    ChatMessage createChatMessage(UserOrDummy author, String content);
+    ChatMessage createChatMessage(Actor author, String content);
 
     /**
      * Create a new ChatMessage in the ChatMessageStore of a lobby's ChatStore
@@ -40,7 +40,7 @@ public interface IChatManagement {
      *
      * @since 2020-12-30
      */
-    ChatMessage createChatMessage(UserOrDummy author, String content, LobbyName originLobby);
+    ChatMessage createChatMessage(Actor author, String content, LobbyName originLobby);
 
     /**
      * Delete a ChatMessage from the global Chat Store

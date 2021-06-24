@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.chat.store.IChatMessageStore;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class ChatManagement implements IChatManagement {
     }
 
     @Override
-    public ChatMessage createChatMessage(UserOrDummy author, String content) throws ChatManagementException {
+    public ChatMessage createChatMessage(Actor author, String content) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
         } else if (author == null) {
@@ -49,7 +49,7 @@ public class ChatManagement implements IChatManagement {
     }
 
     @Override
-    public ChatMessage createChatMessage(UserOrDummy author, String content,
+    public ChatMessage createChatMessage(Actor author, String content,
                                          LobbyName originLobby) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
