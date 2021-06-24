@@ -241,7 +241,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (inGame == false) {
+        if (!inGame) {
             if (userService.getLoggedInUser().equals(owner)) {
                 startSession.setVisible(true);
                 startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
