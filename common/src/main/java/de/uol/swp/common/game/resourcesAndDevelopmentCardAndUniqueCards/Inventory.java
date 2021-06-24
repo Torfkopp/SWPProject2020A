@@ -145,11 +145,7 @@ public class Inventory extends AbstractInventory {
      */
     public void nextTurn() {
         for (var x : developmentCards) {
-            if (x.getAmount() >= 1) {
-                isPlayable.put(x.getType(), true);
-            } else {
-                isPlayable.put(x.getType(), false);
-            }
+            isPlayable.put(x.getType(), x.getAmount() >= 1);
         }
     }
 }
