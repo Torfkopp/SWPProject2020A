@@ -260,7 +260,7 @@ class GameAITest {
         inv.increase(ResourceType.BRICK, 4);
         inv.increase(ResourceType.LUMBER, 4);
         gameAI.turnAI(game, ai2);
-        assertEquals(0, inv.get(DevelopmentCardType.KNIGHT_CARD));
+        assertEquals(1, inv.get(DevelopmentCardType.KNIGHT_CARD));
         assertTrue(inv.get(ResourceType.BRICK) < 4);
         assertTrue(inv.get(ResourceType.LUMBER) < 4);
     }
