@@ -1,7 +1,7 @@
 package de.uol.swp.server.devmenu.message;
 
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
 /**
@@ -15,7 +15,7 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
  */
 public class NewChatCommandMessage extends AbstractServerInternalMessage {
 
-    private final UserOrDummy user;
+    private final Actor user;
     private final String command;
     private final NewChatMessageRequest originalMessage;
 
@@ -27,7 +27,7 @@ public class NewChatCommandMessage extends AbstractServerInternalMessage {
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
      *                        that was made by the user
      */
-    public NewChatCommandMessage(UserOrDummy user, String command, NewChatMessageRequest originalMessage) {
+    public NewChatCommandMessage(Actor user, String command, NewChatMessageRequest originalMessage) {
         this.user = user;
         this.command = command;
         this.originalMessage = originalMessage;
@@ -56,7 +56,7 @@ public class NewChatCommandMessage extends AbstractServerInternalMessage {
      *
      * @return The user invoking the command
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

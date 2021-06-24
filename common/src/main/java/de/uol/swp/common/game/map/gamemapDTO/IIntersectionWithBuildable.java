@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.management.IIntersection;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * The interface Intersection with buildable.
@@ -21,5 +21,5 @@ public interface IIntersectionWithBuildable extends IIntersection {
      * @author Temmo Junkhoff
      * @since 2021-04-25
      */
-    boolean isBuildableBy(UserOrDummy user);
+    boolean isBuildableBy(Actor user);
 }

@@ -4,7 +4,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class AsyncTradeServiceTest {
 
     private static final long DURATION = 200L;
     private final LobbyName defaultLobby = mock(LobbyName.class);
-    private final UserOrDummy otherUser = mock(UserOrDummy.class);
+    private final Actor otherUser = mock(Actor.class);
     private final TradeService syncTradeService = mock(TradeService.class);
     AsyncTradeService tradeService;
 
@@ -36,7 +36,7 @@ class AsyncTradeServiceTest {
         ResourceList offered = mock(ResourceList.class);
         ResourceList demanded = mock(ResourceList.class);
         doNothing().when(syncTradeService)
-                   .acceptUserTrade(isA(LobbyName.class), isA(UserOrDummy.class), isA(ResourceList.class),
+                   .acceptUserTrade(isA(LobbyName.class), isA(Actor.class), isA(ResourceList.class),
                                     isA(ResourceList.class));
 
         tradeService.acceptUserTrade(defaultLobby, otherUser, offered, demanded);
@@ -55,7 +55,7 @@ class AsyncTradeServiceTest {
 
     @Test
     void cancelTrade() {
-        doNothing().when(syncTradeService).cancelTrade(isA(LobbyName.class), isA(UserOrDummy.class));
+        doNothing().when(syncTradeService).cancelTrade(isA(LobbyName.class), isA(Actor.class));
 
         tradeService.cancelTrade(defaultLobby, otherUser);
 
@@ -106,8 +106,8 @@ class AsyncTradeServiceTest {
         ResourceList offered = mock(ResourceList.class);
         ResourceList demanded = mock(ResourceList.class);
         doNothing().when(syncTradeService)
-                   .offerTrade(isA(LobbyName.class), isA(UserOrDummy.class), isA(ResourceList.class),
-                               isA(ResourceList.class), isA(Boolean.class));
+                   .offerTrade(isA(LobbyName.class), isA(Actor.class), isA(ResourceList.class), isA(ResourceList.class),
+                               isA(Boolean.class));
 
         tradeService.offerTrade(defaultLobby, otherUser, offered, demanded, false);
 
@@ -116,7 +116,7 @@ class AsyncTradeServiceTest {
 
     @Test
     void resetOfferTradeButton() {
-        doNothing().when(syncTradeService).resetOfferTradeButton(isA(LobbyName.class), isA(UserOrDummy.class));
+        doNothing().when(syncTradeService).resetOfferTradeButton(isA(LobbyName.class), isA(Actor.class));
 
         tradeService.resetOfferTradeButton(defaultLobby, otherUser);
 
@@ -135,8 +135,8 @@ class AsyncTradeServiceTest {
     @Test
     void showOfferWindow() {
         TradeWithUserOfferResponse response = mock(TradeWithUserOfferResponse.class);
-        doNothing().when(syncTradeService).showOfferWindow(isA(LobbyName.class), isA(UserOrDummy.class),
-                                                           isA(TradeWithUserOfferResponse.class));
+        doNothing().when(syncTradeService)
+                   .showOfferWindow(isA(LobbyName.class), isA(Actor.class), isA(TradeWithUserOfferResponse.class));
 
         tradeService.showOfferWindow(defaultLobby, otherUser, response);
 
@@ -156,7 +156,7 @@ class AsyncTradeServiceTest {
     @Test
     void showUserTradeWindow() {
         doNothing().when(syncTradeService)
-                   .showUserTradeWindow(isA(LobbyName.class), isA(UserOrDummy.class), isA(Boolean.class));
+                   .showUserTradeWindow(isA(LobbyName.class), isA(Actor.class), isA(Boolean.class));
 
         tradeService.showUserTradeWindow(defaultLobby, otherUser, false);
 
@@ -174,8 +174,7 @@ class AsyncTradeServiceTest {
 
     @Test
     void tradeWithUser() {
-        doNothing().when(syncTradeService)
-                   .tradeWithUser(isA(LobbyName.class), isA(UserOrDummy.class), isA(Boolean.class));
+        doNothing().when(syncTradeService).tradeWithUser(isA(LobbyName.class), isA(Actor.class), isA(Boolean.class));
 
         tradeService.tradeWithUser(defaultLobby, otherUser, false);
 

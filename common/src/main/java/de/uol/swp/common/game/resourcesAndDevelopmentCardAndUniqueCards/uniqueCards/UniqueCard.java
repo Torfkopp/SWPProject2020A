@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards;
 
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 
 /**
@@ -12,7 +12,7 @@ import de.uol.swp.common.util.ResourceManager;
 public class UniqueCard implements IUniqueCard {
 
     private final UniqueCardsType type;
-    private UserOrDummy owner;
+    private Actor owner;
     private int amount;
 
     /**
@@ -37,7 +37,7 @@ public class UniqueCard implements IUniqueCard {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public UniqueCard(UniqueCardsType type, UserOrDummy owner, int amount) {
+    public UniqueCard(UniqueCardsType type, Actor owner, int amount) {
         this.type = type;
         this.owner = owner;
         this.amount = amount;
@@ -54,12 +54,12 @@ public class UniqueCard implements IUniqueCard {
     }
 
     @Override
-    public UserOrDummy getOwner() {
+    public Actor getOwner() {
         return owner;
     }
 
     @Override
-    public void setOwner(UserOrDummy owner) {
+    public void setOwner(Actor owner) {
         this.owner = owner;
     }
 

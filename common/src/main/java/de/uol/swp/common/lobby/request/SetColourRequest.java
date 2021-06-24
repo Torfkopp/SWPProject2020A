@@ -2,7 +2,7 @@ package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to change
@@ -22,7 +22,7 @@ public class SetColourRequest extends AbstractLobbyRequest {
      * @param name Name of the lobby
      * @param user User responsible for the creation of this message
      */
-    public SetColourRequest(LobbyName name, UserOrDummy user, Colour colour) {
+    public SetColourRequest(LobbyName name, Actor user, Colour colour) {
         super(name, user);
         this.colour = colour;
     }

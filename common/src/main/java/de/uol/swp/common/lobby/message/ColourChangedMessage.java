@@ -2,7 +2,7 @@ package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class ColourChangedMessage extends AbstractLobbyMessage {
 
-    private final Map<UserOrDummy, Colour> userColours;
+    private final Map<Actor, Colour> userColours;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ public class ColourChangedMessage extends AbstractLobbyMessage {
      *
      * @since 2019-10-08
      */
-    public ColourChangedMessage(LobbyName name, UserOrDummy user, Map<UserOrDummy, Colour> userColours) {
+    public ColourChangedMessage(LobbyName name, Actor user, Map<Actor, Colour> userColours) {
         super(name, user);
         this.userColours = userColours;
     }
@@ -36,7 +36,7 @@ public class ColourChangedMessage extends AbstractLobbyMessage {
      *
      * @return Map of users and their colours
      */
-    public Map<UserOrDummy, Colour> getUserColours() {
+    public Map<Actor, Colour> getUserColours() {
         return userColours;
     }
 }

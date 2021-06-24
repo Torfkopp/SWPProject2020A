@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message used to update the lobby list in the main menu.
@@ -19,7 +19,7 @@ public class AllowedAmountOfPlayersChangedMessage extends AbstractLobbyMessage {
      * @param name Name of the lobby
      * @param user User who updated the allowed player amount
      */
-    public AllowedAmountOfPlayersChangedMessage(LobbyName name, UserOrDummy user) {
+    public AllowedAmountOfPlayersChangedMessage(LobbyName name, Actor user) {
         super(name, user);
     }
 }

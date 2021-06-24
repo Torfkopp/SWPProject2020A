@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message sent by the server when a user changes their Ready status successfully.
@@ -23,7 +23,7 @@ public class UserReadyMessage extends AbstractLobbyMessage {
      * @param lobbyName The Name of the lobby
      * @param user      The User who changed their ready status
      */
-    public UserReadyMessage(LobbyName lobbyName, UserOrDummy user) {
+    public UserReadyMessage(LobbyName lobbyName, Actor user) {
         super(lobbyName, user);
     }
 }

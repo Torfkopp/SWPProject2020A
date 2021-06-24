@@ -3,7 +3,7 @@ package de.uol.swp.common.game.response;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * This response is sent when a user offers another user
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy offeringUser;
+    private final Actor offeringUser;
     private final ResourceList resourceList;
     private final ResourceList offeredResources;
     private final ResourceList demandedResources;
@@ -31,9 +31,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * @param demandedResources The demanded resources
      * @param lobbyName         The name of the lobby
      */
-    public TradeWithUserOfferResponse(UserOrDummy offeringUser, ResourceList resourceList,
-                                      ResourceList offeredResources, ResourceList demandedResources,
-                                      LobbyName lobbyName) {
+    public TradeWithUserOfferResponse(Actor offeringUser, ResourceList resourceList, ResourceList offeredResources,
+                                      ResourceList demandedResources, LobbyName lobbyName) {
         super(lobbyName);
         this.resourceList = resourceList;
         this.offeredResources = offeredResources;
@@ -64,7 +63,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return A User-Object of the offering User
      */
-    public UserOrDummy getOfferingUser() {
+    public Actor getOfferingUser() {
         return offeringUser;
     }
 

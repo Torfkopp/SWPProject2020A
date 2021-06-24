@@ -5,7 +5,7 @@ import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Message sent by the server when a player robs
@@ -18,7 +18,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class RobbingMessage extends AbstractLobbyMessage {
 
-    private final UserOrDummy victim;
+    private final Actor victim;
 
     /**
      * Constructor
@@ -27,7 +27,7 @@ public class RobbingMessage extends AbstractLobbyMessage {
      * @param robber    User getting the card
      * @param victim    User losing the card
      */
-    public RobbingMessage(LobbyName lobbyName, UserOrDummy robber, UserOrDummy victim) {
+    public RobbingMessage(LobbyName lobbyName, Actor robber, Actor victim) {
         super(lobbyName, robber);
         this.victim = victim;
     }
@@ -38,7 +38,7 @@ public class RobbingMessage extends AbstractLobbyMessage {
      * @return The encapsulated InGameSystemMessage
      */
     public SystemMessage getMsg() {
-        return new InGameSystemMessageDTO(new I18nWrapper("game.robber.rob", getUser(), victim));
+        return new InGameSystemMessageDTO(new I18nWrapper("game.robber.rob", getActor(), victim));
     }
 
     /**
@@ -46,7 +46,7 @@ public class RobbingMessage extends AbstractLobbyMessage {
      *
      * @return User losing the card
      */
-    public UserOrDummy getVictim() {
+    public Actor getVictim() {
         return victim;
     }
 }

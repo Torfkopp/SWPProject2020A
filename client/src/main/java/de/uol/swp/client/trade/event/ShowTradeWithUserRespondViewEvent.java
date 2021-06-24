@@ -2,7 +2,7 @@ package de.uol.swp.client.trade.event;
 
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Event used to show the accept window of a trade
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ShowTradeWithUserRespondViewEvent {
 
-    private final UserOrDummy offeringUser;
+    private final Actor offeringUser;
     private final LobbyName lobbyName;
     private final TradeWithUserOfferResponse rsp;
 
@@ -28,8 +28,7 @@ public class ShowTradeWithUserRespondViewEvent {
      * @param lobbyName    The Name of the Lobby
      * @param rsp          The Response found on the EventBus
      */
-    public ShowTradeWithUserRespondViewEvent(UserOrDummy offeringUser, LobbyName lobbyName,
-                                             TradeWithUserOfferResponse rsp) {
+    public ShowTradeWithUserRespondViewEvent(Actor offeringUser, LobbyName lobbyName, TradeWithUserOfferResponse rsp) {
         this.offeringUser = offeringUser;
         this.lobbyName = lobbyName;
         this.rsp = rsp;
@@ -50,7 +49,7 @@ public class ShowTradeWithUserRespondViewEvent {
      *
      * @return Username of the user that wants to trade
      */
-    public UserOrDummy getOfferingUser() {
+    public Actor getOfferingUser() {
         return offeringUser;
     }
 
