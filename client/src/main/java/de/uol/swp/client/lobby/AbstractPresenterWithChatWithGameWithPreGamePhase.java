@@ -427,8 +427,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
+            helpButton.setDisable(true);
+            helpButton.setVisible(false);
             turnIndicator.setAccessibleText("");
             buildingCosts.setVisible(false);
             victoryPointsLabel.setVisible(false);
@@ -673,8 +673,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        helpCheckBox.setDisable(false);
-        helpCheckBox.setVisible(true);
+        helpButton.setDisable(false);
+        helpButton.setVisible(true);
     }
 
     /**
