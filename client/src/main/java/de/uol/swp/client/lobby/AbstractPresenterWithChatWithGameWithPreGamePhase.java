@@ -16,6 +16,8 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.Actor;
@@ -32,7 +34,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -62,7 +63,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected Set<Actor> readyUsers;
+    protected ActorSet readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -241,12 +242,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (userService.getLoggedInUser().equals(owner)) {
-            startSession.setVisible(true);
-            startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
-        } else {
-            startSession.setDisable(true);
-            startSession.setVisible(false);
+        if (!inGame) {
+            if (userService.getLoggedInUser().equals(owner)) {
+                startSession.setVisible(true);
+                startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
+            } else {
+                startSession.setDisable(true);
+                startSession.setVisible(false);
+            }
         }
     }
 
@@ -270,7 +273,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @see de.uol.swp.common.user.Actor
      * @since 2021-01-05
      */
-    protected void updateUsersList(List<Actor> userLobbyList) {
+    protected void updateUsersList(ActorSet userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
@@ -284,22 +287,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyMembers.clear();
             lobbyMembers.addAll(userLobbyList);
         });
-    }
-
-    /**
-     * Helper method to create a PlayerColourMap from
-     * the UserColourMap and the ActorPlayerMap
-     *
-     * @return PlayerColourMap
-     *
-     * @author Mario Fokken
-     * @since 2021-06-02
-     */
-    private Map<Player, Colour> getPlayerColourMap() {
-        Map<Player, Colour> map = new HashMap<>();
-        for (Actor u : userColoursMap.keySet())
-            map.put(actorPlayerMap.get(u), userColoursMap.get(u));
-        return map;
     }
 
     /**
@@ -370,13 +357,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
-        Map<Actor, Player> map = new HashMap<>();
+        ActorPlayerMap map = new ActorPlayerMap();
         int i = 0;
         for (Actor u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
         actorPlayerMap = map;
         userColoursMap = msg.getUserColours();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
         Platform.runLater(this::prepareColourComboBox);
     }
@@ -446,8 +433,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
+            helpButton.setDisable(true);
+            helpButton.setVisible(false);
             turnIndicator.setAccessibleText("");
             buildingCosts.setVisible(false);
             victoryPointsLabel.setVisible(false);
@@ -552,7 +539,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGameUserList = msg.getPlayerList();
         actorPlayerMap = msg.getActorPlayerMap();
         userColoursMap = msg.getActorColourMap();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -692,8 +679,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        helpCheckBox.setDisable(false);
-        helpCheckBox.setVisible(true);
+        helpButton.setDisable(false);
+        helpButton.setVisible(true);
     }
 
     /**

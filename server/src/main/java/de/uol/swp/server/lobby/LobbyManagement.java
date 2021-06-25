@@ -1,11 +1,9 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 import de.uol.swp.common.user.User;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -18,53 +16,29 @@ import java.util.Optional;
  */
 public class LobbyManagement implements ILobbyManagement {
 
-    private final Map<LobbyName, ILobby> lobbies = new HashMap<>();
+    private final LobbyMap lobbies = new LobbyMap();
 
     @Override
     public void createLobby(LobbyName name, User owner, String lobbyPassword) throws IllegalArgumentException {
-        if (lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
-        }
-        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword));
+        lobbies.create(name, owner, lobbyPassword);
     }
 
     @Override
-    public void dropLobby(LobbyName name) throws IllegalArgumentException {
-        if (!lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name [" + name + "] not found!");
-        }
-        lobbies.remove(name);
-    }
+    public void dropLobby(LobbyName name) throws IllegalArgumentException { lobbies.drop(name); }
 
     @Override
-    public Map<LobbyName, ILobby> getLobbies() {
+    public LobbyMap getLobbies() {
         return lobbies;
     }
 
     @Override
-    public Optional<ILobby> getLobby(LobbyName lobbyName) {
-        ILobby lobby = lobbies.get(lobbyName);
-        if (lobby != null) {
-            return Optional.of(lobby);
-        }
-        return Optional.empty();
-    }
+    public Optional<ILobby> getLobby(LobbyName lobbyName) { return lobbies.getLobby(lobbyName); }
 
     @Override
-    public Optional<ILobby> getLobby(LobbyName name, String password) {
-        ILobby lobby = lobbies.get(name);
-        if (lobby != null) {
-            return Optional.of(lobby);
-        }
-        return Optional.empty();
-    }
+    public Optional<ILobby> getLobby(LobbyName name, String password) { return lobbies.getLobby(name, password); }
 
     @Override
-    public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
-        Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
-        lobbies.forEach((key, value) -> temp.put(key, ILobby.getSimpleLobby(value)));
-        return temp;
-    }
+    public SimpleLobbyMap getSimpleLobbies() { return lobbies.getSimpleLobbies(); }
 
     @Override
     public void setInGame(LobbyName lobbyName, boolean inGame) {
@@ -76,10 +50,11 @@ public class LobbyManagement implements ILobbyManagement {
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
                                     boolean randomPlayfieldEnabled, int maxTradeDiff) {
-        lobbies.get(lobbyName).setMaxPlayers(maxPlayers);
-        lobbies.get(lobbyName).setMoveTime(moveTime);
-        lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
-        lobbies.get(lobbyName).setRandomPlayFieldEnabled(randomPlayfieldEnabled);
-        lobbies.get(lobbyName).setMaxTradeDiff(maxTradeDiff);
+        ILobby lobby = lobbies.get(lobbyName);
+        lobby.setMaxPlayers(maxPlayers);
+        lobby.setMoveTime(moveTime);
+        lobby.setStartUpPhaseEnabled(startUpPhaseEnabled);
+        lobby.setRandomPlayFieldEnabled(randomPlayfieldEnabled);
+        lobby.setMaxTradeDiff(maxTradeDiff);
     }
 }

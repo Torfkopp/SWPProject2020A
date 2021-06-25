@@ -15,7 +15,6 @@ import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -32,6 +31,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
+import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.ResourceManager;
@@ -124,7 +124,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label currentRound;
     @FXML
-    protected Button helpCheckBox;
+    protected Button helpButton;
 
     protected ObservableList<Actor> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
@@ -154,12 +154,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
-    protected Map<Actor, Player> actorPlayerMap = null;
-    protected Map<Actor, Colour> userColoursMap = null;
+    protected ActorPlayerMap actorPlayerMap = null;
+    protected ActorColourMap userColoursMap = null;
     protected IGameService gameService;
     protected int maxTradeDiff;
-    protected Map<Actor, Map<Integer, Integer>> victoryPointsOverTimeMap;
-    protected List<Actor> inGameUserList;
+    protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
+    protected ActorSet inGameUserList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -307,6 +307,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onHelpButtonPressed() {
+        if (helpButton.isDisabled()) {
+            LOG.trace("onHelpButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
@@ -325,24 +329,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a click on the Pause/Unpause Button
-     * <p>
-     * Calls the pauseGame method of the gameService to
-     * start or participate in a voting to pause/unpause the
-     * game
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-21
-     */
-    @FXML
-    protected void onPauseButtonPressed() {
-        soundService.button();
-        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
-        else Platform.runLater(
-                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
-    }
-
-    /**
      * Handles a click on the PlayCardButton
      * <p>
      * Method called when the PlayCardButton is pushed
@@ -355,6 +341,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onPlayCardButtonPressed() {
+        if (playCard.isDisabled()) {
+            LOG.trace("onPlayCardButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -451,6 +441,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithBankButtonPressed() {
+        if (tradeWithBankButton.isDisabled()) {
+            LOG.trace("onTradeWithBankButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
@@ -470,6 +464,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithUserButtonPressed() {
+        if (tradeWithUserButton.isDisabled()) {
+            LOG.trace("onTradeWithUserButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         Actor user = membersView.getSelectionModel().getSelectedItem();
@@ -1029,6 +1027,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.showAndWait();
             soundService.button();
         });
+        resetButtonStates(rsp.getUser());
     }
 
     /**
@@ -1161,7 +1160,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             String confirmText = ResourceManager.get("button.confirm");
             String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
-                List<Actor> victims = new ArrayList<>(rsp.getVictims());
+                ActorSet victims = rsp.getVictims();
                 ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
                 dialogue.setTitle(title);
                 dialogue.setHeaderText(headerText);

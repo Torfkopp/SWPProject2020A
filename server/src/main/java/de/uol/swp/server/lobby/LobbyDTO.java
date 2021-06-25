@@ -2,12 +2,16 @@ package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.Computer;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.Util;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Object to transfer the information of a game lobby
@@ -24,10 +28,10 @@ import java.util.*;
 public class LobbyDTO implements ILobby {
 
     private final LobbyName name;
-    private final Set<Actor> users = new TreeSet<>();
-    private final Set<Actor> readyUsers = new TreeSet<>();
+    private final ActorSet users = new ActorSet();
+    private final ActorSet readyUsers = new ActorSet();
     private final String password;
-    private final Map<Actor, Colour> userColours = new LinkedHashMap<>();
+    private final ActorColourMap userColours = new ActorColourMap();
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -56,7 +60,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
-        userColours.put(creator, Util.randomColour());
+        userColours.put(creator);
         this.maxTradeDiff = 2;
     }
 
@@ -165,8 +169,8 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Set<Actor> getActor() {
-        return Collections.unmodifiableSet(users);
+    public ActorSet getReadyUsers() {
+        return readyUsers;
     }
 
     @Override
@@ -181,14 +185,12 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public Set<Actor> getReadyUsers() {
-        return readyUsers;
+    public ActorColourMap getUserColourMap() {
+        return userColours;
     }
 
     @Override
-    public Map<Actor, Colour> getUserColourMap() {
-        return userColours;
-    }
+    public ActorSet getActors() { return users; }
 
     @Override
     public boolean hasPassword() {
@@ -298,5 +300,4 @@ public class LobbyDTO implements ILobby {
         }
         this.owner = user;
     }
-
 }
