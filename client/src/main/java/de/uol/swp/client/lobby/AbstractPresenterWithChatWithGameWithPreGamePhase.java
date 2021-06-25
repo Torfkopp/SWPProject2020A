@@ -140,7 +140,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         ThreadManager.runNow(() -> {
             sceneService.closeUserTradeWindow(lobbyName);
             sceneService.closeAcceptTradeWindow(lobbyName);
-            clearEventBus();
+            try {
+                clearEventBus();
+            } catch (NullPointerException ignored) {}
         });
     }
 

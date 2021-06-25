@@ -10,6 +10,7 @@ import de.uol.swp.common.user.Actor;
  * An interface for all methods of the LobbyService
  *
  * @author Steven Luong
+ * @see de.uol.swp.client.lobby.AsyncLobbyService
  * @see de.uol.swp.client.lobby.LobbyService
  * @since 2021-02-12
  */
@@ -131,21 +132,6 @@ public interface ILobbyService {
     void removeFromAllLobbies();
 
     /**
-     * Posts a request to change a user's colour.
-     * If colour is null, the colour won't be changed,
-     * but the response will be sent nevertheless.
-     *
-     * @param lobbyName The lobby's name
-     * @param colour    The colour the user desires
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @author Mario Fokken
-     * @see de.uol.swp.common.lobby.request.SetColourRequest
-     * @since 2021-06-04
-     */
-    void setColour(LobbyName lobbyName, Colour colour);
-
-    /**
      * Posts a request to retrieve all lobby names
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
@@ -178,6 +164,21 @@ public interface ILobbyService {
      * @since 2021-03-22
      */
     void returnToPreGameLobby(LobbyName lobbyName);
+
+    /**
+     * Posts a request to change a user's colour.
+     * If colour is null, the colour won't be changed,
+     * but the response will be sent nevertheless.
+     *
+     * @param lobbyName The lobby's name
+     * @param colour    The colour the user desires
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-04
+     */
+    void setColour(LobbyName lobbyName, Colour colour);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.

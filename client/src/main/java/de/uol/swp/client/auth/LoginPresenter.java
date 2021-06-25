@@ -2,7 +2,7 @@ package de.uol.swp.client.auth;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -84,7 +84,7 @@ public class LoginPresenter extends AbstractPresenter {
     @FXML
     private void onRegisterButtonPressed() {
         soundService.button();
-        sceneService.showRegistrationScreen();
+        sceneService.displayRegistrationScreen();
     }
 
     /**
@@ -99,7 +99,7 @@ public class LoginPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe

@@ -144,7 +144,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", lobbyName);
         LOG.debug("---- The user got a {}", rsp.getDevelopmentCard());
-        sceneService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
     }
@@ -159,7 +159,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        sceneService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, true);
     }
 
     /**
@@ -250,7 +250,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (lobbyName == null) lobbyName = event.getLobbyName();
         LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
         Window window = ownResourcesToTradeWith.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> sceneService.closeBankTradeWindow(lobbyName));
+        window.setOnCloseRequest(windowEvent -> sceneService.closeBankTradeWindow(lobbyName, true));
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
                          this::onBuyDevelopmentCardButtonPressed);
@@ -272,7 +272,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
-        sceneService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
         soundService.coins();
     }

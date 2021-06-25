@@ -10,7 +10,6 @@ import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.scene.ISceneService;
-import de.uol.swp.client.scene.SceneManagerFactory;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
@@ -122,8 +121,7 @@ public class ClientApp extends Application implements ConnectionListener {
 
         // Client app is created by Java, so injection must
         // be handled here manually
-        SceneManagerFactory sceneManagerFactory = injector.getInstance(SceneManagerFactory.class);
-        sceneManagerFactory.create(primaryStage);
+        this.sceneService = injector.getInstance(ISceneService.class);
 
         ClientConnectionFactory connectionFactory = injector.getInstance(ClientConnectionFactory.class);
         clientConnection = connectionFactory.create(host, port);
@@ -165,12 +163,12 @@ public class ClientApp extends Application implements ConnectionListener {
             else {
                 LOG.trace("No user details found, showing Login screen");
                 attemptingStoredLogin = false;
-                sceneService.showLoginScreen();
+                sceneService.displayLoginScreen();
             }
         } else {
             LOG.trace("'Remember Me' disabled, showing Login screen");
             attemptingStoredLogin = false;
-            sceneService.showLoginScreen();
+            sceneService.displayLoginScreen();
         }
     }
 
@@ -179,7 +177,7 @@ public class ClientApp extends Application implements ConnectionListener {
         if (e.startsWith("Cannot auth user ") && attemptingStoredLogin) {
             LOG.trace("Stored user details were incorrect, showing normal login screen");
             attemptingStoredLogin = false;
-            sceneService.showLoginScreen();
+            sceneService.displayLoginScreen();
         } else {
             sceneService.showServerError(e);
         }

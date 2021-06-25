@@ -3,31 +3,29 @@ package de.uol.swp.client.scene;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.event.RobberTaxUpdateEvent;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.client.trade.ITradeService;
-import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
-import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SceneService implements ISceneService {
@@ -37,20 +35,17 @@ public class SceneService implements ISceneService {
     private final ILobbyService lobbyService;
     private final ITradeService tradeService;
     private final IUserService userService;
-    private final ResourceBundle resourceBundle;
     private final SceneManager sceneManager;
 
     @Inject
     public SceneService(EventBus eventBus, IUserService userService, ILobbyService lobbyService,
-                        SceneManager sceneManager, ITradeService tradeService, ResourceBundle resourceBundle) {
+                        SceneManager sceneManager, ITradeService tradeService) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
         this.userService = userService;
         this.lobbyService = lobbyService;
         this.tradeService = tradeService;
-        this.sceneManager = sceneManager; // this somehow forces a new SceneManager even though it's a Singleton?
-        this.resourceBundle = resourceBundle;
-        eventBus.post(new SetAcceleratorsEvent());
+        this.sceneManager = sceneManager;
         LOG.debug("SceneService initialised");
     }
 
@@ -60,13 +55,14 @@ public class SceneService implements ISceneService {
     }
 
     @Override
-    public void closeBankTradeWindow(LobbyName lobbyName) {
-        sceneManager.closeTradeWindow(lobbyName);
+    public void closeAllLobbyWindows() {
+        sceneManager.closeLobbies();
     }
 
     @Override
-    public void closeLobbyWindows() {
-        sceneManager.closeLobbies();
+    public void closeBankTradeWindow(LobbyName lobbyName, boolean wasCanceled) {
+        sceneManager.closeTradeWindow(lobbyName);
+        if (wasCanceled) eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
     }
 
     @Override
@@ -80,27 +76,102 @@ public class SceneService implements ISceneService {
     }
 
     @Override
-    public void showAcceptTradeWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
-        sceneManager.showAcceptTradeWindow(lobbyName, offeringUser);
-        ThreadManager.runNow(() -> eventBus.post(new TradeWithUserResponseUpdateEvent(rsp)));
-    }
-
-    @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        sceneManager.showBankTradeWindow(lobbyName);
-        LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
-        eventBus.post(new TradeUpdateEvent(lobbyName));
-        tradeService.tradeWithBank(lobbyName);
-    }
-
-    @Override
-    public void showChangeAccountDetailsScreen() {
+    public void displayChangeAccountDetailsScreen() {
         sceneManager.showChangeAccountDetailsScreen(userService.getLoggedInUser());
     }
 
     @Override
-    public void showChangePropertiesScreen() {
-        sceneManager.showChangePropertiesScreen(userService.getLoggedInUser());
+    public void displayChangeSettingsScreen() {
+        sceneManager.showChangeSettingsScreen(userService.getLoggedInUser());
+    }
+
+    @Override
+    public void displayLoginScreen() {
+        sceneManager.showLoginScreen();
+    }
+
+    @Override
+    public void displayMainMenuScreen() {
+        sceneManager.showMainScreen(userService.getLoggedInUser());
+    }
+
+    @Override
+    public void displayRegistrationScreen() {
+        sceneManager.showRegistrationScreen();
+    }
+
+    @Override
+    public void openAcceptTradeWindow(LobbyName lobbyName, Actor offeringUser, TradeWithUserOfferResponse rsp) {
+        CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showAcceptTradeWindow(lobbyName, offeringUser, latch);
+        ThreadManager.runNow(() -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                latch.await(300, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {}
+            LOG.debug("Sending TradeWithUserResponseUpdateEvent for Lobby {}", lobbyName);
+            eventBus.post(new TradeWithUserResponseUpdateEvent(rsp));
+        });
+    }
+
+    @Override
+    public void openBankTradeWindow(LobbyName lobbyName) {
+        CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showBankTradeWindow(lobbyName, latch);
+        ThreadManager.runNow(() -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                latch.await(300, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {}
+            LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
+            eventBus.post(new TradeUpdateEvent(lobbyName));
+            tradeService.tradeWithBank(lobbyName);
+        });
+    }
+
+    @Override
+    public void openLobbyWindow(ISimpleLobby lobby) {
+        CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showLobbyWindow(lobby.getName(), latch);
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            latch.await(300, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ignored) {}
+        lobbyService.refreshLobbyPresenterFields(lobby);
+    }
+
+    @Override
+    public void openRobberTaxWindow(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
+        CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showRobberTaxWindow(lobbyName, latch);
+        ThreadManager.runNow(() -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                latch.await(300, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {}
+            LOG.debug("Sending RobberTaxUpdateEvent to Lobby {}", lobbyName);
+            eventBus.post(new RobberTaxUpdateEvent(lobbyName, taxAmount, inventory));
+        });
+    }
+
+    @Override
+    public void openRulesWindow() {
+        sceneManager.showRulesWindow();
+    }
+
+    @Override
+    public void openUserTradeWindow(LobbyName lobbyName, Actor respondingUser, boolean isCounterOffer) {
+        CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showUserTradeWindow(lobbyName, respondingUser, latch);
+        ThreadManager.runNow(() -> {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                latch.await(300, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {}
+            LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
+            eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
+            tradeService.tradeWithUser(lobbyName, respondingUser, isCounterOffer);
+        });
     }
 
     @Override
@@ -109,40 +180,8 @@ public class SceneService implements ISceneService {
     }
 
     @Override
-    public void showLobbyWindow(ISimpleLobby lobby) {
-        sceneManager.showLobbyWindow(lobby);
-        lobbyService.refreshLobbyPresenterFields(lobby);
-    }
-
-    @Override
-    public void showLoginScreen() {
-        sceneManager.showLoginScreen();
-    }
-
-    @Override
-    public void showMainMenuScreen() {
-        sceneManager.showMainScreen(userService.getLoggedInUser());
-    }
-
-    @Override
-    public void showRegistrationScreen() {
-        sceneManager.showRegistrationScreen();
-    }
-
-    @Override
-    public void showRobberTaxWindow(LobbyName lobbyName, Integer taxAmount, ResourceList inventory) {
-        sceneManager.showRobberTaxWindow(lobbyName);
-        ThreadManager.runNow(() -> eventBus.post(new RobberTaxUpdateEvent(lobbyName, taxAmount, inventory)));
-    }
-
-    @Override
-    public void showRulesWindow() {
-        sceneManager.showRulesWindow();
-    }
-
-    @Override
     public void showServerError(String message) {
-        sceneManager.showError(resourceBundle.getString("error.server") + '\n', message);
+        sceneManager.showError(ResourceManager.get("error.server") + '\n', message);
     }
 
     @Override
@@ -150,36 +189,10 @@ public class SceneService implements ISceneService {
         if (e instanceof IOException) {
             //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
             userService.logout(false);
-            showLoginScreen();
-            cause = resourceBundle.getString("error.server.disrupted");
+            displayLoginScreen();
+            cause = ResourceManager.get("error.server.disrupted");
         }
         showServerError(cause);
-    }
-
-    @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
-        sceneManager.showUserTradeWindow(lobbyName, respondingUser);
-        ThreadManager.runNow(() -> {
-            eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-            tradeService.tradeWithUser(lobbyName, respondingUser, isCounterOffer);
-        });
-    }
-
-    /**
-     * Handles an incoming AllLobbiesResponse
-     * <p>
-     * If a AllLobbiesResponse is detected, the lobbyScenes map
-     * is updated to know the same lobbies as the server
-     *
-     * @param rsp The AllLobbiesResponse detected on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
-     * @since 2020-12-12
-     */
-    @Subscribe
-    private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
-        LOG.debug("Received AllLobbiesResponse");
-        sceneManager.addPlaceholderScenesForNewLobbies(rsp.getLobbyNames());
     }
 
     /**
@@ -275,6 +288,6 @@ public class SceneService implements ISceneService {
     @Subscribe
     private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
         LOG.debug("Registration was successful.");
-        showLoginScreen();
+        displayLoginScreen();
     }
 }

@@ -3,7 +3,7 @@ package de.uol.swp.client.changeAccountDetails;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.util.ResourceManager;
@@ -95,7 +95,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      *
      * @author Phillip-André Suhr
      * @see javafx.scene.input.KeyEvent
-     * @see #onSetAcceleratorsEvent(de.uol.swp.client.SetAcceleratorsEvent)
+     * @see #onSetAcceleratorsEvent(de.uol.swp.client.scene.event.SetAcceleratorsEvent)
      * @since 2021-05-20
      */
     private void handleKeyPress(KeyEvent event) {
@@ -154,7 +154,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        sceneService.showMainMenuScreen();
+        sceneService.displayMainMenuScreen();
     }
 
     /**
@@ -231,7 +231,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe

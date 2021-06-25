@@ -16,6 +16,7 @@ import de.uol.swp.client.lobby.AsyncLobbyService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.scene.*;
+import de.uol.swp.client.scene.util.PresenterAndStageHelper;
 import de.uol.swp.client.sound.AsyncSoundService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.sound.SoundService;
@@ -139,8 +140,6 @@ public class ClientModule extends AbstractModule {
 
         //DI stuff
         bind(SceneManager.class).in(Scopes.SINGLETON);
-        install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
-                                          .build(SceneManagerFactory.class));
         install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class)
                                           .build(ClientConnectionFactory.class));
         bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
@@ -175,7 +174,7 @@ public class ClientModule extends AbstractModule {
         bind(ISceneService.class).to(AsyncSceneService.class).in(Scopes.SINGLETON);
         bind(SceneService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
-        requestStaticInjection(SceneManager.class);
+        requestStaticInjection(PresenterAndStageHelper.class);
         requestStaticInjection(ResourceManager.class);
     }
 }

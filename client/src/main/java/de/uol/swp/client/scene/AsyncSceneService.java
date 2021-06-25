@@ -1,20 +1,40 @@
 package de.uol.swp.client.scene;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
+import de.uol.swp.common.util.ThreadManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+/**
+ * An asynchronous wrapper for the ISceneService implementation
+ * <p>
+ * This class handles putting calls to an injected SceneService into
+ * their own ThreadManager.runNow-Thread which is then executed away from the JavaFX
+ * Application Thread, isolating non-UI calls onto their own threads.
+ *
+ * @author Phillip-André Suhr
+ * @see de.uol.swp.client.scene.ISceneService
+ * @since 2021-06-25
+ */
 public class AsyncSceneService implements ISceneService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncSceneService.class);
     private final SceneService syncSceneService;
 
+    /**
+     * Constructor
+     *
+     * @param syncSceneService The synchronous SceneService (injected)
+     */
     @Inject
     public AsyncSceneService(SceneService syncSceneService) {
         this.syncSceneService = syncSceneService;
+        LOG.debug("AsyncLobbyService initialised");
     }
 
     @Override
@@ -23,13 +43,13 @@ public class AsyncSceneService implements ISceneService {
     }
 
     @Override
-    public void closeBankTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncSceneService.closeBankTradeWindow(lobbyName));
+    public void closeAllLobbyWindows() {
+        ThreadManager.runNow(syncSceneService::closeAllLobbyWindows);
     }
 
     @Override
-    public void closeLobbyWindows() {
-        ThreadManager.runNow(syncSceneService::closeLobbyWindows);
+    public void closeBankTradeWindow(LobbyName lobbyName, boolean wasCanceled) {
+        ThreadManager.runNow(() -> syncSceneService.closeBankTradeWindow(lobbyName, wasCanceled));
     }
 
     @Override
@@ -43,58 +63,63 @@ public class AsyncSceneService implements ISceneService {
     }
 
     @Override
-    public void showAcceptTradeWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
-        ThreadManager.runNow(() -> syncSceneService.showAcceptTradeWindow(lobbyName, offeringUser, rsp));
+    public void displayChangeAccountDetailsScreen() {
+        ThreadManager.runNow(syncSceneService::displayChangeAccountDetailsScreen);
     }
 
     @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncSceneService.showBankTradeWindow(lobbyName));
+    public void displayChangeSettingsScreen() {
+        ThreadManager.runNow(syncSceneService::displayChangeSettingsScreen);
     }
 
     @Override
-    public void showChangeAccountDetailsScreen() {
-        ThreadManager.runNow(syncSceneService::showChangeAccountDetailsScreen);
+    public void displayLoginScreen() {
+        ThreadManager.runNow(syncSceneService::displayLoginScreen);
     }
 
     @Override
-    public void showChangePropertiesScreen() {
-        ThreadManager.runNow(syncSceneService::showChangePropertiesScreen);
+    public void displayMainMenuScreen() {
+        ThreadManager.runNow(syncSceneService::displayMainMenuScreen);
+    }
+
+    @Override
+    public void displayRegistrationScreen() {
+        ThreadManager.runNow(syncSceneService::displayRegistrationScreen);
+    }
+
+    @Override
+    public void openAcceptTradeWindow(LobbyName lobbyName, Actor offeringUser, TradeWithUserOfferResponse rsp) {
+        ThreadManager.runNow(() -> syncSceneService.openAcceptTradeWindow(lobbyName, offeringUser, rsp));
+    }
+
+    @Override
+    public void openBankTradeWindow(LobbyName lobbyName) {
+        ThreadManager.runNow(() -> syncSceneService.openBankTradeWindow(lobbyName));
+    }
+
+    @Override
+    public void openLobbyWindow(ISimpleLobby lobby) {
+        ThreadManager.runNow(() -> syncSceneService.openLobbyWindow(lobby));
+    }
+
+    @Override
+    public void openRobberTaxWindow(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
+        ThreadManager.runNow(() -> syncSceneService.openRobberTaxWindow(lobbyName, taxAmount, inventory));
+    }
+
+    @Override
+    public void openRulesWindow() {
+        ThreadManager.runNow(syncSceneService::openRulesWindow);
+    }
+
+    @Override
+    public void openUserTradeWindow(LobbyName lobbyName, Actor respondingUser, boolean isCounterOffer) {
+        ThreadManager.runNow(() -> syncSceneService.openUserTradeWindow(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override
     public void showError(String message) {
         ThreadManager.runNow(() -> syncSceneService.showError(message));
-    }
-
-    @Override
-    public void showLobbyWindow(ISimpleLobby lobby) {
-        ThreadManager.runNow(() -> syncSceneService.showLobbyWindow(lobby));
-    }
-
-    @Override
-    public void showLoginScreen() {
-        ThreadManager.runNow(syncSceneService::showLoginScreen);
-    }
-
-    @Override
-    public void showMainMenuScreen() {
-        ThreadManager.runNow(syncSceneService::showMainMenuScreen);
-    }
-
-    @Override
-    public void showRegistrationScreen() {
-        ThreadManager.runNow(syncSceneService::showRegistrationScreen);
-    }
-
-    @Override
-    public void showRobberTaxWindow(LobbyName lobbyName, Integer taxAmount, ResourceList inventory) {
-        ThreadManager.runNow(() -> syncSceneService.showRobberTaxWindow(lobbyName, taxAmount, inventory));
-    }
-
-    @Override
-    public void showRulesWindow() {
-        ThreadManager.runNow(syncSceneService::showRulesWindow);
     }
 
     @Override
@@ -105,10 +130,5 @@ public class AsyncSceneService implements ISceneService {
     @Override
     public void showServerError(Throwable e, String cause) {
         ThreadManager.runNow(() -> syncSceneService.showServerError(e, cause));
-    }
-
-    @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
-        ThreadManager.runNow(() -> syncSceneService.showUserTradeWindow(lobbyName, respondingUser, isCounterOffer));
     }
 }

@@ -3,7 +3,6 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
@@ -413,20 +412,6 @@ class LobbyServiceTest {
         assertEquals(defaultLobbyName, request.getName());
         assertEquals(defaultUser, request.getActor());
         assertEquals(colour, request.getColour());
-    }
-
-    @Test
-    void showLobbyError() throws InterruptedException {
-        String message = "test";
-        lobbyService.showLobbyError(message);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof LobbyErrorEvent);
-
-        LobbyErrorEvent eve = (LobbyErrorEvent) event;
-
-        assertEquals(message, eve.getMessage());
     }
 
     /**

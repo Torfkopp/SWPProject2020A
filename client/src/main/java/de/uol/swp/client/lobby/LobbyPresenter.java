@@ -282,7 +282,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onRulesMenuClicked() {
         LOG.debug("Sending ShowRulesOverviewViewEvent");
         soundService.button();
-        sceneService.showRulesWindow();
+        sceneService.openRulesWindow();
     }
 
     /**

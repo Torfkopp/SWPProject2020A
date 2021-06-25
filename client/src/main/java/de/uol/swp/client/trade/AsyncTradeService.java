@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the ITradeService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected TradeService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -25,6 +25,11 @@ public class AsyncTradeService implements ITradeService {
     private static final Logger LOG = LogManager.getLogger(AsyncTradeService.class);
     private final TradeService syncTradeService;
 
+    /**
+     * Constructor
+     *
+     * @param syncTradeService The synchronous TradeService (injected)
+     */
     @Inject
     public AsyncTradeService(TradeService syncTradeService) {
         this.syncTradeService = syncTradeService;

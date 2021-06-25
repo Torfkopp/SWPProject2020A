@@ -6,7 +6,6 @@ import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.I18nWrapper;
@@ -171,7 +170,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
-    private ITradeService tradeService;
     private String theme;
 
     @Override
@@ -446,7 +444,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         soundService.button();
         disableButtonStates();
-        sceneService.showBankTradeWindow(lobbyName);
+        sceneService.openBankTradeWindow(lobbyName);
     }
 
     /**
@@ -476,7 +474,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             sceneService.showError(ResourceManager.get("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            sceneService.showUserTradeWindow(lobbyName, user, false);
+            sceneService.openUserTradeWindow(lobbyName, user, false);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -565,7 +563,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
                         sceneService.closeAcceptTradeWindow(lobbyName);
-                        sceneService.closeBankTradeWindow(lobbyName);
+                        sceneService.closeBankTradeWindow(lobbyName, false);
                         sceneService.closeUserTradeWindow(lobbyName);
                         disableButtonStates();
                         gameService.endTurn(lobbyName);
@@ -961,7 +959,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gamePaused = msg.isPaused();
         if (gamePaused) {
             timerPaused = true;
-            sceneService.closeBankTradeWindow(lobbyName);
+            sceneService.closeBankTradeWindow(lobbyName, true);
             sceneService.closeAcceptTradeWindow(lobbyName);
             sceneService.closeUserTradeWindow(lobbyName);
             disableButtonStates();
@@ -1233,7 +1231,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
-                sceneService.showRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
+                sceneService.openRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
                                                  msg.getInventories().get(user).create());
                 post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
@@ -1295,7 +1293,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         LOG.debug("Received TradeWithUserOfferResponse");
         if (!rsp.getLobbyName().equals(lobbyName)) return;
-        sceneService.showAcceptTradeWindow(lobbyName, rsp.getOfferingUser(), rsp);
+        sceneService.openAcceptTradeWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
     /**
@@ -1604,16 +1602,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * This method sets the injected fields via parameters.
      *
-     * @param tradeService The TradeService this class should use.
-     * @param gameService  The GameService this class should use.
-     * @param theme        The theme this class should use.
+     * @param gameService The GameService this class should use.
+     * @param theme       The theme this class should use.
      *
      * @author Marvin Drees
      * @since 2021-06-09
      */
     @Inject
-    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
-        this.tradeService = tradeService;
+    private void setInjects(IGameService gameService, @Named("theme") String theme) {
         this.gameService = gameService;
         this.theme = theme;
     }

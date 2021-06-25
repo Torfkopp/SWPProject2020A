@@ -5,11 +5,11 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.SetAcceleratorsEvent;
-import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.client.specialisedUtil.LobbyList;
 import de.uol.swp.client.specialisedUtil.LobbyListItem;
 import de.uol.swp.client.specialisedUtil.UsersList;
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
@@ -61,6 +61,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private final String soundPack;
     private final boolean loginLogoutMsgsOn;
     private final boolean lobbyCreateDeleteMsgsOn;
+    private final LobbyList lobbies = new LobbyList();
+    private final UsersList users = new UsersList();
 
     @FXML
     private Label randomLobbyState;
@@ -76,9 +78,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private CheckBox lobbyListFilteredFullBox;
     @FXML
     private TextField lobbyFilterTextField;
-
-    private final LobbyList lobbies = new LobbyList();
-    private final UsersList users = new UsersList();
 
     /**
      * Constructor
@@ -139,7 +138,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         fullFilter.bind(Bindings.createObjectBinding(
                 () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getActors().size() == lobby
-                        .getKey().getMaxPlayers())) || (!lobbyListFilteredFullBox.isSelected()), lobbyListFilteredFullBox.selectedProperty()));
+                        .getKey().getMaxPlayers())) || (!lobbyListFilteredFullBox.isSelected()),
+                lobbyListFilteredFullBox.selectedProperty()));
 
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
@@ -266,13 +266,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent
      * @since 2021-05-22
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
         soundService.button();
-        sceneService.showChangePropertiesScreen();
+        sceneService.displayChangeSettingsScreen();
     }
 
     /**
@@ -295,7 +294,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (rsp.getIsInLobby()) {
             sceneService.showError(ResourceManager.get("lobby.error.in.lobby"));
         } else {
-            sceneService.showChangeAccountDetailsScreen();
+            sceneService.displayChangeAccountDetailsScreen();
         }
     }
 
@@ -376,7 +375,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
-        sceneService.showLobbyWindow(rsp.getLobby());
+        sceneService.openLobbyWindow(rsp.getLobby());
     }
 
     /**
@@ -481,7 +480,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
         LOG.debug("Received JoinLobbyResponse");
-        sceneService.showLobbyWindow(rsp.getLobby());
+        sceneService.openLobbyWindow(rsp.getLobby());
     }
 
     /**
@@ -645,8 +644,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLogoutButtonPressed() {
         soundService.button();
         logout();
-        sceneService.showLoginScreen();
-        sceneService.closeLobbyWindows();
+        sceneService.displayLoginScreen();
+        sceneService.closeAllLobbyWindows();
     }
 
     /**
@@ -661,7 +660,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onRulesMenuClicked() {
         soundService.button();
-        sceneService.showRulesWindow();
+        sceneService.openRulesWindow();
     }
 
     /**
@@ -679,7 +678,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe
@@ -716,7 +715,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
         LOG.info("User deletion successful");
         String username = userService.getLoggedInUser().getUsername();
-        sceneService.showLoginScreen();
+        sceneService.displayLoginScreen();
         logout();
         ButtonType ok = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         String bundleString = ResourceManager.get("mainmenu.settings.deleteaccount.success");
