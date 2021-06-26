@@ -93,7 +93,7 @@ public class ClientModule extends AbstractModule {
         String lang = properties.getProperty("lang");
 
         //Setting the rendering style
-        String renderingStyle = properties.getProperty("renderingStyle");
+        String renderingStyle = properties.getProperty("renderingstyle");
 
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
