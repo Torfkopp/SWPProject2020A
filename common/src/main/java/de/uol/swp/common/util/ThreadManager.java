@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class to handle execution of instructions on a non-JavaFX Application Thread
@@ -21,6 +22,14 @@ public class ThreadManager {
             .newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("RunNow-Thread-%d").build());
     private static final ExecutorService threadForInOrderExecution = Executors
             .newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("inOrderExecutionThread").build());
+
+    public static boolean emptyPool() {
+        try {
+            return executorService.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
 
     /**
      * Forces the shutdown of all ExecutorService Threads
