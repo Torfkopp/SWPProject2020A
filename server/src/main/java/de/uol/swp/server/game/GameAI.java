@@ -272,7 +272,7 @@ public class GameAI {
                 turnBuildAIEasy(game, ai);
                 break;
             case HARD:
-                if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
+                if (game.getInventory(ai).isPlayable(DevelopmentCardType.KNIGHT_CARD))
                     playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
                 turnBuildAIHard(game, ai);
                 break;
@@ -338,7 +338,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
 
         //Play a monopoly card if possible
-        if (inv.get(DevelopmentCardType.MONOPOLY_CARD) > 1) {
+        if (inv.isPlayable(DevelopmentCardType.MONOPOLY_CARD)) {
             if (inv.get(ORE) < 3) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, ORE, null);
             if (inv.get(GRAIN) < 2) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, GRAIN, null);
         }
@@ -431,9 +431,9 @@ public class GameAI {
         }
 
         //Play a card if possible
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.ROAD_BUILDING_CARD))
             playCardAI(game, ai, DevelopmentCardType.ROAD_BUILDING_CARD, null, null);
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.YEAR_OF_PLENTY_CARD))
             playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, BRICK, LUMBER);
 
         //Chooses the best path; best as in longest buildable road

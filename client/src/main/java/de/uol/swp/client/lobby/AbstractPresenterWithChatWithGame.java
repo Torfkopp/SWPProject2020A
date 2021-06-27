@@ -395,6 +395,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onReturnToLobbyButtonPressed() {
+        if (returnToLobby.isDisabled()) {
+            LOG.trace("onReturnToLobbyButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
@@ -1024,6 +1028,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.showAndWait();
             soundService.button();
         });
+        resetButtonStates(rsp.getUser());
     }
 
     /**
