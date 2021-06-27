@@ -34,6 +34,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class SceneServiceTest {
 
+    private static final long DURATION = 200L;
     private final CountDownLatch lock = new CountDownLatch(1);
     private final LobbyName defaultLobby = mock(LobbyName.class);
     private final EventBus eventBus = new EventBus();
@@ -251,6 +252,7 @@ class SceneServiceTest {
     @Test
     void openBankTradeWindow() throws InterruptedException {
         doNothing().when(sceneManager).showBankTradeWindow(isA(LobbyName.class), isA(CountDownLatch.class));
+        doNothing().when(tradeService).tradeWithBank(isA(LobbyName.class));
 
         sceneService.openBankTradeWindow(defaultLobby);
 
@@ -263,7 +265,7 @@ class SceneServiceTest {
         TradeUpdateEvent eve = (TradeUpdateEvent) event;
 
         assertEquals(defaultLobby, eve.getLobbyName());
-        verify(tradeService).tradeWithBank(defaultLobby);
+        verify(tradeService, timeout(DURATION)).tradeWithBank(defaultLobby);
     }
 
     @Test
@@ -314,6 +316,7 @@ class SceneServiceTest {
         Actor actor = mock(Actor.class);
         doNothing().when(sceneManager)
                    .showUserTradeWindow(isA(LobbyName.class), isA(Actor.class), isA(CountDownLatch.class));
+        doNothing().when(tradeService).tradeWithUser(isA(LobbyName.class), isA(Actor.class), isA(Boolean.class));
 
         sceneService.openUserTradeWindow(defaultLobby, actor, false);
 
@@ -327,7 +330,7 @@ class SceneServiceTest {
         TradeWithUserUpdateEvent eve = (TradeWithUserUpdateEvent) event;
         assertEquals(defaultLobby, eve.getLobbyName());
 
-        verify(tradeService).tradeWithUser(defaultLobby, actor, false);
+        verify(tradeService, timeout(DURATION)).tradeWithUser(defaultLobby, actor, false);
     }
 
     @Test
