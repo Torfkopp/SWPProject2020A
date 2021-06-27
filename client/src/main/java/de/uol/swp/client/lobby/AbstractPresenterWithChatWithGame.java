@@ -891,7 +891,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
-            resetButtonStates(userService.getLoggedInUser());
             if (helpActivated) setHelpText();
         }
     }
@@ -1181,6 +1180,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 rst.ifPresent(actor -> gameService.robberChooseVictim(lobbyName, actor));
             });
         }
+    }
+
+    /**
+     * Handles a RobberMovementFailedResponse
+     *
+     * @param rsp The RobberMovementFailedResponse found on the EventBus
+     *
+     * @author Sven Ahrens
+     * @since 2021-06-24
+     */
+    @Subscribe
+    private void onRobberMovementFailedResponse(RobberMovementFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        if (!userService.getLoggedInUser().equals(rsp.getPlayer())) return;
+        LOG.debug("Received RobberMovementFailedResponse for Lobby {}", rsp.getLobbyName());
+        robberNewPosition = true;
+        notice.setVisible(true);
+        if (helpActivated) setHelpText();
     }
 
     /**
