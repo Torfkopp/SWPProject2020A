@@ -1,6 +1,5 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -17,7 +16,6 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
@@ -39,7 +37,7 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
-    private final Deque<Actor> startUpPlayerOrder = new ArrayDeque<>();
+    private final LinkedList<Actor> startUpPlayerOrder = new LinkedList<>();
     private final ActorSet taxPayers = new ActorSet();
     private final ActorBooleanMap autoRollEnabled;
     private final ActorBooleanMap pauseGameMap = new ActorBooleanMap(); //true if the user wants to change the current pause status of the game
