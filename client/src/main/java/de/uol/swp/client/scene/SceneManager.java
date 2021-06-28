@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
+import de.uol.swp.client.changeSettings.ChangeGameSettingsPresenter;
 import de.uol.swp.client.changeSettings.ChangeSettingsPresenter;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -61,10 +62,12 @@ public class SceneManager {
     private Scene registrationScene;
     private Scene mainScene;
     private Scene changeAccountScene;
+    private Scene changeGameSettingsScene;
     private Scene changeSettingsScene;
     private Scene rulesScene;
     private boolean devMenuIsOpen;
     private boolean rulesOverviewIsOpen;
+    private boolean changeGameSettingsViewIsOpen;
 
     /**
      * Package-private Constructor
@@ -203,6 +206,21 @@ public class SceneManager {
             windowEvent.consume();
             showMainScreen(loggedInUser);
         });
+    }
+
+    /**
+     * Displays the ChangeGameSettingsView
+     *
+     * @author Marvin Drees
+     * @since 2021-06-28
+     */
+    void showChangeGameSettingsWindow() {
+        if (changeGameSettingsViewIsOpen) return;
+        changeGameSettingsViewIsOpen = true;
+        makeAndShowStage(primaryStage, ChangeGameSettingsPresenter.fxml, ResourceManager.get(""),
+                         ChangeSettingsPresenter.MIN_HEIGHT, ChangeSettingsPresenter.MIN_WIDTH,
+                         primaryStage.getX() + 100, primaryStage.getY(), null, null,
+                         windowEvent -> changeGameSettingsViewIsOpen = false, false, null);
     }
 
     /**
@@ -396,6 +414,7 @@ public class SceneManager {
         if (rulesScene == null) rulesScene = initPresenter(RulesOverviewPresenter.fxml);
         if (changeAccountScene == null) changeAccountScene = initPresenter(ChangeAccountDetailsPresenter.fxml);
         if (changeSettingsScene == null) changeSettingsScene = initPresenter(ChangeSettingsPresenter.fxml);
+        if (changeGameSettingsScene == null) changeGameSettingsScene = initPresenter(ChangeGameSettingsPresenter.fxml);
         eventBus.post(new SetAcceleratorsEvent());
     }
 }

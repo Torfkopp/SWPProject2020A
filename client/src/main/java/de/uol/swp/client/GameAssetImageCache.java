@@ -20,8 +20,7 @@ class GameAssetImageCache {
     /**
      * Constructor.
      */
-    public GameAssetImageCache() {
-    }
+    public GameAssetImageCache() {}
 
     /**
      * Gets a specified asset from a specified rendering style.
@@ -43,9 +42,9 @@ class GameAssetImageCache {
      * @return A boolean indicating if reading the style was successful or not
      */
     public boolean readStyle(String renderingStyle) {
+        if (renderingStyle.equals("plain")) return false;
         if (gameAssetImages.containsKey(renderingStyle)) return true;
         gameAssetImages.put(renderingStyle, new HashMap<>());
-        System.err.println("Reading");
         try {
             putAsset(renderingStyle, "water");
             putAsset(renderingStyle, "desert");
@@ -81,12 +80,14 @@ class GameAssetImageCache {
      * @throws de.uol.swp.client.GameAssetImageCache.CouldNotFindAssetException When the image could not be read
      */
     private void putAsset(String renderingStyle, String assetName) {
-        try {
-            gameAssetImages.get(renderingStyle)
-                           .put(assetName, new Image("images/assets/" + renderingStyle + "/" + assetName + ".png"));
-        } catch (IllegalArgumentException e) {
-            LOG.error(e.getMessage());
-            throw new CouldNotFindAssetException();
+        if (!renderingStyle.equals("plain")) {
+            try {
+                gameAssetImages.get(renderingStyle)
+                               .put(assetName, new Image("images/assets/" + renderingStyle + "/" + assetName + ".png"));
+            } catch (IllegalArgumentException e) {
+                LOG.error(e.getMessage());
+                throw new CouldNotFindAssetException();
+            }
         }
     }
 

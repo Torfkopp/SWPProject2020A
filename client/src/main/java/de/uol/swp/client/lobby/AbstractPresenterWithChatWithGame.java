@@ -6,7 +6,6 @@ import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
-import de.uol.swp.client.changeSettings.event.ShowChangeGameSettingsViewEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
@@ -332,8 +331,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Handles a click on the Settings button
      * <p>
-     * Opens the ChangeGameSettings window by posting an event
-     * onto the bus which the SceneManager is subscribed to.
+     * Opens the ChangeGameSettings window by asking the
+     * SceneService nicely to do so.
      *
      * @author Marvin Drees
      * @since 2021-06-14
@@ -341,7 +340,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected void onLobbySettingsButtonPressed() {
         soundService.button();
-        post(new ShowChangeGameSettingsViewEvent());
+        sceneService.openChangeGameSettingsWindow();
     }
 
     /**
@@ -1660,8 +1659,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * This method sets the injected fields via parameters.
      *
-     * @param gameService The GameService this class should use.
-     * @param theme       The theme this class should use.
+     * @param gameService    The GameService this class should use.
+     * @param theme          The theme this class should use.
+     * @param drawHitboxGrid Boolean whether to render the HitboxGrid.
+     * @param renderingStyle The renderingStlye this class should use.
      *
      * @author Marvin Drees
      * @since 2021-06-09

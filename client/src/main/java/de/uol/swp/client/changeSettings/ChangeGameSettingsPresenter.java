@@ -5,6 +5,7 @@ import de.uol.swp.client.ClientApp;
 import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.stage.WindowEvent;
 
 import java.util.prefs.Preferences;
 
@@ -37,7 +38,8 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        renderingStyleBox.getScene().getWindow().hide();
+        renderingStyleBox.getScene().getWindow().fireEvent(
+                new WindowEvent(renderingStyleBox.getScene().getWindow(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     /**
@@ -45,7 +47,7 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the ChangeGameSettingsButton is pressed.
      * It gets the value chosen in the ComboBox and puts it into the Preferences.
-     * It also posts a new ChangeDGameSettingsEvent onto the EventBus.
+     * It also posts a new ChangedGameSettingsEvent onto the EventBus.
      */
     @FXML
     private void onChangeGameSettingsButtonPressed() {
@@ -55,6 +57,7 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
             preferences.put("renderingstyle", theme.toLowerCase());
             post(new ChangedGameSettingsEvent(theme.toLowerCase()));
         }
-        renderingStyleBox.getScene().getWindow().hide();
+        renderingStyleBox.getScene().getWindow().fireEvent(
+                new WindowEvent(renderingStyleBox.getScene().getWindow(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 }
