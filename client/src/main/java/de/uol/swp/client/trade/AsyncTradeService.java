@@ -3,7 +3,6 @@ package de.uol.swp.client.trade;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ThreadManager;
@@ -13,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the ITradeService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected TradeService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -26,6 +25,11 @@ public class AsyncTradeService implements ITradeService {
     private static final Logger LOG = LogManager.getLogger(AsyncTradeService.class);
     private final TradeService syncTradeService;
 
+    /**
+     * Constructor
+     *
+     * @param syncTradeService The synchronous TradeService (injected)
+     */
     @Inject
     public AsyncTradeService(TradeService syncTradeService) {
         this.syncTradeService = syncTradeService;
@@ -50,21 +54,6 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void closeBankTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncTradeService.closeBankTradeWindow(lobbyName));
-    }
-
-    @Override
-    public void closeTradeResponseWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncTradeService.closeTradeResponseWindow(lobbyName));
-    }
-
-    @Override
-    public void closeUserTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncTradeService.closeUserTradeWindow(lobbyName));
-    }
-
-    @Override
     public void executeTradeWithBank(LobbyName lobbyName, ResourceType gainedResource, ResourceType lostResource) {
         ThreadManager.runNow(() -> syncTradeService.executeTradeWithBank(lobbyName, gainedResource, lostResource));
     }
@@ -79,26 +68,6 @@ public class AsyncTradeService implements ITradeService {
     @Override
     public void resetOfferTradeButton(LobbyName lobbyName, Actor offeringUser) {
         ThreadManager.runNow(() -> syncTradeService.resetOfferTradeButton(lobbyName, offeringUser));
-    }
-
-    @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncTradeService.showBankTradeWindow(lobbyName));
-    }
-
-    @Override
-    public void showOfferWindow(LobbyName lobbyName, Actor offeringUser, TradeWithUserOfferResponse rsp) {
-        ThreadManager.runNow(() -> syncTradeService.showOfferWindow(lobbyName, offeringUser, rsp));
-    }
-
-    @Override
-    public void showTradeError(String message) {
-        ThreadManager.runNow(() -> syncTradeService.showTradeError(message));
-    }
-
-    @Override
-    public void showUserTradeWindow(LobbyName lobbyName, Actor respondingUser, boolean isCounterOffer) {
-        ThreadManager.runNow(() -> syncTradeService.showUserTradeWindow(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override

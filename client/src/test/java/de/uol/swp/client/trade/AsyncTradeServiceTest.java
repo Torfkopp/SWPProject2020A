@@ -2,7 +2,6 @@ package de.uol.swp.client.trade;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.AfterEach;
@@ -63,33 +62,6 @@ class AsyncTradeServiceTest {
     }
 
     @Test
-    void closeBankTradeWindow() {
-        doNothing().when(syncTradeService).closeBankTradeWindow(isA(LobbyName.class));
-
-        tradeService.closeBankTradeWindow(defaultLobby);
-
-        verify(syncTradeService, after(DURATION)).closeBankTradeWindow(defaultLobby);
-    }
-
-    @Test
-    void closeTradeResponseWindow() {
-        doNothing().when(syncTradeService).closeTradeResponseWindow(isA(LobbyName.class));
-
-        tradeService.closeTradeResponseWindow(defaultLobby);
-
-        verify(syncTradeService, after(DURATION)).closeTradeResponseWindow(defaultLobby);
-    }
-
-    @Test
-    void closeUserTradeWindow() {
-        doNothing().when(syncTradeService).closeUserTradeWindow(isA(LobbyName.class));
-
-        tradeService.closeUserTradeWindow(defaultLobby);
-
-        verify(syncTradeService, after(DURATION)).closeUserTradeWindow(defaultLobby);
-    }
-
-    @Test
     void executeTradeWithBank() {
         ResourceType giveResource = ResourceType.ORE;
         ResourceType loseResource = ResourceType.WOOL;
@@ -121,46 +93,6 @@ class AsyncTradeServiceTest {
         tradeService.resetOfferTradeButton(defaultLobby, otherUser);
 
         verify(syncTradeService, after(DURATION)).resetOfferTradeButton(defaultLobby, otherUser);
-    }
-
-    @Test
-    void showBankTradeWindow() {
-        doNothing().when(syncTradeService).showBankTradeWindow(isA(LobbyName.class));
-
-        tradeService.showBankTradeWindow(defaultLobby);
-
-        verify(syncTradeService, after(DURATION)).showBankTradeWindow(defaultLobby);
-    }
-
-    @Test
-    void showOfferWindow() {
-        TradeWithUserOfferResponse response = mock(TradeWithUserOfferResponse.class);
-        doNothing().when(syncTradeService)
-                   .showOfferWindow(isA(LobbyName.class), isA(Actor.class), isA(TradeWithUserOfferResponse.class));
-
-        tradeService.showOfferWindow(defaultLobby, otherUser, response);
-
-        verify(syncTradeService, after(DURATION)).showOfferWindow(defaultLobby, otherUser, response);
-    }
-
-    @Test
-    void showTradeError() {
-        String message = "some trade error";
-        doNothing().when(syncTradeService).showTradeError(isA(String.class));
-
-        tradeService.showTradeError(message);
-
-        verify(syncTradeService, after(DURATION)).showTradeError(message);
-    }
-
-    @Test
-    void showUserTradeWindow() {
-        doNothing().when(syncTradeService)
-                   .showUserTradeWindow(isA(LobbyName.class), isA(Actor.class), isA(Boolean.class));
-
-        tradeService.showUserTradeWindow(defaultLobby, otherUser, false);
-
-        verify(syncTradeService, after(DURATION)).showUserTradeWindow(defaultLobby, otherUser, false);
     }
 
     @Test

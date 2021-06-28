@@ -3,7 +3,6 @@ package de.uol.swp.client.game;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -43,7 +42,6 @@ class GameServiceTest {
     private IGameService gameService;
     private IUserService userService;
     private Object event;
-    private Object event2;
 
     @BeforeEach
     protected void setUp() {
@@ -56,7 +54,6 @@ class GameServiceTest {
     @AfterEach
     protected void tearDown() {
         event = null;
-        event2 = null;
         gameService = null;
         userService = null;
         eventBus.unregister(this);
@@ -287,12 +284,6 @@ class GameServiceTest {
         assertEquals(defaultUser.getID(), request.getPlayer().getID());
         assertEquals(defaultUser.getUsername(), request.getPlayer().getUsername());
         assertEquals(resources, request.getResources());
-
-        assertTrue(event2 instanceof CloseRobberTaxViewEvent);
-
-        CloseRobberTaxViewEvent viewEvent = (CloseRobberTaxViewEvent) event2;
-
-        assertEquals(defaultLobbyName, viewEvent.getLobbyName());
     }
 
     @Test
@@ -326,11 +317,7 @@ class GameServiceTest {
 
     @Subscribe
     private void onDeadEvent(DeadEvent e) {
-        if (this.event == null) {
-            this.event = e.getEvent();
-        } else {
-            this.event2 = e.getEvent();
-        }
+        this.event = e.getEvent();
         System.out.print(e.getEvent());
         lock.countDown();
     }

@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -50,7 +49,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int HELP_MIN_WIDTH = 350;
     public static final int MIN_HEIGHT_IN_GAME = 905;
-    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int MIN_WIDTH_PRE_GAME = 695;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -277,14 +276,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * It posts a ShowRulesOverviewViewEvent onto the EventBus.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
      * @since 2021-04-24
      */
     @FXML
     private void onRulesMenuClicked() {
         LOG.debug("Sending ShowRulesOverviewViewEvent");
         soundService.button();
-        post(new ShowRulesOverviewViewEvent());
+        sceneService.openRulesWindow();
     }
 
     /**

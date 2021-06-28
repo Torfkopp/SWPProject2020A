@@ -144,7 +144,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", lobbyName);
         LOG.debug("---- The user got a {}", rsp.getDevelopmentCard());
-        tradeService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
     }
@@ -159,7 +159,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        tradeService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, true);
     }
 
     /**
@@ -197,7 +197,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * If there is a selected item in both lists, it calls the
      * TradeService to execute the trade with the Bank.
      *
-     * @see de.uol.swp.client.trade.event.TradeErrorEvent
      * @see de.uol.swp.common.game.request.ExecuteTradeWithBankRequest
      */
     @FXML
@@ -211,14 +210,14 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         IResource giveResource;
         ownResourcesToTradeWith.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourcesToTradeWith.getSelectionModel().isEmpty()) {
-            tradeService.showTradeError(ResourceManager.get("game.error.trade.noplayerresource"));
+            sceneService.showError(ResourceManager.get("game.error.trade.noplayerresource"));
             return;
         }
         giveResource = ownResourcesToTradeWith.getSelectionModel().getSelectedItem();
         bankResourcesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         bankResource = bankResourcesView.getSelectionModel().getSelectedItem();
         if (bankResourcesView.getSelectionModel().isEmpty()) {
-            tradeService.showTradeError(ResourceManager.get("game.error.trade.nobankresource"));
+            sceneService.showError(ResourceManager.get("game.error.trade.nobankresource"));
             return;
         }
         if (bankResource != null && giveResource != null) {
@@ -251,7 +250,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (lobbyName == null) lobbyName = event.getLobbyName();
         LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
         Window window = ownResourcesToTradeWith.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
+        window.setOnCloseRequest(windowEvent -> sceneService.closeBankTradeWindow(lobbyName, true));
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
                          this::onBuyDevelopmentCardButtonPressed);
@@ -273,7 +272,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
-        tradeService.closeBankTradeWindow(lobbyName);
+        sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
         soundService.coins();
     }

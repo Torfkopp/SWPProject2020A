@@ -13,6 +13,7 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
@@ -58,6 +59,7 @@ import java.util.function.Consumer;
 
 import static de.uol.swp.common.game.RoadBuildingCardPhase.*;
 import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
+import static de.uol.swp.common.game.map.management.MapPoint.HexMapPoint;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
@@ -798,6 +800,7 @@ public class GameService extends AbstractService {
         } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getActor())) {
             return;
         }
+        game.getInventory(game.getActivePlayer()).nextTurn();
         game.setBuildingAllowed(false);
         Actor nextPlayer;
         Actor user;
@@ -1116,12 +1119,12 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.KNIGHT_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.KNIGHT_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
-            post(returnMessage);
             LOG.debug("Sending PlayCardFailureResponse");
+            post(returnMessage);
             LOG.debug("---- Not enough Knight cards");
             return;
         }
@@ -1169,7 +1172,7 @@ public class GameService extends AbstractService {
             return;
         Inventory invMono = game.getInventory(req.getUser());
 
-        if (invMono.get(DevelopmentCardType.MONOPOLY_CARD) == 0) {
+        if (!invMono.isPlayable(DevelopmentCardType.MONOPOLY_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1237,7 +1240,7 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.ROAD_BUILDING_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1315,7 +1318,7 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) == 0) {
+        if (!inv.isPlayable(DevelopmentCardType.YEAR_OF_PLENTY_CARD)) {
             ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
@@ -1435,6 +1438,23 @@ public class GameService extends AbstractService {
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
         LOG.debug("Received RobberNewPositionChosenRequest for Lobby {}", msg.getLobby());
         IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
+        int newRobberPositionY = msg.getPosition().getY();
+        int newRobberPositionX = msg.getPosition().getX();
+        int oldRobberPositionY = map.getRobberPosition().getY();
+        int oldRobberPositionX = map.getRobberPosition().getX();
+        boolean newRobberPositionIsInWater = map.getHex(msg.getPosition()).getType()
+                                                .equals(IGameHex.HexType.WATER) || map.getHex(msg.getPosition())
+                                                                                      .getType()
+                                                                                      .equals(IGameHex.HexType.HARBOUR);
+        boolean newRobberPositionIsSameAsOldPosition = newRobberPositionY == oldRobberPositionY && newRobberPositionX == oldRobberPositionX;
+        if (newRobberPositionIsSameAsOldPosition || newRobberPositionIsInWater) {
+            LOG.debug("Sending RobberMovementFailedResponse for Lobby {}", msg.getLobby());
+            RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer(), msg.getLobby());
+            rsp.initWithMessage(msg);
+            post(rsp);
+            return;
+        }
+
         map.moveRobber(msg.getPosition());
         LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
@@ -1836,7 +1856,7 @@ public class GameService extends AbstractService {
     private void robberMovementDummy(Dummy dummy, LobbyName lobby) {
         Game game = gameManagement.getGame(lobby);
         IGameMapManagement map = game.getMap();
-        MapPoint mapPoint = MapPoint.HexMapPoint(3, 3);
+        MapPoint mapPoint = HexMapPoint(3, 3);
         map.moveRobber(mapPoint);
         LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);

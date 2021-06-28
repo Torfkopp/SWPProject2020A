@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the IGameService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected GameService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -26,6 +26,11 @@ public class AsyncGameService implements IGameService {
     private static final Logger LOG = LogManager.getLogger(AsyncGameService.class);
     private final GameService syncGameService;
 
+    /**
+     * Constructor
+     *
+     * @param syncGameService The synchronous GameService (injected)
+     */
     @Inject
     public AsyncGameService(GameService syncGameService) {
         this.syncGameService = syncGameService;

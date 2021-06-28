@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the ISoundService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected SoundService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -21,6 +21,11 @@ public class AsyncSoundService implements ISoundService {
     private static final Logger LOG = LogManager.getLogger(AsyncSoundService.class);
     private final SoundService syncSoundService;
 
+    /**
+     * Constructor
+     *
+     * @param syncSoundService The synchronous SoundService (injected)
+     */
     @Inject
     public AsyncSoundService(SoundService syncSoundService) {
         this.syncSoundService = syncSoundService;

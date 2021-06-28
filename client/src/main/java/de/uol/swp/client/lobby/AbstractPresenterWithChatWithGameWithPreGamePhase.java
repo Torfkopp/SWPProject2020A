@@ -2,9 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
-import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
-import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
@@ -141,9 +138,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         window.hide();
         ThreadManager.runNow(() -> {
-            eventBus.post(new TradeCancelEvent(lobbyName));
-            eventBus.post(new CloseTradeResponseEvent(lobbyName));
-            clearEventBus();
+            sceneService.closeUserTradeWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            try {
+                clearEventBus();
+            } catch (NullPointerException ignored) {}
         });
     }
 
@@ -447,19 +446,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             roundCounter = 0;
             this.elapsedTimer.stop();
             displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setDisable(false);
             displayVictoryPointChartButton.setPrefHeight(30);
             displayVictoryPointChartButton.setPrefWidth(230);
             if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
+                returnToLobby.setDisable(false);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
             }
-            gameMapDescription.clear();
+            gameRendering.redraw();
             gameMapDescription.setCenterText(
                     winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
                     ResourceManager.get("game.won.info", winner));
+            fitCanvasToSize();
         });
-        fitCanvasToSize();
         soundService.victory();
     }
 
@@ -499,6 +500,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             returnToLobby.setVisible(false);
+            returnToLobby.setDisable(true);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
             window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -511,6 +513,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(190);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
+            displayVictoryPointChartButton.setVisible(false);
+            displayVictoryPointChartButton.setDisable(true);
+            displayVictoryPointChartButton.setPrefHeight(0);
+            displayVictoryPointChartButton.setPrefWidth(0);
+            gameMapDescription.setCenterText("");
+            gameMapDescription.clear();
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
         });
@@ -706,14 +714,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+                sceneService.showError(ResourceManager.get("lobby.error.movetime"));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+            sceneService.showError(ResourceManager.get("lobby.error.movetime"));
         }
     }
 

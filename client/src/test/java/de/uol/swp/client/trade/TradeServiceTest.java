@@ -3,7 +3,6 @@ package de.uol.swp.client.trade;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.request.*;
@@ -129,51 +128,6 @@ class TradeServiceTest {
     }
 
     @Test
-    void closeBankTradeWindow() throws InterruptedException {
-        tradeService.closeBankTradeWindow(defaultLobbyName);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof TradeCancelEvent);
-
-        TradeCancelEvent tradeCancelEvent = (TradeCancelEvent) event;
-
-        assertEquals(defaultLobbyName, tradeCancelEvent.getLobbyName());
-
-        assertTrue(event2 instanceof ResetTradeWithBankButtonEvent);
-
-        ResetTradeWithBankButtonEvent resetTradeWithBankButtonEvent = (ResetTradeWithBankButtonEvent) event2;
-
-        assertEquals(defaultLobbyName, resetTradeWithBankButtonEvent.getLobbyName());
-    }
-
-    @Test
-    void closeTradeResponseWindow() throws InterruptedException {
-        tradeService.closeTradeResponseWindow(defaultLobbyName);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof CloseTradeResponseEvent);
-
-        CloseTradeResponseEvent eve = (CloseTradeResponseEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
-    }
-
-    @Test
-    void closeUserTradeWindow() throws InterruptedException {
-        tradeService.closeUserTradeWindow(defaultLobbyName);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof TradeCancelEvent);
-
-        TradeCancelEvent eve = (TradeCancelEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
-    }
-
-    @Test
     void executeTradeWithBank() throws InterruptedException {
         tradeService.executeTradeWithBank(defaultLobbyName, defaultGainedResource, defaultLostResource);
 
@@ -226,67 +180,6 @@ class TradeServiceTest {
         assertEquals(defaultUser, request.getOfferingUser());
         assertEquals(defaultUser.getID(), request.getOfferingUser().getID());
         assertEquals(defaultUser.getUsername(), request.getOfferingUser().getUsername());
-    }
-
-    @Test
-    void showBankTradeWindow() throws InterruptedException {
-        tradeService.showBankTradeWindow(defaultLobbyName);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof ShowTradeWithBankViewEvent);
-        ShowTradeWithBankViewEvent eve = (ShowTradeWithBankViewEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
-    }
-
-    @Test
-    void showOfferWindow() throws InterruptedException {
-        tradeService.showOfferWindow(defaultLobbyName, defaultUser, defaultTradeOfferResp);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof ShowTradeWithUserRespondViewEvent);
-
-        ShowTradeWithUserRespondViewEvent eve = (ShowTradeWithUserRespondViewEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
-        assertEquals(defaultUser, eve.getOfferingUser());
-        assertEquals(defaultUser.getID(), eve.getOfferingUser().getID());
-        assertEquals(defaultUser.getUsername(), eve.getOfferingUser().getUsername());
-        assertEquals(defaultTradeOfferResp, eve.getRsp());
-        assertEquals(defaultTradeOfferResp.getOfferedResources(), eve.getRsp().getOfferedResources());
-        assertEquals(defaultTradeOfferResp.getResourceList(), eve.getRsp().getResourceList());
-        assertEquals(defaultTradeOfferResp.getDemandedResources(), eve.getRsp().getDemandedResources());
-    }
-
-    @Test
-    void showTradeError() throws InterruptedException {
-        tradeService.showTradeError(defaultTradeError);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof TradeErrorEvent);
-
-        TradeErrorEvent eve = (TradeErrorEvent) event;
-
-        assertEquals(defaultTradeError, eve.getMessage());
-    }
-
-    @Test
-    void showUserTradeWindow() throws InterruptedException {
-        tradeService.showUserTradeWindow(defaultLobbyName, secondUser, false);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof ShowTradeWithUserViewEvent);
-
-        ShowTradeWithUserViewEvent eve = (ShowTradeWithUserViewEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
-        assertEquals(secondUser, eve.getRespondingUser());
-        assertEquals(secondUser.getID(), eve.getRespondingUser().getID());
-        assertEquals(secondUser.getUsername(), eve.getRespondingUser().getUsername());
     }
 
     @Test

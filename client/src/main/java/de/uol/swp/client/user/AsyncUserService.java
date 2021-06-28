@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the IUserService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected UserService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -22,6 +22,11 @@ public class AsyncUserService implements IUserService {
     private static final Logger LOG = LogManager.getLogger(AsyncUserService.class);
     private final UserService syncUserService;
 
+    /**
+     * Constructor
+     *
+     * @param syncUserService The synchronous UserService (injected)
+     */
     @Inject
     public AsyncUserService(UserService syncUserService) {
         this.syncUserService = syncUserService;

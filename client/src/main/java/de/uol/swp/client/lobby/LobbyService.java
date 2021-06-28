@@ -2,7 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.Colour;
@@ -143,12 +142,6 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending SetColourRequest");
         Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
         eventBus.post(setColourRequest);
-    }
-
-    @Override
-    public void showLobbyError(String message) {
-        LOG.debug("Sending LobbyErrorEvent");
-        eventBus.post(new LobbyErrorEvent(message));
     }
 
     @Override
