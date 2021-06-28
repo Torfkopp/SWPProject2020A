@@ -141,12 +141,7 @@ public class ClientApp extends Application implements ConnectionListener {
     @Override
     public void stop() {
         if (userService != null && userService.getLoggedInUser() != null) userService.logout(false);
-        if (ThreadManager.emptyPool()) {
-            System.err.println("Pool was drained gracefully");
-        } else {
-            System.err.println("Pool was drained forcefully");
-        }
-        System.err.println("Pool should be empty");
+        ThreadManager.shutdown();
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
@@ -155,7 +150,6 @@ public class ClientApp extends Application implements ConnectionListener {
             clientConnection.close();
         }
         LOG.info("ClientConnection shutdown");
-        ThreadManager.shutdown();
     }
 
     @Override

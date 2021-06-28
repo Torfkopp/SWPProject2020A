@@ -23,14 +23,6 @@ public class ThreadManager {
     private static final ExecutorService threadForInOrderExecution = Executors
             .newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("inOrderExecutionThread").build());
 
-    public static boolean emptyPool() {
-        try {
-            return executorService.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            return false;
-        }
-    }
-
     /**
      * Forces the shutdown of all ExecutorService Threads
      */
@@ -61,7 +53,12 @@ public class ThreadManager {
      * Shuts down the ExecutorService Threads orderly
      */
     public static void shutdown() {
-        executorService.shutdown();
-        threadForInOrderExecution.shutdown();
+        try {
+            executorService.awaitTermination(2, TimeUnit.SECONDS);
+            threadForInOrderExecution.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            executorService.shutdown();
+            threadForInOrderExecution.shutdown();
+        }
     }
 }
