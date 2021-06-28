@@ -3,6 +3,7 @@ package de.uol.swp.client.changeSettings;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ClientApp;
 import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.WindowEvent;
@@ -27,6 +28,8 @@ public class ChangeGameSettingsPresenter extends AbstractPresenter {
     @FXML
     private void initialize() {
         renderingStyleBox.getItems().setAll("Plain", "Pixel");
+        renderingStyleBox.setPromptText(
+                preferences.get("renderingstyle", ResourceManager.get("changegamesettings.combobox.renderingstyle")));
     }
 
     /**
