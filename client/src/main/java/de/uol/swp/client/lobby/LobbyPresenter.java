@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -17,6 +16,7 @@ import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.util.ResourceManager;
@@ -31,7 +31,9 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the lobby's menu
@@ -47,7 +49,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int HELP_MIN_WIDTH = 350;
     public static final int MIN_HEIGHT_IN_GAME = 905;
-    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int MIN_WIDTH_PRE_GAME = 695;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -122,7 +124,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
         this.owner = (User) rsp.getOwner();
-        if (this.readyUsers == null) this.readyUsers = new HashSet<>();
+        if (this.readyUsers == null) this.readyUsers = new ActorSet();
         this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
         updateUsersList(rsp.getUsers());
@@ -174,7 +176,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      *     <li> CTRL/META + B = Trade with Bank button
      *     <li> CTRL/META + C = Play a Card button
      *     <li> CTRL/META + H = Return to Lobby button
-     *     <li> CTRL/META + P = Pause Function
      *     <li> F1            = Toggle help action list
      *     <li> F2            = Open Rules menu
      *
@@ -196,7 +197,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             window = membersView.getScene().getWindow();
         }
         if (readyUsers == null) {
-            readyUsers = new HashSet<>();
+            readyUsers = new ActorSet();
         }
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 
@@ -219,8 +220,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                          this::onPlayCardButtonPressed);
         accelerators.put(new KeyCodeCombination(KeyCode.H, KeyCombination.SHORTCUT_DOWN), // CTRL/META + H
                          this::onReturnToLobbyButtonPressed);
-        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
-                         this::onPauseButtonPressed);
         accelerators.put(new KeyCodeCombination(KeyCode.F1), this::onHelpButtonPressed); // F1 for help
         accelerators.put(new KeyCodeCombination(KeyCode.F2), this::onRulesMenuClicked); // F2 for rules
         membersView.getScene().getAccelerators().putAll(accelerators);
@@ -277,14 +276,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * It posts a ShowRulesOverviewViewEvent onto the EventBus.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
      * @since 2021-04-24
      */
     @FXML
     private void onRulesMenuClicked() {
         LOG.debug("Sending ShowRulesOverviewViewEvent");
         soundService.button();
-        post(new ShowRulesOverviewViewEvent());
+        sceneService.openRulesWindow();
     }
 
     /**

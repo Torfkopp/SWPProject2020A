@@ -2,9 +2,6 @@ package de.uol.swp.client.changeSettings;
 
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ClientApp;
-import de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent;
-import de.uol.swp.client.changeSettings.event.ChangeSettingsSuccessfulEvent;
-import de.uol.swp.client.changeSettings.event.SetVolumeErrorEvent;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -71,13 +68,11 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the CancelButton is pressed.
      * It posts a new ChangeSettingsCanceledEvent onto the EventBus.
-     *
-     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(new ChangeSettingsCanceledEvent());
+        sceneService.displayMainMenuScreen();
     }
 
     /**
@@ -86,8 +81,6 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
      * This method is called when the ChangeSettingsButton is pressed.
      * It gets the value chosen in the ComboBox/TextField and puts it into the Preferences.
      * It also posts a new ChangeSettingsSuccessfulEvent onto the EventBus.
-     *
-     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsSuccessfulEvent
      */
     @FXML
     private void onChangeSettingsButtonPressed() {
@@ -138,12 +131,12 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
             try {
                 int volume = Integer.parseInt(volumeField.getText());
                 if (volume < 0 || volume > 100) {
-                    post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.volume")));
+                    sceneService.showError(ResourceManager.get("changesettings.error.volume"));
                 } else {
                     preferences.put("volume", Integer.toString(volume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.volume")));
+                sceneService.showError(ResourceManager.get("changesettings.error.volume"));
                 return;
             }
         }
@@ -151,12 +144,12 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
             try {
                 int backgroundVolume = Integer.parseInt(backgroundVolumeField.getText());
                 if (backgroundVolume < 0 || backgroundVolume > 100) {
-                    post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.backgroundvolume")));
+                    sceneService.showError(ResourceManager.get("changesettings.error.backgroundvolume"));
                 } else {
                     preferences.put("backgroundvolume", Integer.toString(backgroundVolume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(ResourceManager.get("changesettings.error.backgroundvolume")));
+                sceneService.showError(ResourceManager.get("changesettings.error.backgroundvolume"));
                 return;
             }
         }
@@ -164,6 +157,6 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
         if (loglevel != null) {
             preferences.put("debug.loglevel", loglevel);
         }
-        post(new ChangeSettingsSuccessfulEvent());
+        sceneService.displayMainMenuScreen();
     }
 }

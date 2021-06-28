@@ -5,6 +5,9 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The player's inventory
  *
@@ -13,6 +16,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
  */
 public class Inventory extends AbstractInventory {
 
+    private final Map<DevelopmentCardType, Boolean> isPlayable;
     private int knights = 0;
 
     /**
@@ -24,6 +28,10 @@ public class Inventory extends AbstractInventory {
     public Inventory() {
         resources = new ResourceList();
         developmentCards = new DevelopmentCardList();
+        isPlayable = new HashMap<>();
+        for (var type : DevelopmentCardType.values()) {
+            isPlayable.put(type, false);
+        }
     }
 
     /**
@@ -113,5 +121,31 @@ public class Inventory extends AbstractInventory {
      */
     public void increaseKnights(int amount) {
         knights += amount;
+    }
+
+    /**
+     * Tests if the specified development card type can be played this turn.
+     *
+     * @param developmentCardType The type of development card for which should be checked if it can be played.
+     *
+     * @return true if the type of development card is playable, false otherwise.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-06-22
+     */
+    public boolean isPlayable(DevelopmentCardType developmentCardType) {
+        return isPlayable.get(developmentCardType) && developmentCards.getAmount(developmentCardType) >= 1;
+    }
+
+    /**
+     * Used to signal the inventory that the turn ended and newly acquired development cards can be played now
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-06-22
+     */
+    public void nextTurn() {
+        for (var x : developmentCards) {
+            isPlayable.put(x.getType(), x.getAmount() >= 1);
+        }
     }
 }

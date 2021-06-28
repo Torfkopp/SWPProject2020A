@@ -1,13 +1,11 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.game.message.AbstractGameMessage;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.ActorIntegerMap;
+import de.uol.swp.common.specialisedUtil.ActorResourceListMap;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Gets sent to all players with more than seven resource
@@ -22,8 +20,8 @@ import java.util.Map;
  */
 public class RobberTaxMessage extends AbstractGameMessage {
 
-    private final Map<User, Integer> players;
-    private final Map<User, ResourceList> inventories;
+    private final ActorIntegerMap players;
+    private final ActorResourceListMap inventories;
 
     /**
      * Constructor
@@ -33,8 +31,8 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * @param players     Map of User to pay the tax and the amount of card to pay
      * @param inventories Map of user and the inventory as map with resources and its amount
      */
-    public RobberTaxMessage(LobbyName lobbyName, Actor user, Map<User, Integer> players,
-                            Map<User, ResourceList> inventories) {
+    public RobberTaxMessage(LobbyName lobbyName, Actor user, ActorIntegerMap players,
+                            ActorResourceListMap inventories) {
         super(lobbyName, user);
         this.players = players;
         this.inventories = inventories;
@@ -55,8 +53,8 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and a map of a resource and its amount
      */
-    public Map<User, ResourceList> getInventories() {
-        return new HashMap<>(inventories);
+    public ActorResourceListMap getInventories() {
+        return inventories;
     }
 
     /**
@@ -64,7 +62,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and the amount to pay
      */
-    public Map<User, Integer> getPlayers() {
+    public ActorIntegerMap getPlayers() {
         return players;
     }
 }

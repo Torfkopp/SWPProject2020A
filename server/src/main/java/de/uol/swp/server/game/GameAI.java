@@ -1,6 +1,5 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
@@ -18,8 +17,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
@@ -29,7 +28,6 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -45,8 +43,8 @@ public class GameAI {
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
 
-    private final Map<AI, List<IHarbourHex.HarbourResource>> harbours = new HashMap<>();
-    private final Map<Game, Map<MapPoint, Integer>> aiBuildPriority = new HashMap<>();
+    private final AIHarbourMap harbours = new AIHarbourMap();
+    private final AIBuildPriorityMap aiBuildPriority = new AIBuildPriorityMap();
 
     /**
      * Constructor
@@ -149,7 +147,7 @@ public class GameAI {
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
-        List<Player> player = new ArrayList<>(map.getPlayersAroundHex(mapPoint));
+        List<Player> player = map.getPlayersAroundHex(mapPoint);
         if (player.size() > 0) {
             Player victim = player.get(0);
             switch (difficulty) {
@@ -274,7 +272,7 @@ public class GameAI {
                 turnBuildAIEasy(game, ai);
                 break;
             case HARD:
-                if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
+                if (game.getInventory(ai).isPlayable(DevelopmentCardType.KNIGHT_CARD))
                     playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
                 turnBuildAIHard(game, ai);
                 break;
@@ -301,9 +299,8 @@ public class GameAI {
                 startUpPhaseAIHard(game, ai);
                 break;
         }
-        Map<Actor, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-        if (startUpBuiltMap.get(ai) == NONE_BUILT) startUpBuiltMap.put(ai, FIRST_BOTH_BUILT);
-        else startUpBuiltMap.put(ai, ALL_BUILT);
+        ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        startUpBuiltMap.nextPhase(ai);
 
         gameService.turnEndAI(game, ai);
     }
@@ -341,7 +338,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
 
         //Play a monopoly card if possible
-        if (inv.get(DevelopmentCardType.MONOPOLY_CARD) > 1) {
+        if (inv.isPlayable(DevelopmentCardType.MONOPOLY_CARD)) {
             if (inv.get(ORE) < 3) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, ORE, null);
             if (inv.get(GRAIN) < 2) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, GRAIN, null);
         }
@@ -434,9 +431,9 @@ public class GameAI {
         }
 
         //Play a card if possible
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.ROAD_BUILDING_CARD))
             playCardAI(game, ai, DevelopmentCardType.ROAD_BUILDING_CARD, null, null);
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.YEAR_OF_PLENTY_CARD))
             playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, BRICK, LUMBER);
 
         //Chooses the best path; best as in longest buildable road
@@ -800,7 +797,7 @@ public class GameAI {
      * @since 2021-06-05
      */
     private void startUpPhaseAIHard(Game game, AI ai) {
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
         Player player = game.getPlayer(ai);
         IGameMapManagement map = game.getMap();
         LobbyName lobbyName = game.getLobby().getName();
@@ -944,7 +941,7 @@ public class GameAI {
     private void turnBuildAIHard(Game game, AI ai) {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
 
         useHarbour(game, ai);
 
@@ -1054,7 +1051,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
         if (!harbours.containsKey(ai)) return;
         ResourceType tradeGive = null;
-        ResourceType tradeGet = null;
+        ResourceType tradeGet;
         //Check if any resource amount is relatively high
         for (ResourceType res : ResourceType.values())
             if (1.0 * inv.get(res) / inv.getResourceAmount() > 0.6) {
@@ -1063,15 +1060,7 @@ public class GameAI {
             }
         if (tradeGive == null) return;
         //Early Game Brick/ Lumber focus, Later Ore/ Grain focus
-        if (game.getRound() < 6) {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.LUMBER)) tradeGet = LUMBER;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.BRICK)) tradeGet = BRICK;
-        } else {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.GRAIN)) tradeGet = GRAIN;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.ORE)) tradeGet = ORE;
-        }
-        //Wool
-        if (tradeGet == null && harbours.get(ai).contains(IHarbourHex.HarbourResource.WOOL)) tradeGet = WOOL;
+        tradeGet = harbours.tradeGet(ai, game.getRound());
         //Use harbour
         if (tradeGet != null) {
             inv.decrease(tradeGive, 2);

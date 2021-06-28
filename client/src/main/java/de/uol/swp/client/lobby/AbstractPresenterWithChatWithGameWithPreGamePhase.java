@@ -2,9 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
-import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
-import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
@@ -16,6 +13,8 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.Actor;
@@ -32,7 +31,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -62,7 +60,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected Set<Actor> readyUsers;
+    protected ActorSet readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -140,9 +138,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         window.hide();
         ThreadManager.runNow(() -> {
-            eventBus.post(new TradeCancelEvent(lobbyName));
-            eventBus.post(new CloseTradeResponseEvent(lobbyName));
-            clearEventBus();
+            sceneService.closeUserTradeWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            try {
+                clearEventBus();
+            } catch (NullPointerException ignored) {}
         });
     }
 
@@ -241,12 +241,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (userService.getLoggedInUser().equals(owner)) {
-            startSession.setVisible(true);
-            startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
-        } else {
-            startSession.setDisable(true);
-            startSession.setVisible(false);
+        if (!inGame) {
+            if (userService.getLoggedInUser().equals(owner)) {
+                startSession.setVisible(true);
+                startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
+            } else {
+                startSession.setDisable(true);
+                startSession.setVisible(false);
+            }
         }
     }
 
@@ -270,7 +272,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @see de.uol.swp.common.user.Actor
      * @since 2021-01-05
      */
-    protected void updateUsersList(List<Actor> userLobbyList) {
+    protected void updateUsersList(ActorSet userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
@@ -284,22 +286,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyMembers.clear();
             lobbyMembers.addAll(userLobbyList);
         });
-    }
-
-    /**
-     * Helper method to create a PlayerColourMap from
-     * the UserColourMap and the ActorPlayerMap
-     *
-     * @return PlayerColourMap
-     *
-     * @author Mario Fokken
-     * @since 2021-06-02
-     */
-    private Map<Player, Colour> getPlayerColourMap() {
-        Map<Player, Colour> map = new HashMap<>();
-        for (Actor u : userColoursMap.keySet())
-            map.put(actorPlayerMap.get(u), userColoursMap.get(u));
-        return map;
     }
 
     /**
@@ -370,13 +356,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
-        Map<Actor, Player> map = new HashMap<>();
+        ActorPlayerMap map = new ActorPlayerMap();
         int i = 0;
         for (Actor u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
         actorPlayerMap = map;
         userColoursMap = msg.getUserColours();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
         Platform.runLater(this::prepareColourComboBox);
     }
@@ -446,8 +432,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
+            helpButton.setDisable(true);
+            helpButton.setVisible(false);
             turnIndicator.setAccessibleText("");
             buildingCosts.setVisible(false);
             victoryPointsLabel.setVisible(false);
@@ -460,19 +446,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             roundCounter = 0;
             this.elapsedTimer.stop();
             displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setDisable(false);
             displayVictoryPointChartButton.setPrefHeight(30);
             displayVictoryPointChartButton.setPrefWidth(230);
             if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
+                returnToLobby.setDisable(false);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
             }
-            gameMapDescription.clear();
+            gameRendering.redraw();
             gameMapDescription.setCenterText(
                     winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
                     ResourceManager.get("game.won.info", winner));
+            fitCanvasToSize();
         });
-        fitCanvasToSize();
         soundService.victory();
     }
 
@@ -512,6 +500,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             returnToLobby.setVisible(false);
+            returnToLobby.setDisable(true);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
             window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -524,6 +513,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(190);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
+            displayVictoryPointChartButton.setVisible(false);
+            displayVictoryPointChartButton.setDisable(true);
+            displayVictoryPointChartButton.setPrefHeight(0);
+            displayVictoryPointChartButton.setPrefWidth(0);
+            gameMapDescription.setCenterText("");
+            gameMapDescription.clear();
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
         });
@@ -552,7 +547,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGameUserList = msg.getPlayerList();
         actorPlayerMap = msg.getActorPlayerMap();
         userColoursMap = msg.getActorColourMap();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -692,8 +687,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        helpCheckBox.setDisable(false);
-        helpCheckBox.setVisible(true);
+        helpButton.setDisable(false);
+        helpButton.setVisible(true);
     }
 
     /**
@@ -719,14 +714,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+                sceneService.showError(ResourceManager.get("lobby.error.movetime"));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+            sceneService.showError(ResourceManager.get("lobby.error.movetime"));
         }
     }
 

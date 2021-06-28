@@ -2,8 +2,7 @@ package de.uol.swp.client.auth;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
-import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -30,7 +29,6 @@ public class LoginPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 220;
     public static final int MIN_WIDTH = 400;
     private static final Logger LOG = LogManager.getLogger(LoginPresenter.class);
-    private static final ShowRegistrationViewEvent showRegViewMessage = new ShowRegistrationViewEvent();
 
     @FXML
     private Button loginButton;
@@ -80,14 +78,13 @@ public class LoginPresenter extends AbstractPresenter {
      * of the ShowRegistrationViewEvent onto the EventBus the SceneManager is subscribed
      * to.
      *
-     * @see de.uol.swp.client.register.event.ShowRegistrationViewEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2019-08-13
      */
     @FXML
     private void onRegisterButtonPressed() {
         soundService.button();
-        post(showRegViewMessage);
+        sceneService.displayRegistrationScreen();
     }
 
     /**
@@ -102,7 +99,7 @@ public class LoginPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe

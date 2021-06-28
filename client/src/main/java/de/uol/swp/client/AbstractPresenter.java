@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.scene.ISceneService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.util.ThreadManager;
@@ -19,6 +20,7 @@ import de.uol.swp.common.util.ThreadManager;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenter {
 
+    protected ISceneService sceneService;
     protected ISoundService soundService;
     protected IUserService userService;
     protected ILobbyService lobbyService;
@@ -61,10 +63,10 @@ public abstract class AbstractPresenter {
      * This method sets the injected fields via parameters.
      * It additionally registers this class to the EventBus.
      *
-     * @param eventBus       The EventBus this class should use.
-     * @param soundService   The SoundService this class should use.
-     * @param userService    The UserService this class should use.
-     * @param lobbyService   The LobbyService this class should use.
+     * @param eventBus     The EventBus this class should use.
+     * @param soundService The SoundService this class should use.
+     * @param userService  The UserService this class should use.
+     * @param lobbyService The LobbyService this class should use.
      *
      * @implNote This method does not unregister this class from any EventBus it
      * may already be registered to.
@@ -73,10 +75,11 @@ public abstract class AbstractPresenter {
      */
     @Inject
     private void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
-                            EventBus eventBus) {
+                            ISceneService sceneService, EventBus eventBus) {
         this.soundService = soundService;
         this.userService = userService;
         this.lobbyService = lobbyService;
+        this.sceneService = sceneService;
         this.eventBus = eventBus;
         eventBus.register(this);
     }

@@ -164,16 +164,6 @@ class AsyncLobbyServiceTest {
     }
 
     @Test
-    void showLobbyError() {
-        String message = "message";
-        doNothing().when(syncLobbyService).showLobbyError(isA(String.class));
-
-        lobbyService.showLobbyError(message);
-
-        verify(syncLobbyService, after(DURATION)).showLobbyError(message);
-    }
-
-    @Test
     void updateLobbySettings() {
         doNothing().when(syncLobbyService)
                    .updateLobbySettings(isA(LobbyName.class), isA(Integer.class), isA(Boolean.class),

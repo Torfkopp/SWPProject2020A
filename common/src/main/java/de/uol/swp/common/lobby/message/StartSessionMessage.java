@@ -1,13 +1,11 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.Colour;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Message sent by the server when a game session was started.
@@ -20,11 +18,11 @@ import java.util.Map;
  */
 public class StartSessionMessage extends AbstractLobbyMessage {
 
-    private final Map<Actor, Player> actorPlayerMap;
-    private final Map<Actor, Colour> actorColourMap;
+    private final ActorPlayerMap actorPlayerMap;
+    private final ActorColourMap actorColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
-    private final List<Actor> playerList;
+    private final ActorSet playerList;
 
     /**
      * Constructor
@@ -38,14 +36,27 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param playerList          List of the players order
      */
     public StartSessionMessage(LobbyName name, Actor user, IConfiguration configuration, boolean startUpPhaseEnabled,
-                               Map<Actor, Player> actorPlayerMap, Map<Actor, Colour> actorColourMap,
-                               List<Actor> playerList) {
+                               ActorPlayerMap actorPlayerMap, ActorColourMap actorColourMap, ActorSet playerList) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.actorPlayerMap = actorPlayerMap;
         this.actorColourMap = actorColourMap;
         this.playerList = playerList;
+    }
+
+    /**
+     * Gets the Map of Actors and Colours
+     */
+    public ActorColourMap getActorColourMap() {
+        return actorColourMap;
+    }
+
+    /**
+     * Gets the Map of Actors and Players
+     */
+    public ActorPlayerMap getActorPlayerMap() {
+        return actorPlayerMap;
     }
 
     /**
@@ -65,20 +76,6 @@ public class StartSessionMessage extends AbstractLobbyMessage {
     }
 
     /**
-     * Gets the Map of Actor and Colours
-     */
-    public Map<Actor, Colour> getActorColourMap() {
-        return actorColourMap;
-    }
-
-    /**
-     * Gets the Map of Actor and Players
-     */
-    public Map<Actor, Player> getActorPlayerMap() {
-        return actorPlayerMap;
-    }
-
-    /**
      * Gets the player list
      *
      * @return The order of the players in the game
@@ -86,7 +83,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @author Maximilian Lindner
      * @since 2021-06-11
      */
-    public List<Actor> getPlayerList() {
+    public ActorSet getPlayerList() {
         return playerList;
     }
 

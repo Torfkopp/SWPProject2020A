@@ -159,7 +159,7 @@ public class GameRendering {
             drawDice(gameMapDescription.getFirstDie(), gameMapDescription.getSecondDie());
         }
         if (gameMapDescription.getCenterText() != null) {
-            showCenterText(gameMapDescription.getCenterText());
+            showTopText(gameMapDescription.getCenterText());
         }
         if (gameMapDescription.getBottomText() != null) {
             showBottomText(gameMapDescription.getBottomText());
@@ -1097,12 +1097,15 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-03-29
      */
-    private void showCenterText(String text) {
+    private void showTopText(String text) {
         if (text == null) return;
         Font centerTextFont = Font.font(centerTextFontSize);
-        double centerTextX = width / 2.0;
-        double centerTextY = height / 2.0;
+        double centerTextX = effectiveWidth / 2.0;
+        double centerTextY = OFFSET_Y + (hexHeight / 2);
         Platform.runLater(() -> {
+            gfxCtx.clearRect(0, 0, diceSize * 3, diceSize * 1.5);
+            gfxCtx.setFill(Color.WHITE);
+            gfxCtx.clearRect(0, OFFSET_Y + hexHeight / 4, width, hexHeight / 2);
             gfxCtx.setTextAlign(TextAlignment.CENTER);
             gfxCtx.setTextBaseline(VPos.CENTER);
             gfxCtx.setFill(Color.BLACK);
