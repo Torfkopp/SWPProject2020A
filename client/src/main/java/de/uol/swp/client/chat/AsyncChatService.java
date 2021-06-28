@@ -22,9 +22,14 @@ public class AsyncChatService implements IChatService {
     private static final Logger LOG = LogManager.getLogger(AsyncChatService.class);
     private final ChatService syncChatService;
 
+    /**
+     * Constructor
+     *
+     * @param syncChatService The synchronous ChatService (injected)
+     */
     @Inject
-    public AsyncChatService(ChatService chatService) {
-        this.syncChatService = chatService;
+    public AsyncChatService(ChatService syncChatService) {
+        this.syncChatService = syncChatService;
         LOG.debug("AsyncChatService initialised");
     }
 

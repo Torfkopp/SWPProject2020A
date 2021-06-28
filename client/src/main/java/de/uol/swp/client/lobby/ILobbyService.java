@@ -10,6 +10,7 @@ import de.uol.swp.common.user.Actor;
  * An interface for all methods of the LobbyService
  *
  * @author Steven Luong
+ * @see de.uol.swp.client.lobby.AsyncLobbyService
  * @see de.uol.swp.client.lobby.LobbyService
  * @since 2021-02-12
  */
@@ -178,15 +179,6 @@ public interface ILobbyService {
      * @since 2021-06-04
      */
     void setColour(LobbyName lobbyName, Colour colour);
-
-    /**
-     * Posts an event to show a Lobby Error alert with the provided message
-     *
-     * @param message The message to display
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showLobbyError(String message);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.

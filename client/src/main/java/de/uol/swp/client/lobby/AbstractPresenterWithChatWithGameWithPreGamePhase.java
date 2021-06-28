@@ -2,9 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
-import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
-import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
@@ -141,9 +138,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         window.hide();
         ThreadManager.runNow(() -> {
-            eventBus.post(new TradeCancelEvent(lobbyName));
-            eventBus.post(new CloseTradeResponseEvent(lobbyName));
-            clearEventBus();
+            sceneService.closeUserTradeWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            try {
+                clearEventBus();
+            } catch (NullPointerException ignored) {}
         });
     }
 
@@ -715,14 +714,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+                sceneService.showError(ResourceManager.get("lobby.error.movetime"));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+            sceneService.showError(ResourceManager.get("lobby.error.movetime"));
         }
     }
 

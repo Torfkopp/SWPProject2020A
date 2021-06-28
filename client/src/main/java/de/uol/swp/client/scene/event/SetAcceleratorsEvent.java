@@ -1,4 +1,4 @@
-package de.uol.swp.client;
+package de.uol.swp.client.scene.event;
 
 /**
  * Event used to trigger setting of a presenter's accelerators

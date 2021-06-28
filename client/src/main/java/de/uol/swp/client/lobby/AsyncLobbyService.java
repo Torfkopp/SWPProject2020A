@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the ILobbyService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected LobbyService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -26,6 +26,11 @@ public class AsyncLobbyService implements ILobbyService {
     private static final Logger LOG = LogManager.getLogger(AsyncLobbyService.class);
     private final LobbyService syncLobbyService;
 
+    /**
+     * Constructor
+     *
+     * @param syncLobbyService The synchronous LobbyService (injected)
+     */
     @Inject
     public AsyncLobbyService(LobbyService syncLobbyService) {
         this.syncLobbyService = syncLobbyService;
@@ -100,11 +105,6 @@ public class AsyncLobbyService implements ILobbyService {
     @Override
     public void setColour(LobbyName lobbyName, Colour colour) {
         ThreadManager.runNow(() -> syncLobbyService.setColour(lobbyName, colour));
-    }
-
-    @Override
-    public void showLobbyError(String message) {
-        ThreadManager.runNow(() -> syncLobbyService.showLobbyError(message));
     }
 
     @Override

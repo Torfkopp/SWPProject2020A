@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ShowRobberTaxUpdateEventTest {
+class RobberTaxUpdateEventTest {
 
     private final LobbyName defaultLobby = new LobbyName("test");
     private final ResourceList inventory = new ResourceList();
     int taxAmount = 4;
-    private final ShowRobberTaxUpdateEvent event = new ShowRobberTaxUpdateEvent(defaultLobby, taxAmount, inventory);
+    private final RobberTaxUpdateEvent event = new RobberTaxUpdateEvent(defaultLobby, taxAmount, inventory);
 
     @Test
     void getInventory() {
