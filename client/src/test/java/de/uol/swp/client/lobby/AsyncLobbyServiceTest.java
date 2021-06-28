@@ -4,7 +4,7 @@ import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,8 @@ class AsyncLobbyServiceTest {
 
     @Test
     void changeOwner() {
-        UserOrDummy newOwner = mock(UserOrDummy.class);
-        doNothing().when(syncLobbyService).changeOwner(isA(LobbyName.class), isA(UserOrDummy.class));
+        Actor newOwner = mock(Actor.class);
+        doNothing().when(syncLobbyService).changeOwner(isA(LobbyName.class), isA(Actor.class));
 
         lobbyService.changeOwner(defaultLobby, newOwner);
 
@@ -90,8 +90,8 @@ class AsyncLobbyServiceTest {
 
     @Test
     void kickUser() {
-        UserOrDummy otherUser = mock(UserOrDummy.class);
-        doNothing().when(syncLobbyService).kickUser(isA(LobbyName.class), isA(UserOrDummy.class));
+        Actor otherUser = mock(Actor.class);
+        doNothing().when(syncLobbyService).kickUser(isA(LobbyName.class), isA(Actor.class));
 
         lobbyService.kickUser(defaultLobby, otherUser);
 
@@ -161,16 +161,6 @@ class AsyncLobbyServiceTest {
         lobbyService.setColour(defaultLobby, colour);
 
         verify(syncLobbyService, after(DURATION)).setColour(defaultLobby, colour);
-    }
-
-    @Test
-    void showLobbyError() {
-        String message = "message";
-        doNothing().when(syncLobbyService).showLobbyError(isA(String.class));
-
-        lobbyService.showLobbyError(message);
-
-        verify(syncLobbyService, after(DURATION)).showLobbyError(message);
     }
 
     @Test

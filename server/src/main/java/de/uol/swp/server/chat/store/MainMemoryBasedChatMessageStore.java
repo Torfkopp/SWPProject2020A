@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public class MainMemoryBasedChatMessageStore implements IChatMessageStore {
     private int id_count;
 
     @Override
-    public ChatMessage createChatMessage(UserOrDummy author, String content) {
+    public ChatMessage createChatMessage(Actor author, String content) {
         if (author == null) {
             throw new IllegalArgumentException("Message author must not be null");
         }
@@ -47,7 +47,7 @@ public class MainMemoryBasedChatMessageStore implements IChatMessageStore {
     }
 
     @Override
-    public ChatMessage createChatMessage(UserOrDummy author, String content, LobbyName originLobby) {
+    public ChatMessage createChatMessage(Actor author, String content, LobbyName originLobby) {
         if (author == null) {
             throw new IllegalArgumentException("Message author must not be null");
         } else if (originLobby == null) {

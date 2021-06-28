@@ -12,18 +12,20 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.request.EditInventoryRequest;
-import de.uol.swp.common.game.request.EndTurnRequest;
-import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.request.ChangeOwnerRequest;
 import de.uol.swp.common.lobby.request.JoinLobbyRequest;
+import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.server.specialisedUtil.CommandMap;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.chat.CommandChatService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobby;
@@ -53,23 +55,27 @@ public class CommandService extends AbstractService {
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement;
     private final ILobbyManagement lobbyManagement;
-    private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
+    private final CommandChatService commandChatService;
+    private final CommandMap commandMap = new CommandMap();
 
     /**
      * Constructor
      *
-     * @param eventBus        The {@link com.google.common.eventbus.EventBus} (injected)
-     * @param lobbyManagement The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
-     * @param userManagement  The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param eventBus           The {@link com.google.common.eventbus.EventBus} (injected)
+     * @param lobbyManagement    The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
+     * @param userManagement     The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param commandChatService The {@link de.uol.swp.server.chat.CommandChatService} (injected)
      *
      * @see de.uol.swp.server.lobby.ILobbyManagement
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     @Inject
-    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
+    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
+                          CommandChatService commandChatService) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.userManagement = userManagement;
+        this.commandChatService = commandChatService;
         getAllClasses();
         commandMap.put("devmenu", this::command_DevMenu);
         commandMap.put("forceendturn", this::command_ForceEndTurn);
@@ -81,6 +87,12 @@ public class CommandService extends AbstractService {
         commandMap.put("d", this::command_AddDummy);
         commandMap.put("addai", this::command_AddAI);
         commandMap.put("ai", this::command_AddAI);
+        commandMap.put("kick", this::command_Kick);
+        commandChatService.addGameCommand("/kick");
+        commandMap.put("changeowner", this::command_ChangeOwner);
+        commandChatService.addGameCommand("/changeowner");
+        commandMap.put("pause", this::command_pause);
+        commandChatService.addGameCommand("/pause");
         LOG.debug("CommandService started");
     }
 
@@ -121,7 +133,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
                 for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
             }
@@ -154,7 +166,7 @@ public class CommandService extends AbstractService {
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 ILobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
                     post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
@@ -162,6 +174,35 @@ public class CommandService extends AbstractService {
             }
         } else {
             command_Invalid(args, originalMessage);
+        }
+    }
+
+    /**
+     * Handles the /changeowner command
+     * <p>
+     * Usage: {@code /changeowner <player>}
+     * <p>
+     * Takes the given User and posts the fitting ChangeOwnerRequest onto the Eventbus.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_ChangeOwner(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /changeowner command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        Actor newOwner = getActor(args.get(1));
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new ChangeOwnerRequest(lobbyName, user, newOwner));
+            }
         }
     }
 
@@ -210,7 +251,7 @@ public class CommandService extends AbstractService {
                                  Optional.of(originalMessage.getAuthor()));
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
-            UserOrDummy user = getUserOrDummy(args.get(0));
+            Actor user = getActor(args.get(0));
             post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
@@ -229,7 +270,7 @@ public class CommandService extends AbstractService {
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
         if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
-        UserOrDummy user = getUserOrDummy(args.get(1));
+        Actor user = getActor(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
         ResourceType resource = null;
@@ -322,6 +363,35 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Handles the /kick command
+     * <p>
+     * Usage: {@code /kick <player>}
+     * <p>
+     * Takes the given actor and posts the fitting KickUserRequest onto the Eventbus.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_Kick(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /kick command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        Actor toBeKickedUser = getActor(args.get(1));
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new KickUserRequest(lobbyName, user, toBeKickedUser));
+            }
+        }
+    }
+
+    /**
      * Handles the /post command
      * <p>
      * Usage: {@code /post <? extends Message> <*args>}
@@ -380,6 +450,66 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Handles the /pause command
+     * <p>
+     * Usage: {@code /pause}
+     * <p>
+     * Posts a PauseGameRequest onto the Eventbus, coming from the player who used the command.
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-06-12
+     */
+    private void command_pause(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /pause command");
+        if (args.size() > 0) args.add(0, originalMessage.getOriginLobby().toString());
+        User user = (User) originalMessage.getAuthor();
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                post(new PauseGameRequest(lobbyName, user));
+            }
+        }
+    }
+
+    /**
+     * Helper method used to find an Actor, depending on the input
+     * String
+     * <p>
+     * This method looks up the provided name in the UserManagement and returns the
+     * found User, if one exists. If no matching user is found and the name happens
+     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
+     * instead.
+     * If neither case happens, the returned value will be null.
+     *
+     * @param name The name of the actor to look up
+     *
+     * @return Actor object representing the found result (null if nothing found)
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private Actor getActor(String name) {
+        Optional<User> userOptional = userManagement.getUser(name);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            if (name.matches("^Dummy\\d+")) {
+                StringBuilder x = new StringBuilder();
+                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
+                return new DummyDTO(Integer.parseInt(x.toString()));
+            }
+            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
+            return null;
+        }
+    }
+
+    /**
      * Helper method that filters through all classes in the project modules
      * and returns a list that contains only classes the Developer Menu is
      * allowed to request an instantiation and posting of.
@@ -403,38 +533,6 @@ public class CommandService extends AbstractService {
                   .filter(cls -> !AbstractServerInternalMessage.class.isAssignableFrom(cls)) // No server-only Messages
                   .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException ignored) {}
-    }
-
-    /**
-     * Helper method used to find either a User or a Dummy, depending on the input
-     * String
-     * <p>
-     * This method looks up the provided name in the UserManagement and returns the
-     * found User, if one exists. If no matching user is found and the name happens
-     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
-     * instead.
-     * If neither case happens, the returned value will be null.
-     *
-     * @param name The name of the User or Dummy to look up
-     *
-     * @return UserOrDummy object representing the found result (null if nothing found)
-     *
-     * @author Phillip-André Suhr
-     * @since 2021-03-30
-     */
-    private UserOrDummy getUserOrDummy(String name) {
-        Optional<User> userOptional = userManagement.getUser(name);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        } else {
-            if (name.matches("^Dummy\\d+")) {
-                StringBuilder x = new StringBuilder();
-                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
-                return new DummyDTO(Integer.parseInt(x.toString()));
-            }
-            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
-            return null;
-        }
     }
 
     /**
@@ -580,14 +678,14 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     private Message parseArguments(List<String> args, Constructor<?> constr,
-                                   Optional<UserOrDummy> currentUser) throws ReflectiveOperationException {
+                                   Optional<Actor> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
             if (args.get(i).equals("§null") || args.get(i).equals("§n")) argList.add(null);
             else switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
-                case "de.uol.swp.common.user.UserOrDummy":
+                case "de.uol.swp.common.user.Actor":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
                         if (currentUser.get() instanceof User) currentUser.ifPresent(argList::add);
                     } else {

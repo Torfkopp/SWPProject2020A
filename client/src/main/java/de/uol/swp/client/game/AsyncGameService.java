@@ -5,7 +5,7 @@ import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * An asynchronous wrapper for the IGameService implementation
  * <p>
- * This class handles putting calls to an injected ChatService into
+ * This class handles putting calls to an injected GameService into
  * their own Task-Thread which is then executed away from the JavaFX
  * Application Thread, isolating non-UI calls onto their own threads.
  *
@@ -26,6 +26,11 @@ public class AsyncGameService implements IGameService {
     private static final Logger LOG = LogManager.getLogger(AsyncGameService.class);
     private final GameService syncGameService;
 
+    /**
+     * Constructor
+     *
+     * @param syncGameService The synchronous GameService (injected)
+     */
     @Inject
     public AsyncGameService(GameService syncGameService) {
         this.syncGameService = syncGameService;
@@ -73,7 +78,7 @@ public class AsyncGameService implements IGameService {
     }
 
     @Override
-    public void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim) {
+    public void robberChooseVictim(LobbyName lobbyName, Actor victim) {
         ThreadManager.runNow(() -> syncGameService.robberChooseVictim(lobbyName, victim));
     }
 

@@ -2,9 +2,8 @@ package de.uol.swp.client.trade;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * An interface for all methods of the TradeService
@@ -26,7 +25,7 @@ public interface ITradeService {
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceList demandedResources,
+    void acceptUserTrade(LobbyName lobbyName, Actor offeringUser, ResourceList demandedResources,
                          ResourceList offeredResources);
 
     /**
@@ -46,34 +45,7 @@ public interface ITradeService {
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void cancelTrade(LobbyName lobbyName, UserOrDummy respondingUser);
-
-    /**
-     * Posts an event to close the Bank trade window and re-enable the in-game buttons
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void closeBankTradeWindow(LobbyName lobbyName);
-
-    /**
-     * Posts an event to close a Trade Response window
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void closeTradeResponseWindow(LobbyName lobbyName);
-
-    /**
-     * Posts an event to close a User trade window
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void closeUserTradeWindow(LobbyName lobbyName);
+    void cancelTrade(LobbyName lobbyName, Actor respondingUser);
 
     /**
      * Posts a request to execute a resource trade with the Bank
@@ -97,7 +69,7 @@ public interface ITradeService {
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
+    void offerTrade(LobbyName lobbyName, Actor respondingUser, ResourceList offeredResources,
                     ResourceList demandedResources, boolean counterOffer);
 
     /**
@@ -109,49 +81,7 @@ public interface ITradeService {
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void resetOfferTradeButton(LobbyName lobbyName, UserOrDummy offeringUser);
-
-    /**
-     * Posts an event to show the Bank trade window
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showBankTradeWindow(LobbyName lobbyName);
-
-    /**
-     * Posts an event to show the Trade Offered window displaying a trade offer
-     * from another user
-     *
-     * @param lobbyName    The name of the lobby
-     * @param offeringUser The user who offered a trade
-     * @param rsp          The TradeWithUserOfferResponse containing the
-     *                     details of the offer
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp);
-
-    /**
-     * Posts an event to show a Trade Error alert with the provided message
-     *
-     * @param message The message to display
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showTradeError(String message);
-
-    /**
-     * Posts an event to show the User trade window for making a trade offer
-     *
-     * @param lobbyName      The name of the lobby
-     * @param respondingUser The user to whom the offer is being made
-     * @param isCounterOffer Whether the trade is a counter offer or not
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer);
+    void resetOfferTradeButton(LobbyName lobbyName, Actor offeringUser);
 
     /**
      * Posts a request for the Bank's inventory in order to trade with the Bank
@@ -172,5 +102,5 @@ public interface ITradeService {
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer);
+    void tradeWithUser(LobbyName lobbyName, Actor respondingUser, boolean counterOffer);
 }

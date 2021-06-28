@@ -62,8 +62,8 @@ class LobbyDTOTest {
         ILobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
 
         assertEquals(new LobbyName("test"), lobby.getName());
-        assertEquals(1, lobby.getUserOrDummies().size());
-        assertEquals(defaultUser, lobby.getUserOrDummies().iterator().next());
+        assertEquals(1, lobby.getActors().size());
+        assertEquals(defaultUser, lobby.getActors().iterator().next());
     }
 
     /**
@@ -95,15 +95,15 @@ class LobbyDTOTest {
         ILobby lobby = LobbyDTO.create(defaultLobby);
 
         lobby.joinUser(users.get(0));
-        assertEquals(2, lobby.getUserOrDummies().size());
-        assertTrue(lobby.getUserOrDummies().contains(users.get(0)));
+        assertEquals(2, lobby.getActors().size());
+        assertTrue(lobby.getActors().contains(users.get(0)));
 
         lobby.joinUser(users.get(0));
-        assertEquals(2, lobby.getUserOrDummies().size());
+        assertEquals(2, lobby.getActors().size());
 
         lobby.joinUser(users.get(1));
-        assertEquals(3, lobby.getUserOrDummies().size());
-        assertTrue(lobby.getUserOrDummies().contains(users.get(1)));
+        assertEquals(3, lobby.getActors().size());
+        assertTrue(lobby.getActors().contains(users.get(1)));
     }
 
     /**
@@ -119,12 +119,12 @@ class LobbyDTOTest {
         ILobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
-        assertEquals(users.size() + 1, lobby.getUserOrDummies().size());
+        assertEquals(users.size() + 1, lobby.getActors().size());
         lobby.leaveUser(users.get(5));
 
         // +1 for owner, -1 for user who left
-        assertEquals(users.size() + 1 - 1, lobby.getUserOrDummies().size());
-        assertFalse(lobby.getUserOrDummies().contains(users.get(5)));
+        assertEquals(users.size() + 1 - 1, lobby.getActors().size());
+        assertFalse(lobby.getActors().contains(users.get(5)));
     }
 
     /**

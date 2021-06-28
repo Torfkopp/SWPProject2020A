@@ -1,10 +1,9 @@
 package de.uol.swp.common.lobby;
 
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
-import java.util.Set;
 
 /**
  * The interface for a simple lobby used to send lobby data over the network.
@@ -72,7 +71,7 @@ public interface ISimpleLobby extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    Set<UserOrDummy> getReadyUsers();
+    ActorSet getReadyUsers();
 
     /**
      * Gets the users.
@@ -82,7 +81,7 @@ public interface ISimpleLobby extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    Set<UserOrDummy> getUserOrDummies();
+    ActorSet getActors();
 
     /**
      * Returns if the lobby has a password

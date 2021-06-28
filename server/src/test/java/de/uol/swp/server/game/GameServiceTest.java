@@ -262,7 +262,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     /**
@@ -290,7 +290,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(2, lobby2.get().getUserOrDummies().size());
+        assertEquals(2, lobby2.get().getActors().size());
     }
 
     /**
@@ -318,7 +318,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     /**
@@ -344,7 +344,7 @@ public class GameServiceTest {
 
         Optional<ILobby> lobby2 = lobbyManagement.getLobby(lobbyName);
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
+        assertEquals(3, lobby2.get().getActors().size());
     }
 
     @Test
@@ -352,6 +352,9 @@ public class GameServiceTest {
         Game game = gameManagement.getGame(defaultLobby);
         game.getInventory(Player.PLAYER_1).increase(KNIGHT_CARD, 1);
         game.setDiceRolledAlready(true);
+        bus.post(new PlayKnightCardRequest(defaultLobby, user1));
+        assertEquals(0, game.getInventory(Player.PLAYER_1).getKnights());
+        game.getInventory(Player.PLAYER_1).nextTurn();
         bus.post(new PlayKnightCardRequest(defaultLobby, user1));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getKnights());
     }
@@ -365,6 +368,9 @@ public class GameServiceTest {
         inventories[0].increase(MONOPOLY_CARD, 1);
         game.setDiceRolledAlready(true);
         bus.post(new PlayMonopolyCardRequest(defaultLobby, user1, BRICK));
+        assertEquals(0, inventories[0].get(BRICK));
+        inventories[0].nextTurn();
+        bus.post(new PlayMonopolyCardRequest(defaultLobby, user1, BRICK));
         assertEquals(3, inventories[0].get(BRICK));
         assertEquals(0, inventories[1].get(BRICK));
         assertEquals(0, inventories[2].get(BRICK));
@@ -376,6 +382,10 @@ public class GameServiceTest {
         assertEquals(0, game.getInventory(Player.PLAYER_1).get(BRICK));
         game.getInventory(Player.PLAYER_1).increase(YEAR_OF_PLENTY_CARD, 1);
         game.setDiceRolledAlready(true);
+        bus.post(new PlayYearOfPlentyCardRequest(defaultLobby, user1, BRICK, GRAIN));
+        assertEquals(0, game.getInventory(Player.PLAYER_1).get(BRICK));
+        assertEquals(0, game.getInventory(Player.PLAYER_1).get(GRAIN));
+        game.getInventory(Player.PLAYER_1).nextTurn();
         bus.post(new PlayYearOfPlentyCardRequest(defaultLobby, user1, BRICK, GRAIN));
         assertEquals(1, game.getInventory(Player.PLAYER_1).get(BRICK));
         assertEquals(1, game.getInventory(Player.PLAYER_1).get(GRAIN));

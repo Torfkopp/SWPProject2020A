@@ -2,7 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.Colour;
@@ -12,7 +11,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +55,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
+    public void changeOwner(LobbyName lobbyName, Actor newOwner) {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
         eventBus.post(req);
@@ -91,7 +90,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
+    public void kickUser(LobbyName lobbyName, Actor userToKick) {
         LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
         eventBus.post(kickUserRequest);
@@ -143,12 +142,6 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending SetColourRequest");
         Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
         eventBus.post(setColourRequest);
-    }
-
-    @Override
-    public void showLobbyError(String message) {
-        LOG.debug("Sending LobbyErrorEvent");
-        eventBus.post(new LobbyErrorEvent(message));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
@@ -18,8 +17,9 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -44,8 +43,8 @@ public class GameAI {
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
 
-    private final Map<AI, List<IHarbourHex.HarbourResource>> harbours = new HashMap<>();
-    private final Map<Game, Map<MapPoint, Integer>> aiBuildPriority = new HashMap<>();
+    private final AIHarbourMap harbours = new AIHarbourMap();
+    private final AIBuildPriorityMap aiBuildPriority = new AIBuildPriorityMap();
 
     /**
      * Constructor
@@ -81,9 +80,9 @@ public class GameAI {
         MapPoint mapPoint;
         switch (difficulty) {
             case EASY:
-                y = (int) (Math.random() * 4 + 1);
-                x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
-                    ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
+                y = Util.randomPositiveInt(5);
+                x = (y == 1 || y == 5) ? (Util.randomPositiveInt(4)) :
+                    ((y == 2 || y == 4) ? (Util.randomPositiveInt(5)) : (Util.randomPositiveInt(6)));
                 break;
             case HARD:
                 Map<MapPoint, Integer> position = new HashMap<>();
@@ -135,7 +134,7 @@ public class GameAI {
 
                 //Pick a random hex from the survivors
                 if (!position.isEmpty()) {
-                    mapPoint = new ArrayList<>(position.keySet()).get((int) (Math.random() * position.keySet().size()));
+                    mapPoint = new ArrayList<>(position.keySet()).get(Util.randomInt(position.keySet().size()));
                     y = mapPoint.getY();
                     x = mapPoint.getX();
                 }
@@ -148,12 +147,12 @@ public class GameAI {
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
-        List<Player> player = new ArrayList<>(map.getPlayersAroundHex(mapPoint));
+        List<Player> player = map.getPlayersAroundHex(mapPoint);
         if (player.size() > 0) {
             Player victim = player.get(0);
             switch (difficulty) {
                 case EASY:
-                    victim = player.get((int) (Math.random() * player.size()));
+                    victim = player.get(Util.randomInt(player.size()));
                     break;
                 case HARD:
                     Map<Player, List<MapPoint>> victimRating = map.getPlayerSettlementsAndCities();
@@ -166,7 +165,7 @@ public class GameAI {
                                                                              .getResourceAmount()))) victim = p;
                     break;
             }
-            gameService.robRandomResource(game, ai, game.getUserFromPlayer(victim));
+            gameService.robRandomResource(game, ai, game.getActorFromPlayer(victim));
         }
     }
 
@@ -228,9 +227,9 @@ public class GameAI {
             case EASY:
                 if (ai.getUsername().equals("Robert E. O. Speedwagon")) return true;
                 //Difference:4-100%, 3-92%, 2-84%, 1-76%, 0-68%
-                if (difference >= 0 && ((int) (Math.random() * 100) < (68 + difference * 8))) return true;
+                if (difference >= 0 && (Util.randomInt(100) < (68 + difference * 8))) return true;
                     //Difference:4-0%, 3-8%, 2-16%, 1-24%
-                else return difference < 0 && ((int) (Math.random() * 100) < (32 + difference * 8));
+                else return difference < 0 && (Util.randomInt(100) < (32 + difference * 8));
             case HARD:
                 if (demanded.getTotal() == 0 || difference > 2) return true;
                 if (offered.getTotal() == 0 || difference < -2) return false;
@@ -251,7 +250,7 @@ public class GameAI {
                     if (r.getAmount() <= 1) priority.add(r.getType());
                 //If offered has a prioritised resource, the rating goes up
                 for (ResourceType r : priority) rating += offered.getAmount(r) - demanded.getAmount(r);
-                return ((int) (Math.random() * 100)) < (50 + rating * 10);
+                return Util.randomInt(100) < (50 + rating * 10);
             default:
                 return false;
         }
@@ -273,7 +272,7 @@ public class GameAI {
                 turnBuildAIEasy(game, ai);
                 break;
             case HARD:
-                if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
+                if (game.getInventory(ai).isPlayable(DevelopmentCardType.KNIGHT_CARD))
                     playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
                 turnBuildAIHard(game, ai);
                 break;
@@ -300,9 +299,8 @@ public class GameAI {
                 startUpPhaseAIHard(game, ai);
                 break;
         }
-        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-        if (startUpBuiltMap.get(ai) == NONE_BUILT) startUpBuiltMap.put(ai, FIRST_BOTH_BUILT);
-        else startUpBuiltMap.put(ai, ALL_BUILT);
+        ActorStartUpBuiltMap startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        startUpBuiltMap.nextPhase(ai);
 
         gameService.turnEndAI(game, ai);
     }
@@ -340,7 +338,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
 
         //Play a monopoly card if possible
-        if (inv.get(DevelopmentCardType.MONOPOLY_CARD) > 1) {
+        if (inv.isPlayable(DevelopmentCardType.MONOPOLY_CARD)) {
             if (inv.get(ORE) < 3) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, ORE, null);
             if (inv.get(GRAIN) < 2) playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, GRAIN, null);
         }
@@ -433,9 +431,9 @@ public class GameAI {
         }
 
         //Play a card if possible
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.ROAD_BUILDING_CARD))
             playCardAI(game, ai, DevelopmentCardType.ROAD_BUILDING_CARD, null, null);
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0)
+        if (inv.isPlayable(DevelopmentCardType.YEAR_OF_PLENTY_CARD))
             playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, BRICK, LUMBER);
 
         //Chooses the best path; best as in longest buildable road
@@ -765,9 +763,9 @@ public class GameAI {
 
         //Choose random place to build settlement upon
         while (mp == null || !built) {
-            y = (int) (Math.random() * 5);
+            y = Util.randomInt(5);
             xmax = (y == 0 || y == 5) ? 6 : (y == 1 || y == 4) ? 8 : 10;
-            x = (int) (Math.random() * xmax);
+            x = Util.randomInt(xmax);
             mp = MapPoint.IntersectionMapPoint(y, x);
             System.err.println(mp.getY() + " " + mp.getX());
             built = map.placeFoundingSettlement(player, mp);
@@ -780,7 +778,7 @@ public class GameAI {
 
         //Choose random place to build road upon
         while (!built) {
-            edge = edges.get((int) (Math.random() * edges.size()));
+            edge = edges.get(Util.randomInt(edges.size()));
             built = map.placeRoad(player, edge);
         }
 
@@ -799,7 +797,7 @@ public class GameAI {
      * @since 2021-06-05
      */
     private void startUpPhaseAIHard(Game game, AI ai) {
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
         Player player = game.getPlayer(ai);
         IGameMapManagement map = game.getMap();
         LobbyName lobbyName = game.getLobby().getName();
@@ -878,7 +876,7 @@ public class GameAI {
 
         //Build City for Rock 'n' Roll
         while (inv.get(GRAIN) >= 2 && inv.get(ORE) >= 3 && !cities.isEmpty()) {
-            mp = cities.remove((int) (Math.random() * cities.size()));
+            mp = cities.remove(Util.randomInt(cities.size()));
             map.upgradeSettlement(player, mp);
             inv.decrease(GRAIN, 2);
             inv.decrease(ORE, 3);
@@ -888,7 +886,7 @@ public class GameAI {
         //Build Settlement
         while (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && inv.get(GRAIN) >= 1 && inv.get(WOOL) >= 1 && !settlements
                 .isEmpty()) {
-            mp = settlements.remove((int) (Math.random() * settlements.size()));
+            mp = settlements.remove(Util.randomInt(settlements.size()));
             try {
                 map.placeSettlement(player, mp);
             } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
@@ -913,7 +911,7 @@ public class GameAI {
         List<IEdge> roads = new ArrayList<>(edges);
         //Build Road
         while (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && !roads.isEmpty()) {
-            IEdge edge = roads.remove((int) (Math.random() * roads.size()));
+            IEdge edge = roads.remove(Util.randomInt(roads.size()));
             map.placeRoad(player, edge);
             inv.decrease(BRICK);
             inv.decrease(LUMBER);
@@ -943,13 +941,13 @@ public class GameAI {
     private void turnBuildAIHard(Game game, AI ai) {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
-        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        if (!aiBuildPriority.containsKey(game)) createBuildPriority(game);
 
         useHarbour(game, ai);
 
         //Random chance of buying a card increases steadily
         if (inv.get(GRAIN) > 0 && inv.get(ORE) > 0 && inv.get(WOOL) > 0 && //
-            ((int) (Math.random() * 100) < (10 + game.getRound() * 5)))
+            Util.randomInt(100) < (10 + game.getRound() * 5))
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(ai, lobbyName));
 
         //The numbers may not be optimal; not enough data
@@ -993,21 +991,7 @@ public class GameAI {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
 
-        Supplier<ResourceType> getRandomResource = () -> {
-
-            switch ((int) (Math.random() * 4)) {
-                case 0:
-                    return BRICK;
-                case 1:
-                    return GRAIN;
-                case 2:
-                    return LUMBER;
-                case 3:
-                    return ORE;
-                default:
-                    return WOOL;
-            }
-        };
+        Supplier<ResourceType> getRandomResource = Util::randomResourceType;
 
         if (cards.getAmount(DevelopmentCardType.MONOPOLY_CARD) > 0) {
             playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, getRandomResource.get(), null);
@@ -1028,15 +1012,15 @@ public class GameAI {
             }
             List<IEdge> roads = new ArrayList<>(edges);
             if (roads.size() > 1) {
-                IEdge edge = roads.remove((int) (Math.random() * roads.size()));
+                IEdge edge = roads.remove(Util.randomInt(roads.size()));
                 map.placeRoad(player, edge);
                 inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge),
                                                                             ROAD));
                 if (roads.size() > 2) {
-                    edge = roads.remove((int) (Math.random() * roads.size()));
-                    game.getMap().placeRoad(player, roads.remove((int) (Math.random() * roads.size())));
+                    edge = roads.remove(Util.randomInt(roads.size()));
+                    game.getMap().placeRoad(player, roads.remove(Util.randomInt(roads.size())));
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai,
                                                                                            map.getEdgeMapPoint(edge),
                                                                                            ROAD));
@@ -1067,7 +1051,7 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
         if (!harbours.containsKey(ai)) return;
         ResourceType tradeGive = null;
-        ResourceType tradeGet = null;
+        ResourceType tradeGet;
         //Check if any resource amount is relatively high
         for (ResourceType res : ResourceType.values())
             if (1.0 * inv.get(res) / inv.getResourceAmount() > 0.6) {
@@ -1076,15 +1060,7 @@ public class GameAI {
             }
         if (tradeGive == null) return;
         //Early Game Brick/ Lumber focus, Later Ore/ Grain focus
-        if (game.getRound() < 6) {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.LUMBER)) tradeGet = LUMBER;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.BRICK)) tradeGet = BRICK;
-        } else {
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.GRAIN)) tradeGet = GRAIN;
-            if (harbours.get(ai).contains(IHarbourHex.HarbourResource.ORE)) tradeGet = ORE;
-        }
-        //Wool
-        if (tradeGet == null && harbours.get(ai).contains(IHarbourHex.HarbourResource.WOOL)) tradeGet = WOOL;
+        tradeGet = harbours.tradeGet(ai, game.getRound());
         //Use harbour
         if (tradeGet != null) {
             inv.decrease(tradeGive, 2);

@@ -2,7 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request is sent to the Server the get the Inventory
@@ -15,7 +15,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class TradeWithUserRequest extends AbstractLobbyRequest {
 
-    private final UserOrDummy respondingUser;
+    private final Actor respondingUser;
     private final boolean counterOffer;
 
     /**
@@ -26,7 +26,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      * @param tradingPartner The trading partner
      * @param counterOffer   Whether the offer is a counter offer or not
      */
-    public TradeWithUserRequest(LobbyName name, UserOrDummy user, UserOrDummy tradingPartner, boolean counterOffer) {
+    public TradeWithUserRequest(LobbyName name, Actor user, Actor tradingPartner, boolean counterOffer) {
         super(name, user);
         this.respondingUser = tradingPartner;
         this.counterOffer = counterOffer;
@@ -37,7 +37,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      *
      * @return The username of the trading partner
      */
-    public UserOrDummy getRespondingUser() {
+    public Actor getRespondingUser() {
         return respondingUser;
     }
 

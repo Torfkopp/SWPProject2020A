@@ -1,7 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 
@@ -20,7 +20,7 @@ public interface IGameManagement {
      * Creates a new game and adds it to the list
      *
      * @param lobby    The game's lobby
-     * @param first    The User or Dummy who will be first
+     * @param first    The Actor who will be first
      * @param gameMap  The IGameMap the game will use
      * @param moveTime The moveTime for the game
      *
@@ -29,7 +29,7 @@ public interface IGameManagement {
      * only one game per lobby is possible
      * @since 2021-01-24
      */
-    void createGame(ILobby lobby, UserOrDummy first, IGameMapManagement gameMap,
+    void createGame(ILobby lobby, Actor first, IGameMapManagement gameMap,
                     int moveTime) throws IllegalArgumentException;
 
     /**

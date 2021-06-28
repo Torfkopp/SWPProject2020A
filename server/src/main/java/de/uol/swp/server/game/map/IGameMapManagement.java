@@ -8,7 +8,7 @@ import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.server.game.Game;
 import de.uol.swp.server.game.GameMapManagement;
 
@@ -146,7 +146,7 @@ public interface IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
+    IGameMap getGameMapDTO(Map<Player, Actor> playerUserMapping);
 
     /**
      * Gets the HarbourResourceType of a specific Intersection MapPoint
@@ -270,12 +270,12 @@ public interface IGameMapManagement {
      *
      * @param mapPoint The hex
      *
-     * @return Set of Players around said hex
+     * @return List of Players around said hex
      *
      * @author Mario Fokken
      * @since 2021-04-07
      */
-    Set<Player> getPlayersAroundHex(MapPoint mapPoint);
+    List<Player> getPlayersAroundHex(MapPoint mapPoint);
 
     /**
      * Builds a Settlement on a random Intersection during the Founding Phase

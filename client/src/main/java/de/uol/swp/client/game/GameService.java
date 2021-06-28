@@ -3,7 +3,6 @@ package de.uol.swp.client.game;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
-import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.*;
@@ -16,7 +15,7 @@ import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,6 +72,13 @@ public class GameService implements IGameService {
     }
 
     @Override
+    public void pauseGame(LobbyName lobbyName) {
+        LOG.debug("Sending PauseGameRequest");
+        Message request = new PauseGameRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
+    }
+
+    @Override
     public void playKnightCard(LobbyName lobbyName) {
         LOG.debug("Sending PlayKnightCardRequest");
         Message request = new PlayKnightCardRequest(lobbyName, userService.getLoggedInUser());
@@ -102,7 +108,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim) {
+    public void robberChooseVictim(LobbyName lobbyName, Actor victim) {
         LOG.debug("Sending RobberChosenVictimRequest");
         Message msg = new RobberChosenVictimRequest(lobbyName, userService.getLoggedInUser(), victim);
         eventBus.post(msg);
@@ -134,8 +140,6 @@ public class GameService implements IGameService {
         LOG.debug("Sending RobberTaxChosenRequest");
         Message request = new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);
-        LOG.debug("Sending CloseRobberTaxViewEvent");
-        eventBus.post(new CloseRobberTaxViewEvent(lobbyName));
     }
 
     @Override
@@ -149,13 +153,6 @@ public class GameService implements IGameService {
     public void updateInventory(LobbyName lobbyName) {
         LOG.debug("Sending UpdateInventoryRequest");
         Message request = new UpdateInventoryRequest(userService.getLoggedInUser(), lobbyName);
-        eventBus.post(request);
-    }
-
-    @Override
-    public void pauseGame(LobbyName lobbyName) {
-        LOG.debug("Sending PauseGameRequest");
-        Message request = new PauseGameRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
     }
 }

@@ -2,8 +2,8 @@ package de.uol.swp.server.sessionmanagement;
 
 import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.sessions.Session;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.*;
 
@@ -51,7 +51,7 @@ public interface ISessionManagement {
      *
      * @return The Session of the User
      */
-    Optional<Session> getSession(UserOrDummy user);
+    Optional<Session> getSession(Actor user);
 
     /**
      * Gets the session for a given MessageContext

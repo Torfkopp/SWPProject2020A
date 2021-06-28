@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 /**
  * Request sent to the server when a user wants to buy a random developmentCard
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class BuyDevelopmentCardRequest extends AbstractGameRequest {
 
-    private final UserOrDummy user;
+    private final Actor user;
 
     /**
      * Constructor
@@ -22,7 +22,7 @@ public class BuyDevelopmentCardRequest extends AbstractGameRequest {
      * @param user        The User wanting to buy a developmentCard
      * @param originLobby The Lobby from which a request originated from
      */
-    public BuyDevelopmentCardRequest(UserOrDummy user, LobbyName originLobby) {
+    public BuyDevelopmentCardRequest(Actor user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }
@@ -32,7 +32,7 @@ public class BuyDevelopmentCardRequest extends AbstractGameRequest {
      *
      * @return The user who wants to buy a DevelopmentCard
      */
-    public UserOrDummy getUser() {
+    public Actor getActor() {
         return user;
     }
 }

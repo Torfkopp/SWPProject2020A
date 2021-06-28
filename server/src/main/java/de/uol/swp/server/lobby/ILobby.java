@@ -3,11 +3,12 @@ package de.uol.swp.server.lobby;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
+import de.uol.swp.common.specialisedUtil.ActorColourMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,9 +36,19 @@ public interface ILobby extends Serializable {
     static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.getMaxPlayers(),
                                lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled(),
-                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers(),
-                               lobby.getMaxTradeDiff());
+                               lobby.hasPassword(), lobby.getActors(), lobby.getReadyUsers(), lobby.getMaxTradeDiff());
     }
+
+    /**
+     * Gets all users and dummies in the lobby
+     *
+     * @return A Set containing all users and dummies in this lobby
+     *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
+     */
+    ActorSet getActors();
 
     /**
      * Gets the maximum amount of players for a lobby.
@@ -73,8 +84,6 @@ public interface ILobby extends Serializable {
 
     /**
      * Sets the maximum trade difference for a lobby
-     *
-     * @return Maximum trade difference
      *
      * @author Aldin Dervisi
      * @since 2021-08-06
@@ -140,7 +149,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    Set<UserOrDummy> getReadyUsers();
+    ActorSet getReadyUsers();
 
     /**
      * Gets all real users in the lobby
@@ -154,25 +163,14 @@ public interface ILobby extends Serializable {
     Set<User> getRealUsers();
 
     /**
-     * Gets a map of UserOrDummies and their chosen colour
+     * Gets a map of Actors and their chosen colour
      *
-     * @return A map containing UserOrDummies and their chosen colour
+     * @return A map containing Actors and their chosen colour
      *
      * @author Mario Fokken
      * @since 2021-06-02
      */
-    Map<UserOrDummy, Colour> getUserColourMap();
-
-    /**
-     * Gets all users and dummies in the lobby
-     *
-     * @return A Set containing all users and dummies in this lobby
-     *
-     * @author Alwin Bossert
-     * @author Temmo Junkhoff
-     * @since 2021-03-13
-     */
-    Set<UserOrDummy> getUserOrDummies();
+    ActorColourMap getUserColourMap();
 
     /**
      * Gets whether the Lobby has a password or not
@@ -255,7 +253,7 @@ public interface ILobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void joinUser(UserOrDummy user);
+    void joinUser(Actor user);
 
     /**
      * Removes a user from the lobby
@@ -264,7 +262,7 @@ public interface ILobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void leaveUser(UserOrDummy user);
+    void leaveUser(Actor user);
 
     /**
      * Sets whether the Lobby currently has a password according to the boolean provided
@@ -285,7 +283,7 @@ public interface ILobby extends Serializable {
      * @author Mario Fokken
      * @since 2012-06-02
      */
-    void setUserColour(UserOrDummy user, Colour colour);
+    void setUserColour(Actor user, Colour colour);
 
     /**
      * Sets a user as ready
@@ -296,7 +294,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void setUserReady(UserOrDummy user);
+    void setUserReady(Actor user);
 
     /**
      * Marks a user as not ready.
@@ -307,7 +305,7 @@ public interface ILobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void unsetUserReady(UserOrDummy user);
+    void unsetUserReady(Actor user);
 
     /**
      * Changes the owner of the lobby

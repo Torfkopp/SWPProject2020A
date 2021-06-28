@@ -8,7 +8,7 @@ import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -55,7 +55,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private Button offerTradeButton;
 
     private LobbyName lobbyName;
-    private UserOrDummy respondingUser;
+    private Actor respondingUser;
     private int traderInventorySize;
     private ResourceList selectedOwnResourceList;
     private ResourceList selectedPartnersResourceList;
@@ -90,7 +90,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             selectedPartnersResourceMapCounter += entry.getAmount();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
-            tradeService.showTradeError(ResourceManager.get("game.trade.error.demandtoohigh"));
+            sceneService.showError(ResourceManager.get("game.trade.error.demandtoohigh"));
         }
         //@formatter:off
         return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0)
@@ -104,11 +104,9 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window if existent.
-     *
-     * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
-        tradeService.closeUserTradeWindow(lobbyName);
+        sceneService.closeUserTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, respondingUser);
     }
 
@@ -200,7 +198,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             statusLabel.setText(ResourceManager.get("game.trade.status.waiting", respondingUser));
             tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                     counterOffer);
-            tradeService.closeTradeResponseWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }

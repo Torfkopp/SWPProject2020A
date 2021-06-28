@@ -9,6 +9,7 @@ import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.scene.ISceneService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
@@ -42,9 +43,9 @@ public class ClientApp extends Application implements ConnectionListener {
     private String host;
     private int port;
     private IUserService userService;
+    private ISceneService sceneService;
     private ClientConnection clientConnection;
     private EventBus eventBus;
-    private SceneManager sceneManager;
     private boolean attemptingStoredLogin;
 
     // -----------------------------------------------------
@@ -120,8 +121,7 @@ public class ClientApp extends Application implements ConnectionListener {
 
         // Client app is created by Java, so injection must
         // be handled here manually
-        SceneManagerFactory sceneManagerFactory = injector.getInstance(SceneManagerFactory.class);
-        this.sceneManager = sceneManagerFactory.create(primaryStage);
+        this.sceneService = injector.getInstance(ISceneService.class);
 
         ClientConnectionFactory connectionFactory = injector.getInstance(ClientConnectionFactory.class);
         clientConnection = connectionFactory.create(host, port);
@@ -169,12 +169,12 @@ public class ClientApp extends Application implements ConnectionListener {
             else {
                 LOG.trace("No user details found, showing Login screen");
                 attemptingStoredLogin = false;
-                sceneManager.showLoginScreen();
+                sceneService.displayLoginScreen();
             }
         } else {
             LOG.trace("'Remember Me' disabled, showing Login screen");
             attemptingStoredLogin = false;
-            sceneManager.showLoginScreen();
+            sceneService.displayLoginScreen();
         }
     }
 
@@ -183,15 +183,15 @@ public class ClientApp extends Application implements ConnectionListener {
         if (e.startsWith("Cannot auth user ") && attemptingStoredLogin) {
             LOG.trace("Stored user details were incorrect, showing normal login screen");
             attemptingStoredLogin = false;
-            sceneManager.showLoginScreen();
+            sceneService.displayLoginScreen();
         } else {
-            sceneManager.showServerError(e);
+            sceneService.showServerError(e);
         }
     }
 
     @Override
     public void exceptionOccurred(Throwable e, String cause) {
-        sceneManager.showServerError(e, cause);
+        sceneService.showServerError(e, cause);
     }
 
     /**

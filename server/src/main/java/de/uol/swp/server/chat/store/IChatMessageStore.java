@@ -2,7 +2,7 @@ package de.uol.swp.server.chat.store;
 
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +29,7 @@ public interface IChatMessageStore {
      *
      * @implSpec ID and Timestamp need to be added on creation
      */
-    ChatMessage createChatMessage(UserOrDummy author, String content);
+    ChatMessage createChatMessage(Actor author, String content);
 
     /**
      * Method to create a ChatMessage in a lobby's ChatStore
@@ -43,7 +43,7 @@ public interface IChatMessageStore {
      * @implSpec ID and Timestamp need to be added on creation
      * @since 2020-12-30
      */
-    ChatMessage createChatMessage(UserOrDummy author, String content, LobbyName originLobby);
+    ChatMessage createChatMessage(Actor author, String content, LobbyName originLobby);
 
     /**
      * Method to retrieve a ChatMessage from the global ChatStore through its ID

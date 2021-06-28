@@ -2,9 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
-import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
-import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
@@ -16,9 +13,11 @@ import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.specialisedUtil.ActorPlayerMap;
+import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import de.uol.swp.common.util.Util;
@@ -32,7 +31,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -52,10 +50,6 @@ import java.util.function.UnaryOperator;
 public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends AbstractPresenterWithChatWithGame {
 
     @FXML
-    protected Button kickUserButton;
-    @FXML
-    protected Button changeOwnerButton;
-    @FXML
     protected Label moveTimeLabel;
     @FXML
     protected TextField moveTimeTextField;
@@ -66,7 +60,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected Set<UserOrDummy> readyUsers;
+    protected ActorSet readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -144,9 +138,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         window.hide();
         ThreadManager.runNow(() -> {
-            eventBus.post(new TradeCancelEvent(lobbyName));
-            eventBus.post(new CloseTradeResponseEvent(lobbyName));
-            clearEventBus();
+            sceneService.closeUserTradeWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            try {
+                clearEventBus();
+            } catch (NullPointerException ignored) {}
         });
     }
 
@@ -165,7 +161,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void onKickUserButtonPressed() {
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        Actor selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
@@ -210,39 +206,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the visibility and state of the changeOwnerButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @since 2021-04-13
-     */
-    protected void setChangeOwnerButtonState() {
-        Platform.runLater(() -> {
-            changeOwnerButton.setVisible(userService.getLoggedInUser().equals(owner));
-            changeOwnerButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
-    }
-
-    /**
-     * Helper function that sets the visibility and state of the kickUserButton.
-     * <p>
-     * The button is only enabled for the lobby owner when a game
-     * has not started yet and if the logged in user is the owner
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @since 2021-03-03
-     */
-    protected void setKickUserButtonState() {
-        Platform.runLater(() -> {
-            kickUserButton.setVisible(userService.getLoggedInUser().equals(owner));
-            kickUserButton.setDisable(userService.getLoggedInUser().equals(owner));
-        });
-    }
-
-    /**
      * Helper method that sets the visibility and state of buttons and checkboxes for the
      * pre-game settings. The pre-game settings are disabled for everyone, except the
      * owner of the lobby.
@@ -278,12 +241,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (userService.getLoggedInUser().equals(owner)) {
-            startSession.setVisible(true);
-            startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
-        } else {
-            startSession.setDisable(true);
-            startSession.setVisible(false);
+        if (!inGame) {
+            if (userService.getLoggedInUser().equals(owner)) {
+                startSession.setVisible(true);
+                startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
+            } else {
+                startSession.setDisable(true);
+                startSession.setVisible(false);
+            }
         }
     }
 
@@ -304,10 +269,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserOrDummy
+     * @see de.uol.swp.common.user.Actor
      * @since 2021-01-05
      */
-    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+    protected void updateUsersList(ActorSet userLobbyList) {
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
@@ -321,22 +286,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyMembers.clear();
             lobbyMembers.addAll(userLobbyList);
         });
-    }
-
-    /**
-     * Helper method to create a PlayerColourMap from
-     * the UserColourMap and the UserOrDummyPlayerMap
-     *
-     * @return PlayerColourMap
-     *
-     * @author Mario Fokken
-     * @since 2021-06-02
-     */
-    private Map<Player, Colour> getPlayerColourMap() {
-        Map<Player, Colour> map = new HashMap<>();
-        for (UserOrDummy u : userColoursMap.keySet())
-            map.put(userOrDummyPlayerMap.get(u), userColoursMap.get(u));
-        return map;
     }
 
     /**
@@ -373,7 +322,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onChangeOwnerButtonPressed() {
         soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        Actor selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.changeOwner(lobbyName, selectedUser);
     }
@@ -407,13 +356,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
-        Map<UserOrDummy, Player> map = new HashMap<>();
+        ActorPlayerMap map = new ActorPlayerMap();
         int i = 0;
-        for (UserOrDummy u : msg.getUserColours().keySet())
+        for (Actor u : msg.getUserColours().keySet())
             map.put(u, Player.byIndex(i++));
-        userOrDummyPlayerMap = map;
+        actorPlayerMap = map;
         userColoursMap = msg.getUserColours();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
         Platform.runLater(this::prepareColourComboBox);
     }
@@ -459,7 +408,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         victoryPointsOverTimeMap = msg.getVictoryPointMap();
-        winner = msg.getUser();
+        winner = msg.getActor();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
             uniqueCardView.setMinHeight(0);
@@ -481,11 +430,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
             turnIndicator.setVisible(false);
-            pauseButton.setVisible(false);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
+            helpButton.setDisable(true);
+            helpButton.setVisible(false);
             turnIndicator.setAccessibleText("");
             buildingCosts.setVisible(false);
             victoryPointsLabel.setVisible(false);
@@ -498,19 +446,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             roundCounter = 0;
             this.elapsedTimer.stop();
             displayVictoryPointChartButton.setVisible(true);
+            displayVictoryPointChartButton.setDisable(false);
             displayVictoryPointChartButton.setPrefHeight(30);
             displayVictoryPointChartButton.setPrefWidth(230);
             if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
+                returnToLobby.setDisable(false);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
             }
-            gameMapDescription.clear();
+            gameRendering.redraw();
             gameMapDescription.setCenterText(
                     winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
                     ResourceManager.get("game.won.info", winner));
+            fitCanvasToSize();
         });
-        fitCanvasToSize();
         soundService.victory();
     }
 
@@ -550,6 +500,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             returnToLobby.setVisible(false);
+            returnToLobby.setDisable(true);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
             window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -562,10 +513,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(190);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
+            displayVictoryPointChartButton.setVisible(false);
+            displayVictoryPointChartButton.setDisable(true);
+            displayVictoryPointChartButton.setPrefHeight(0);
+            displayVictoryPointChartButton.setPrefWidth(0);
+            gameMapDescription.setCenterText("");
+            gameMapDescription.clear();
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
-            kickUserButton.setVisible(true);
-            changeOwnerButton.setVisible(true);
         });
     }
 
@@ -590,9 +545,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         inGameUserList = msg.getPlayerList();
-        userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
-        userColoursMap = msg.getUserOrDummyColourMap();
-        gameRendering.setPlayerColours(getPlayerColourMap());
+        actorPlayerMap = msg.getActorPlayerMap();
+        userColoursMap = msg.getActorColourMap();
+        gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -600,7 +555,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 notice.setVisible(true);
                 notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
             }
-            setTurnIndicatorText(msg.getUser());
+            setTurnIndicatorText(msg.getActor());
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
@@ -614,9 +569,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
             currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
-            setRollDiceButtonState(msg.getUser());
-            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
-            kickUserButton.setVisible(false);
+            setRollDiceButtonState(msg.getActor());
+            if (msg.getActor().equals(userService.getLoggedInUser())) ownTurn = true;
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -706,7 +660,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
-        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
@@ -734,8 +687,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        helpCheckBox.setDisable(false);
-        helpCheckBox.setVisible(true);
+        helpButton.setDisable(false);
+        helpButton.setVisible(true);
     }
 
     /**
@@ -761,14 +714,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+                sceneService.showError(ResourceManager.get("lobby.error.movetime"));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
+            sceneService.showError(ResourceManager.get("lobby.error.movetime"));
         }
     }
 
