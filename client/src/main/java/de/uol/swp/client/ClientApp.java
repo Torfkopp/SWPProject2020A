@@ -98,8 +98,8 @@ public class ClientApp extends Application implements ConnectionListener {
         if (args.size() != 2) {
             host = "localhost";
             port = 50010;
-            System.err.println("Usage: " + ClientConnection.class.getSimpleName() + " host port");
-            System.err.println("Using default port " + port + " on " + host);
+            System.out.println("Usage: " + ClientConnection.class.getSimpleName() + " host port");
+            System.out.println("Using default port " + port + " on " + host);
         } else {
             host = args.get(0);
             port = Integer.parseInt(args.get(1));
