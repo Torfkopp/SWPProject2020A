@@ -125,6 +125,21 @@ class PresenterAndStageHelperTest {
     }
 
     @Test
+    void showAndGetConfirmation() {
+        try (MockedStatic<Platform> mockedPlatform = mockStatic(Platform.class)) {
+            mockedPlatform.when(() -> Platform.runLater(isA(Runnable.class))).then(i -> null);
+
+            PresenterAndStageHelper.showAndGetConfirmation("title", "content", "header", "confirm", "cancel",
+                                                           Alert.AlertType.CONFIRMATION, mock(Runnable.class));
+
+            /*cannot verify the executed runnable because object equality can't
+              see that a Runnable declared here is functionally identical to the
+              one declared in the real method*/
+            mockedPlatform.verify(() -> Platform.runLater(isA(Runnable.class)));
+        }
+    }
+
+    @Test
     void showSceneOnPrimaryStage() {
         try (MockedStatic<Platform> mockedPlatform = mockStatic(Platform.class)) {
             mockedPlatform.when(() -> Platform.runLater(isA(Runnable.class))).then(i -> null);

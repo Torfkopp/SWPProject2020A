@@ -446,6 +446,32 @@ class SceneManagerTest {
     }
 
     @Test
+    void showLogOldSessionOutScreen() {
+        try (MockedStatic<PresenterAndStageHelper> mockedHelper = mockStatic(PresenterAndStageHelper.class)) {
+            mockedHelper.when(() -> PresenterAndStageHelper.initPresenter(isA(String.class)))
+                        .thenReturn(new Scene(new Pane()));
+            mockedHelper.when(() -> PresenterAndStageHelper
+                    .showAndGetConfirmation(isA(String.class), isA(String.class), isA(String.class), isA(String.class),
+                                            isA(String.class), isA(Alert.AlertType.class), isA(Runnable.class)))
+                        .then(invocation -> null);
+            String title = ResourceManager.get("confirmation.title");
+            String expectedContent = ResourceManager.get("logoldsessionout.error");
+            String header = ResourceManager.get("confirmation.header");
+            String confirm = ResourceManager.get("button.confirm");
+            String cancel = ResourceManager.get("button.cancel");
+
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+
+            sceneManager.showLogOldSessionOutScreen(mockUser);
+
+            verify(soundService).popup();
+            mockedHelper.verify(() -> PresenterAndStageHelper
+                    .showAndGetConfirmation(eq(title), eq(expectedContent), eq(header), eq(confirm), eq(cancel),
+                                            eq(Alert.AlertType.CONFIRMATION), isA(Runnable.class)));
+        }
+    }
+
+    @Test
     void showLoginScreen() {
         try (MockedStatic<PresenterAndStageHelper> mockedHelper = mockStatic(PresenterAndStageHelper.class)) {
             mockedHelper.when(() -> PresenterAndStageHelper.initPresenter(isA(String.class)))

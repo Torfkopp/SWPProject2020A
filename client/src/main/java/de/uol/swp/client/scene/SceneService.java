@@ -273,13 +273,13 @@ public class SceneService implements ISceneService {
     }
 
     /**
-     * Handles the NukeUsersSessionsResponse detected on the EventBus
+     * Handles the NukedUsersSessionsResponse detected on the EventBus
      * <p>
      * If this method is called, it means all sessions belonging to a
      * user have been nuked, therefore it posts a RetryLoginEvent
      * on the EventBus to create a new session for the user.
      *
-     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
+     * @param rsp The NukedUsersSessionsResponse detected on the EventBus
      *
      * @author Eric Vuong
      * @author Marvin Drees

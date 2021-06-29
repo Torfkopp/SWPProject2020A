@@ -291,13 +291,13 @@ public class SceneManager {
      */
     void showLogOldSessionOutScreen(User user) {
         soundService.popup();
-        if (showAndGetConfirmation(ResourceManager.get("confirmation.title"),
-                                   ResourceManager.get("logoldsessionout.error"),
-                                   ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
-                                   ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION)) {
+        Runnable AIDS = () -> {
             LOG.debug("Sending NukeUsersSessionsRequest");
             ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
-        }
+        };
+        showAndGetConfirmation(ResourceManager.get("confirmation.title"), ResourceManager.get("logoldsessionout.error"),
+                               ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
+                               ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION, AIDS);
     }
 
     /**
