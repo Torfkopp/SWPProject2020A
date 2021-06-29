@@ -1386,7 +1386,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             rsp.getDevelopmentCardList()
                .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
-            uniqueCardList.set(2, new UniqueCard(null, null, rsp.getKnightAmount()));
+            uniqueCardList.set(2, new UniqueCard(UniqueCardsType.ARMY_SIZE, null, rsp.getKnightAmount()));
         });
     }
 
@@ -1565,9 +1565,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 Platform.runLater(() -> {
                     super.updateItem(uniqueCard, empty);
                     if (empty || uniqueCard == null) setText("");
-                    else if (uniqueCard.getType() != null) {
-                        setText(uniqueCard.toString());
-                    } else setText(ResourceManager.get("game.resources.knights", uniqueCard.getAmount()));
+                    else setText(uniqueCard.toString());
                 });
             }
         });
@@ -1575,9 +1573,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
-        uniqueCardList.add(new UniqueCard(null, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.ARMY_SIZE));
     }
 
     /**
