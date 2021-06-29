@@ -22,7 +22,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A utility class used for Presenter instantiation and Stage creation
@@ -179,6 +181,42 @@ public class PresenterAndStageHelper {
             alert.showAndWait();
             soundService.button();
         });
+    }
+
+    /**
+     * Utility method to display an Alert dialogue window.
+     * Returns true if OK is pressed and false if Cancel is pressed.
+     *
+     * @param title       The title of the Alert window
+     * @param contentText The content of the Alert window
+     * @param headerText  The text to be displayed in the header portion of the Alert window
+     * @param confirmText The text of the "Confirm" button
+     * @param alertType   What AlertType the Alert window should be
+     *
+     * @return Whether Confirm has been pressed
+     */
+    public static boolean showAndGetConfirmation(String title, String contentText, String headerText,
+                                                 String confirmText, String cancelText, Alert.AlertType alertType) {
+        AtomicBoolean ret = new AtomicBoolean();
+        AtomicBoolean decision = new AtomicBoolean();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(alertType, contentText);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(confirm, cancel);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
+            Optional<ButtonType> result = alert.showAndWait();
+            soundService.button();
+            if (result.isPresent() && result.get() == confirm) {
+                ret.set(true);
+                decision.set(true);
+            }
+            decision.set(true);
+        });
+        while (!decision.get()) {} // Busy-waiting is bad, I know but showAndWait doesn't work between threads
+        return ret.get();
     }
 
     /**

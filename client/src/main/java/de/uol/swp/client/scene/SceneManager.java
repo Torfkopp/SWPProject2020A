@@ -21,6 +21,7 @@ import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
@@ -274,6 +275,29 @@ public class SceneManager {
         double xPos = Math.max(10, primaryStage.getX() - 0.5 * LobbyPresenter.MIN_WIDTH_IN_GAME);
         makeAndShowStage(primaryStage, LobbyPresenter.fxml, lobbyName.toString(), LobbyPresenter.MIN_HEIGHT_PRE_GAME,
                          LobbyPresenter.MIN_WIDTH_PRE_GAME, xPos, 10.0, lobbyName, lobbyStages, null, false, latch);
+    }
+
+    /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-29
+     */
+    void showLogOldSessionOutScreen(User user) {
+        soundService.popup();
+        if (showAndGetConfirmation(ResourceManager.get("confirmation.title"),
+                                   ResourceManager.get("logoldsessionout.error"),
+                                   ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
+                                   ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION)) {
+            LOG.debug("Sending NukeUsersSessionsRequest");
+            ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
+        }
     }
 
     /**

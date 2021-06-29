@@ -560,6 +560,28 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a KillOldClientResponse found on the EventBus
+     * <p>
+     * If a new KillOldClientResponse object is found on the EventBus, this
+     * method removes the user from all lobbies and resets the users chat vars.
+     * After that it requests the SceneService to close all lobby windows and
+     * reset the old client to the login screen.
+     *
+     * @param rsp TheKillOldClientResponse object fount on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.common.user.response.KillOldClientResponse
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        resetChatVars();
+        sceneService.closeAllLobbyWindows();
+        sceneService.displayLoginScreen();
+    }
+
+    /**
      * Adds a newly created lobby to LobbyList
      * <p>
      * If a new LobbyCreatedMessage object is posted onto the EventBus, the name
