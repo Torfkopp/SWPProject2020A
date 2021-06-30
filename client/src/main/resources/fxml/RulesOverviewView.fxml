@@ -306,4 +306,12 @@
             </padding>
         </VBox>
     </Tab>
+    <Tab text="%rules.tabs.shortcuts">
+        <VBox spacing="15.0">
+            <Label text="%rules.shortcuts.text" wrapText="true"/>
+            <padding>
+                <Insets topRightBottomLeft="15.0"/>
+            </padding>
+        </VBox>
+    </Tab>
 </TabPane>
