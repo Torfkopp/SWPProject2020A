@@ -231,7 +231,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getScene().getAccelerators().putAll(accelerators);
 
         // onCloseRequest already set by SceneManager, so do not overwrite
-        this.window.setOnHiding(windowEvent -> closeWindow(false));
+        this.window.setOnHiding(windowEvent -> {
+            closeWindow(false);
+            clearEventBus();
+        });
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         lobbyService.setColour(lobbyName, null);
 
