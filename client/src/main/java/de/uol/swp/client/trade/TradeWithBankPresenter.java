@@ -12,6 +12,7 @@ import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -141,8 +142,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", rsp.getLobbyName());
         LOG.debug("---- The user got a {}", rsp.getDevelopmentCard());
         sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
@@ -179,8 +180,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         ResourceList resourceList = rsp.getResourceList();
         ResourceList tradingRatios = setupHarbourRatios(rsp.getHarbourResourceList());
         setInventories(resourceList, tradingRatios);
@@ -247,8 +248,9 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
-        if (lobbyName == null) lobbyName = event.getLobbyName();
-        LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
+        if (lobbyName != null) return;
+        lobbyName = event.getLobbyName();
+        LOG.debug("Received TradeUpdateEvent for Lobby {}", event.getLobbyName());
         Window window = ownResourcesToTradeWith.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> sceneService.closeBankTradeWindow(lobbyName, true));
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
@@ -270,8 +272,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", rsp.getLobbyName());
         sceneService.closeBankTradeWindow(lobbyName, false);
         gameService.updateInventory(lobbyName);
         soundService.coins();

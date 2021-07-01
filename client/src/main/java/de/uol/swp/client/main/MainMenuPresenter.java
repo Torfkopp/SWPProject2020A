@@ -198,6 +198,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
         Platform.runLater(() -> randomLobbyState.setVisible(false));
@@ -216,6 +217,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllOnlineUsersResponse(AllOnlineUsersResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllOnlineUsersResponse");
         updateUsersList(rsp.getUsers());
     }
@@ -290,6 +292,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
             sceneService.showError(ResourceManager.get("lobby.error.in.lobby"));
@@ -374,6 +377,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received CreateLobbyResponse");
         sceneService.openLobbyWindow(rsp.getLobby());
     }
@@ -479,6 +483,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received JoinLobbyResponse");
         sceneService.openLobbyWindow(rsp.getLobby());
     }
@@ -495,6 +500,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
@@ -520,9 +526,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyPassword = userService.hash(lobbyPasswordField.getText());
             }
             String finalLobbyPassword = lobbyPassword;
-            result.ifPresent(s -> post(
-                    new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(), userService.getLoggedInUser(),
-                                                                 finalLobbyPassword)));
+            result.ifPresent(s -> {
+                LOG.debug("Sending JoinLobbyWithPasswordConfirmationRequest");
+                post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
+                                                                  userService.getLoggedInUser(), finalLobbyPassword));
+            });
         });
     }
 
@@ -556,6 +564,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
+        LOG.debug("Received JoinRandomLobbyFailedResponse");
         Platform.runLater(() -> randomLobbyState.setVisible(true));
     }
 
@@ -713,7 +723,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
-        LOG.info("User deletion successful");
+        LOG.debug("Received UserDeletionSuccessfulResponse");
         String username = userService.getLoggedInUser().getUsername();
         sceneService.displayLoginScreen();
         logout();

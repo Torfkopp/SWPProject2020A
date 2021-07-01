@@ -62,7 +62,10 @@ public class SceneService implements ISceneService {
     @Override
     public void closeBankTradeWindow(LobbyName lobbyName, boolean wasCanceled) {
         sceneManager.closeTradeWindow(lobbyName);
-        if (wasCanceled) eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
+        if (wasCanceled) {
+            LOG.debug("Sending ResetTradeWithBankButtonEvent");
+            eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
+        }
     }
 
     @Override
@@ -209,7 +212,7 @@ public class SceneService implements ISceneService {
      */
     @Subscribe
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
-        LOG.debug("Account Details change was successful.");
+        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
         sceneManager.showMainScreen(rsp.getUser());
     }
 
@@ -220,15 +223,15 @@ public class SceneService implements ISceneService {
      * is found on the EventBus. It shows an error indicating that the
      * connection timed out and closes the client.
      *
-     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
+     * @param event ClientDisconnectedFromServerEvent found on the EventBus
      *
      * @author Aldin Dervisi
      * @author Marvin Drees
      * @since 2021-03-25
      */
     @Subscribe
-    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
-        LOG.debug("Client disconnected from server");
+    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent event) {
+        LOG.debug("Received ClientDisconnectedFromServerEvent");
         sceneManager.showTimeoutErrorScreen();
         sceneManager.closeMainScreen();
     }
@@ -287,7 +290,7 @@ public class SceneService implements ISceneService {
      */
     @Subscribe
     private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
-        LOG.debug("Registration was successful.");
+        LOG.debug("Received RegistrationSuccessfulResponse");
         displayLoginScreen();
     }
 }

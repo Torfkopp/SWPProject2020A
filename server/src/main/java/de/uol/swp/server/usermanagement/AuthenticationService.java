@@ -74,20 +74,25 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onLoginRequest(LoginRequest msg) {
-        LOG.debug("Received LoginRequest for User {}", msg.getUsername());
+        String username = msg.getUsername();
+        LOG.debug("Received LoginRequest for User {}", username);
         ServerInternalMessage returnMessage;
         try {
-            if (userManagement.isLoggedIn(msg.getUsername())) {
-                returnMessage = new ServerExceptionMessage(
-                        new LoginException("User [" + msg.getUsername() + "] already logged in"));
+            if (userManagement.isLoggedIn(username)) {
+                LoginException e = new LoginException("User [" + username + "] already logged in");
+                returnMessage = new ServerExceptionMessage(e);
+                LOG.debug("Sending ServerExceptionMessage [{}]", e.getMessage());
             } else {
-                User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
+                User newUser = userManagement.login(username, msg.getPassword());
                 returnMessage = new ClientAuthorisedMessage(newUser);
                 returnMessage.setSession(sessionManagement.createSession(newUser));
+                LOG.debug("Sending ClientAuthorisedMessage for User {}", username);
             }
         } catch (SecurityException e) {
             LOG.error(e);
-            returnMessage = new ServerExceptionMessage(new LoginException("Cannot auth user " + msg.getUsername()));
+            LoginException e1 = new LoginException("Cannot auth user " + username);
+            returnMessage = new ServerExceptionMessage(e1);
+            LOG.debug("Sending ServerExceptionMessage [{}]", e1.getMessage());
         }
         returnMessage.initWithMessage(msg);
         post(returnMessage);
@@ -123,6 +128,7 @@ public class AuthenticationService extends AbstractService {
             LOG.error(e);
         }
         Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+        LOG.debug("Sending UserLoggedOutMessage");
         post(returnMessage);
     }
 
@@ -141,8 +147,10 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onRetrieveAllOnlineUsersRequest(RetrieveAllOnlineUsersRequest msg) {
+        LOG.debug("Received RetrieveAllOnlineUsersRequest");
         Message response = new AllOnlineUsersResponse(sessionManagement.getAllUsers());
         response.initWithMessage(msg);
+        LOG.debug("Sending AllOnlineUsersResponse");
         post(response);
     }
 }

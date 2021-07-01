@@ -17,11 +17,13 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -39,6 +41,7 @@ import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.r
  */
 public class GameAI {
 
+    private static final Logger LOG = LogManager.getLogger(GameAI.class);
     private final GameService gameService;
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
@@ -140,10 +143,10 @@ public class GameAI {
                 }
         }
         mapPoint = MapPoint.HexMapPoint(y, x);
-        GameService.LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
+        LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
         map.moveRobber(mapPoint);
-        GameService.LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, ai, mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
@@ -183,7 +186,7 @@ public class GameAI {
         int i = inv.getResourceAmount() / 2;
         writeChatMessageAI(ai, game.getLobby().getName(), AI.WriteType.TAX);
 
-        GameService.LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
+        LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
         switch (ai.getDifficulty()) {
             case EASY:
                 while (i > 0) {
@@ -368,6 +371,7 @@ public class GameAI {
                     map.upgradeSettlement(player, mp);
                     inv.decrease(GRAIN, 2);
                     inv.decrease(ORE, 3);
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
                     return true;
                 }
@@ -474,6 +478,7 @@ public class GameAI {
                 game.getMap().placeRoad(game.getPlayer(ai), mapPoint);
                 inv.decrease(BRICK);
                 inv.decrease(LUMBER);
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, ROAD));
             }
         }
@@ -531,6 +536,7 @@ public class GameAI {
                             game.setPlayerWithLongestRoad(null);
                             game.setLongestRoadLength(0);
                         }
+                        LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                         lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName,
                                                                                                   game.getUniqueCardsList()));
                     }
@@ -542,6 +548,7 @@ public class GameAI {
                     inv.decrease(LUMBER);
                     inv.decrease(GRAIN);
                     inv.decrease(WOOL);
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService
                             .sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
                     return true;
@@ -770,6 +777,7 @@ public class GameAI {
             System.err.println(mp.getY() + " " + mp.getX());
             built = map.placeFoundingSettlement(player, mp);
         }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
 
         List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
@@ -782,6 +790,7 @@ public class GameAI {
             built = map.placeRoad(player, edge);
         }
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName,
                                       new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge), ROAD));
     }
@@ -819,6 +828,7 @@ public class GameAI {
                 mapPoint = mp;
                 break;
             }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, SETTLEMENT));
 
         //Build road in the direction of the next best rated point
@@ -836,6 +846,7 @@ public class GameAI {
 
         map.placeRoad(player, road);
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, road, ROAD));
     }
 
@@ -880,6 +891,7 @@ public class GameAI {
             map.upgradeSettlement(player, mp);
             inv.decrease(GRAIN, 2);
             inv.decrease(ORE, 3);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
         }
 
@@ -898,6 +910,7 @@ public class GameAI {
                     game.setPlayerWithLongestRoad(null);
                     game.setLongestRoadLength(0);
                 }
+                LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
             }
@@ -905,6 +918,7 @@ public class GameAI {
             inv.decrease(LUMBER);
             inv.decrease(GRAIN);
             inv.decrease(WOOL);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
         }
 
@@ -916,6 +930,7 @@ public class GameAI {
             inv.decrease(BRICK);
             inv.decrease(LUMBER);
             mp = map.getEdgeMapPoint(edge);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
         }
 
@@ -1015,12 +1030,14 @@ public class GameAI {
                 IEdge edge = roads.remove(Util.randomInt(roads.size()));
                 map.placeRoad(player, edge);
                 inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge),
                                                                             ROAD));
                 if (roads.size() > 2) {
                     edge = roads.remove(Util.randomInt(roads.size()));
                     game.getMap().placeRoad(player, roads.remove(Util.randomInt(roads.size())));
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai,
                                                                                            map.getEdgeMapPoint(edge),
                                                                                            ROAD));

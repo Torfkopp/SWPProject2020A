@@ -22,7 +22,6 @@ import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.server.specialisedUtil.CommandMap;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.chat.CommandChatService;
@@ -31,6 +30,7 @@ import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
+import de.uol.swp.server.specialisedUtil.CommandMap;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -135,7 +135,10 @@ public class CommandService extends AbstractService {
                 ILobby lobby = optLobby.get();
                 int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
-                for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
+                for (; aiAmount > 0; aiAmount--) {
+                    LOG.debug("Sending JoinLobbyRequest");
+                    post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
+                }
             }
         } else {
             command_Invalid(args, originalMessage);
@@ -169,6 +172,7 @@ public class CommandService extends AbstractService {
                 int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
+                    LOG.debug("Sending JoinLobbyRequest");
                     post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
                 }
             }
@@ -201,6 +205,7 @@ public class CommandService extends AbstractService {
             LobbyName lobbyName = originalMessage.getOriginLobby();
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
+                LOG.debug("Sending ChangeOwnerRequest");
                 post(new ChangeOwnerRequest(lobbyName, user, newOwner));
             }
         }
@@ -219,6 +224,7 @@ public class CommandService extends AbstractService {
         LOG.debug("Received /devmenu command");
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
+        LOG.debug("Sending OpenDevMenuResponse");
         post(msg);
     }
 
@@ -245,13 +251,16 @@ public class CommandService extends AbstractService {
             // roll dice for the skipped player
             Message req = parseArguments(args, RollDiceRequest.class.getConstructors()[0],
                                          Optional.of(originalMessage.getAuthor()));
+            LOG.debug("Sending RollDiceRequest");
             post(req);
             // end their turn for them
             req = parseArguments(args, EndTurnRequest.class.getConstructors()[0],
                                  Optional.of(originalMessage.getAuthor()));
+            LOG.debug("Sending EndTurnRequest");
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
             Actor user = getActor(args.get(0));
+            LOG.debug("Sending ForwardToUserInternalRequest with TurnSkippedResponse");
             post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
@@ -325,6 +334,7 @@ public class CommandService extends AbstractService {
         }
         Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,
                                                Integer.parseInt(args.get(3)), giveAllCards);
+        LOG.debug("Sending EditInventoryRequest for Lobby {}", lobbyName);
         post(msg);
     }
 
@@ -386,6 +396,7 @@ public class CommandService extends AbstractService {
             LobbyName lobbyName = originalMessage.getOriginLobby();
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
+                LOG.debug("Sending KickUserRequest for Lobby {}", lobbyName);
                 post(new KickUserRequest(lobbyName, user, toBeKickedUser));
             }
         }
@@ -424,6 +435,7 @@ public class CommandService extends AbstractService {
                                                                                               .getUser()) :
                                                                    Optional.empty()));
                     msg.initWithMessage(originalMessage);
+                    LOG.debug("Sending constructed {}", cls.getSimpleName());
                     post(msg);
                     break;
                 }
@@ -472,6 +484,7 @@ public class CommandService extends AbstractService {
             LobbyName lobbyName = originalMessage.getOriginLobby();
             Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
+                LOG.debug("Sending PauseGameRequest for Lobby {}", lobbyName);
                 post(new PauseGameRequest(lobbyName, user));
             }
         }
@@ -603,6 +616,7 @@ public class CommandService extends AbstractService {
         }
         ResponseMessage response = new DevMenuClassesResponse(classesMap);
         response.initWithMessage(req);
+        LOG.debug("Sending DevMenuClassesResponse");
         post(response);
     }
 

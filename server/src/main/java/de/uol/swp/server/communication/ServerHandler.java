@@ -72,6 +72,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             Session session = sessionManagement.getSession(ctx).get();
             Message msg = new ClientDisconnectedMessage();
             msg.setSession(session);
+            LOG.debug("Sending ClientDisconnectedMessage");
             eventBus.post(msg);
             sessionManagement.removeSession(ctx);
         }
@@ -192,6 +193,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
+        LOG.debug("Received ClientAuthorisedMessage");
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent()) {
             if (msg.getSession().isPresent()) try {
@@ -223,14 +225,16 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
-        if (msg.getSession().isPresent()) {
-            eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
-            LogoutRequest req = new LogoutRequest();
-            req.setSession(msg.getSession().get());
-            eventBus.post(req);
-            Optional<MessageContext> ctx = getCtx(msg);
-            ctx.ifPresent(sessionManagement::removeSession);
-        }
+        if (msg.getSession().isEmpty()) return;
+        LOG.debug("Received ClientDisconnectedMessage");
+        LOG.debug("Sending RemoveFromLobbiesRequest");
+        eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
+        LogoutRequest req = new LogoutRequest();
+        req.setSession(msg.getSession().get());
+        LOG.debug("Sending LogoutRequest");
+        eventBus.post(req);
+        Optional<MessageContext> ctx = getCtx(msg);
+        ctx.ifPresent(sessionManagement::removeSession);
     }
 
     /**
@@ -267,6 +271,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onFetchUserContextInternalRequest(FetchUserContextInternalRequest req) {
+        LOG.debug("Received FetchUserContextInternalRequest");
         Optional<MessageContext> ctx = sessionManagement.getCtx(req.getUserSession());
         ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
     }
