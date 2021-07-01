@@ -14,9 +14,7 @@ import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.client.scene.util.PresenterAndStageHelper;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.specialisedUtil.LobbyStageMap;
-import de.uol.swp.client.trade.TradeWithBankPresenter;
-import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
-import de.uol.swp.client.trade.TradeWithUserPresenter;
+import de.uol.swp.client.trade.*;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
@@ -42,6 +40,7 @@ import static org.mockito.Mockito.*;
 class SceneManagerTest {
 
     private final ISoundService soundService = mock(ISoundService.class);
+    private final ITradeService tradeService = mock(ITradeService.class);
     private final EventBus eventBus = mock(EventBus.class);
     private final Stage primary = mock(Stage.class);
     private final LobbyName defaultLobby = new LobbyName("chubby bunny");
@@ -68,7 +67,7 @@ class SceneManagerTest {
                 doCallRealMethod().when(mock).isEmpty();
                 doCallRealMethod().when(mock).containsKey(isA(LobbyName.class));
             })) {
-                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
                 Field acceptTradeStagesField = sceneManager.getClass().getDeclaredField("tradingResponseStages");
                 acceptTradeStagesField.setAccessible(true);
@@ -97,7 +96,7 @@ class SceneManagerTest {
                 doCallRealMethod().when(mock).put(isA(LobbyName.class), isA(Stage.class));
                 doCallRealMethod().when(mock).keySet();
             })) {
-                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
                 Field lobbyStageField = sceneManager.getClass().getDeclaredField("lobbyStages");
                 lobbyStageField.setAccessible(true);
@@ -128,7 +127,7 @@ class SceneManagerTest {
                     primary.close();
                     return null;
                 });
-                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
                 sceneManager.closeMainScreen();
 
@@ -156,7 +155,7 @@ class SceneManagerTest {
                         mockStage.close();
                         return null;
                     });
-                    SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+                    SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
                     Field robberTaxStages = sceneManager.getClass().getDeclaredField("robberTaxStages");
                     robberTaxStages.setAccessible(true);
@@ -189,7 +188,7 @@ class SceneManagerTest {
                 doCallRealMethod().when(mock).isEmpty();
                 doCallRealMethod().when(mock).containsKey(isA(LobbyName.class));
             })) {
-                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+                SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
                 Field tradingStagesField = sceneManager.getClass().getDeclaredField("tradingStages");
                 tradingStagesField.setAccessible(true);
@@ -213,9 +212,9 @@ class SceneManagerTest {
             mockedStatic.when(() -> PresenterAndStageHelper.initPresenter(isA(String.class)))
                         .thenReturn(new Scene(new Pane()));
             try (MockedConstruction<LobbyStageMap> mockedLobbyStageMaps = mockConstruction(LobbyStageMap.class)) {
-                new SceneManager(soundService, eventBus, primary);
+                new SceneManager(soundService, eventBus, primary, tradeService);
 
-                assertEquals(4, mockedLobbyStageMaps.constructed().size());
+                assertEquals(5, mockedLobbyStageMaps.constructed().size());
                 mockedStatic.verify(() -> PresenterAndStageHelper.initPresenter(LoginPresenter.fxml));
                 mockedStatic.verify(() -> PresenterAndStageHelper.initPresenter(MainMenuPresenter.fxml));
                 mockedStatic.verify(() -> PresenterAndStageHelper.initPresenter(RegistrationPresenter.fxml));
@@ -242,13 +241,13 @@ class SceneManagerTest {
             int minHeight = TradeWithUserAcceptPresenter.MIN_HEIGHT;
             int minWidth = TradeWithUserAcceptPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showAcceptTradeWindow(defaultLobby, mockActor, mockLatch);
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(defaultLobby),
-                                      isA(LobbyStageMap.class), isNull(), eq(false), eq(mockLatch)));
+                                      isA(LobbyStageMap.class), isA(EventHandler.class), eq(false), eq(mockLatch)));
         }
     }
 
@@ -267,13 +266,13 @@ class SceneManagerTest {
             int minHeight = TradeWithBankPresenter.MIN_HEIGHT;
             int minWidth = TradeWithBankPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showBankTradeWindow(defaultLobby, mockLatch);
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(defaultLobby),
-                                      isA(LobbyStageMap.class), isNull(), eq(false), eq(mockLatch)));
+                                      isA(LobbyStageMap.class), isA(EventHandler.class), eq(false), eq(mockLatch)));
         }
     }
 
@@ -289,7 +288,7 @@ class SceneManagerTest {
             int minHeight = ChangeAccountDetailsPresenter.MIN_HEIGHT;
             int minWidth = ChangeAccountDetailsPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showChangeAccountDetailsScreen(mockUser);
 
@@ -311,7 +310,7 @@ class SceneManagerTest {
             int minHeight = ChangeSettingsPresenter.MIN_HEIGHT;
             int minWidth = ChangeSettingsPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showChangeSettingsScreen(mockUser);
 
@@ -330,7 +329,7 @@ class SceneManagerTest {
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isA(Double.class), isA(Double.class), isA(LobbyName.class),
                                       isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class),
-                                      isA(CountDownLatch.class))).then(invocation -> null);
+                                      isA(Boolean.class), isA(CountDownLatch.class))).then(invocation -> null);
             doReturn(11.0).when(primary).getX();
             doReturn(10.0).when(primary).getY();
             String fxml = DevMenuPresenter.fxml;
@@ -340,7 +339,7 @@ class SceneManagerTest {
             double expectedXPos = 100.0 + primary.getX();
             double expectedYPos = primary.getY();
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             Field devMenuOpenField = sceneManager.getClass().getDeclaredField("devMenuIsOpen");
             devMenuOpenField.setAccessible(true);
@@ -351,7 +350,7 @@ class SceneManagerTest {
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isA(Double.class), isA(Double.class), isA(LobbyName.class),
-                                      isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class),
+                                      isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class), eq(false),
                                       isA(CountDownLatch.class)), times(0));
 
             devMenuOpenField.set(sceneManager, false);
@@ -361,7 +360,7 @@ class SceneManagerTest {
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(expectedXPos),
                                       eq(expectedYPos), isNull(), isNull(), isA(EventHandler.class), eq(false),
-                                      isNull()));
+                                      eq(false), isNull()));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             fail(e.getMessage());
         }
@@ -381,13 +380,31 @@ class SceneManagerTest {
             String header = ResourceManager.get("error.header");
             String confirm = ResourceManager.get("button.confirm");
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showError(message);
 
             verify(soundService).popup();
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .showAlert(title, expectedContent, header, confirm, Alert.AlertType.ERROR));
+        }
+    }
+
+    @Test
+    void showLoadingLobbyWindow() {
+        try (MockedStatic<PresenterAndStageHelper> mockedHelper = mockStatic(PresenterAndStageHelper.class)) {
+            mockedHelper.when(() -> PresenterAndStageHelper.initPresenter(isA(String.class)))
+                        .thenReturn(new Scene(new Pane()));
+            mockedHelper.when(() -> PresenterAndStageHelper
+                    .makeAndShowLoadingLobbyWindow(isA(LobbyName.class), isA(LobbyStageMap.class)))
+                        .then(invocation -> null);
+
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
+
+            sceneManager.showLoadingLobbyWindow(defaultLobby);
+
+            mockedHelper.verify(() -> PresenterAndStageHelper
+                    .makeAndShowLoadingLobbyWindow(eq(defaultLobby), isA(LobbyStageMap.class)));
         }
     }
 
@@ -400,7 +417,7 @@ class SceneManagerTest {
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isA(Double.class), isA(Double.class), isA(LobbyName.class),
                                       isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class),
-                                      isA(CountDownLatch.class))).then(invocation -> null);
+                                      isA(Boolean.class), isA(CountDownLatch.class))).then(invocation -> null);
             doReturn(900.0).when(primary).getX();
             String fxml = LobbyPresenter.fxml;
             String title = defaultLobby.toString();
@@ -408,14 +425,14 @@ class SceneManagerTest {
             int minWidth = LobbyPresenter.MIN_WIDTH_PRE_GAME;
             double expectedXPos = 900.0 - 0.5 * LobbyPresenter.MIN_WIDTH_IN_GAME;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showLobbyWindow(defaultLobby, mockLatch);
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(expectedXPos),
-                                      eq(10.0), eq(defaultLobby), isA(LobbyStageMap.class), isNull(), eq(false),
-                                      eq(mockLatch)));
+                                      eq(10.0), eq(defaultLobby), isA(LobbyStageMap.class), isA(EventHandler.class),
+                                      eq(false), eq(true), eq(mockLatch)));
         }
     }
 
@@ -428,20 +445,21 @@ class SceneManagerTest {
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isA(Double.class), isA(Double.class), isA(LobbyName.class),
                                       isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class),
-                                      isA(CountDownLatch.class))).then(invocation -> null);
+                                      isA(Boolean.class), isA(CountDownLatch.class))).then(invocation -> null);
             doReturn(5.0).when(primary).getX();
             String fxml = LobbyPresenter.fxml;
             String title = defaultLobby.toString();
             int minHeight = LobbyPresenter.MIN_HEIGHT_PRE_GAME;
             int minWidth = LobbyPresenter.MIN_WIDTH_PRE_GAME;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showLobbyWindow(defaultLobby, mockLatch);
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(10.0), eq(10.0),
-                                      eq(defaultLobby), isA(LobbyStageMap.class), isNull(), eq(false), eq(mockLatch)));
+                                      eq(defaultLobby), isA(LobbyStageMap.class), isA(EventHandler.class), eq(false),
+                                      eq(true), eq(mockLatch)));
         }
     }
 
@@ -457,7 +475,7 @@ class SceneManagerTest {
             int minHeight = LoginPresenter.MIN_HEIGHT;
             int minWidth = LoginPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showLoginScreen();
 
@@ -479,7 +497,7 @@ class SceneManagerTest {
             int minHeight = MainMenuPresenter.MIN_HEIGHT;
             int minWidth = MainMenuPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showMainScreen(mockUser);
 
@@ -501,7 +519,7 @@ class SceneManagerTest {
             int minHeight = RegistrationPresenter.MIN_HEIGHT;
             int minWidth = RegistrationPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showRegistrationScreen();
 
@@ -525,7 +543,7 @@ class SceneManagerTest {
             int minHeight = RobberTaxPresenter.MIN_HEIGHT;
             int minWidth = RobberTaxPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showRobberTaxWindow(defaultLobby, mockLatch);
 
@@ -547,7 +565,7 @@ class SceneManagerTest {
             int minHeight = RulesOverviewPresenter.MIN_HEIGHT;
             int minWidth = RulesOverviewPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showRulesWindow();
 
@@ -570,7 +588,7 @@ class SceneManagerTest {
             String header = ResourceManager.get("error.header.disconnected");
             String confirm = ResourceManager.get("button.confirm");
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showTimeoutErrorScreen();
 
@@ -595,13 +613,13 @@ class SceneManagerTest {
             int minHeight = TradeWithUserPresenter.MIN_HEIGHT;
             int minWidth = TradeWithUserPresenter.MIN_WIDTH;
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showUserTradeWindow(defaultLobby, mockActor, mockLatch);
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(defaultLobby),
-                                      isA(LobbyStageMap.class), isNull(), eq(false), eq(mockLatch)));
+                                      isA(LobbyStageMap.class), isA(EventHandler.class), eq(false), eq(mockLatch)));
         }
     }
 
@@ -619,7 +637,7 @@ class SceneManagerTest {
             String confirm = ResourceManager.get("button.confirm");
             String expectedContent = "super\nerror";
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showError("super\n", message);
 
