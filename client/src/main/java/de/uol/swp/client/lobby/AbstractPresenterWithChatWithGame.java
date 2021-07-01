@@ -6,8 +6,6 @@ import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
-import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.I18nWrapper;
@@ -27,6 +25,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.IUniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
@@ -106,7 +105,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label notice;
     @FXML
-    protected ListView<UniqueCard> uniqueCardView;
+    protected ListView<IUniqueCard> uniqueCardView;
     @FXML
     protected Label victoryPointsLabel;
     @FXML
@@ -147,7 +146,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean gamePaused = false;
     protected int moveTime;
     protected User owner;
-    protected ObservableList<UniqueCard> uniqueCardList;
+    protected ObservableList<IUniqueCard> uniqueCardList;
     protected Window window;
     protected Actor winner = null;
     protected boolean helpActivated = false;
@@ -172,7 +171,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
-    private ITradeService tradeService;
     private String theme;
 
     @Override
@@ -398,6 +396,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onReturnToLobbyButtonPressed() {
+        if (returnToLobby.isDisabled()) {
+            LOG.trace("onReturnToLobbyButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
@@ -447,7 +449,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         soundService.button();
         disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName);
+        sceneService.openBankTradeWindow(lobbyName);
     }
 
     /**
@@ -472,12 +474,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         Actor user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
-            tradeService.showTradeError(ResourceManager.get("game.trade.error.noplayer"));
+            sceneService.showError(ResourceManager.get("game.trade.error.noplayer"));
         } else if (Util.equals(user, userService.getLoggedInUser())) {
-            tradeService.showTradeError(ResourceManager.get("game.trade.error.selfplayer"));
+            sceneService.showError(ResourceManager.get("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, user, false);
+            sceneService.openUserTradeWindow(lobbyName, user, false);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -565,9 +567,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                             .setText(String.format(moveTimeText, moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
-                        tradeService.closeTradeResponseWindow(lobbyName);
-                        tradeService.closeBankTradeWindow(lobbyName);
-                        tradeService.closeUserTradeWindow(lobbyName);
+                        sceneService.closeAcceptTradeWindow(lobbyName);
+                        sceneService.closeBankTradeWindow(lobbyName, false);
+                        sceneService.closeUserTradeWindow(lobbyName);
                         disableButtonStates();
                         gameService.endTurn(lobbyName);
                         moveTimeTimer.cancel();
@@ -887,7 +889,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
-            resetButtonStates(userService.getLoggedInUser());
             if (helpActivated) setHelpText();
         }
     }
@@ -962,9 +963,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gamePaused = msg.isPaused();
         if (gamePaused) {
             timerPaused = true;
-            tradeService.closeBankTradeWindow(lobbyName);
-            tradeService.closeTradeResponseWindow(lobbyName);
-            tradeService.closeUserTradeWindow(lobbyName);
+            sceneService.closeBankTradeWindow(lobbyName, true);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            sceneService.closeUserTradeWindow(lobbyName);
             disableButtonStates();
             rollDice.setDisable(true);
         } else {
@@ -1180,6 +1181,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RobberMovementFailedResponse
+     *
+     * @param rsp The RobberMovementFailedResponse found on the EventBus
+     *
+     * @author Sven Ahrens
+     * @since 2021-06-24
+     */
+    @Subscribe
+    private void onRobberMovementFailedResponse(RobberMovementFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        if (!userService.getLoggedInUser().equals(rsp.getPlayer())) return;
+        LOG.debug("Received RobberMovementFailedResponse for Lobby {}", rsp.getLobbyName());
+        robberNewPosition = true;
+        notice.setVisible(true);
+        if (helpActivated) setHelpText();
+    }
+
+    /**
      * Handles a RobberNewPositionResponse
      *
      * @param rsp The RobberNewPositionResponse found on the EventBus
@@ -1235,8 +1254,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
-                post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                msg.getInventories().get(user).create()));
+                sceneService.openRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                 msg.getInventories().get(user).create());
                 post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
@@ -1274,9 +1293,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        LOG.debug("Received TradeWithUserCancelResponse");
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
+        sceneService.closeAcceptTradeWindow(rsp.getLobbyName());
     }
 
     /**
@@ -1293,9 +1314,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
+        LOG.debug("Received TradeWithUserOfferResponse");
         if (!rsp.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
+        sceneService.openAcceptTradeWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
     /**
@@ -1365,6 +1386,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             rsp.getDevelopmentCardList()
                .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
+            uniqueCardList.set(2, new UniqueCard(UniqueCardsType.ARMY_SIZE, null, rsp.getKnightAmount()));
         });
     }
 
@@ -1382,8 +1404,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
         if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
-        uniqueCardList.clear();
-        uniqueCardList.addAll(msg.getUniqueCardsList());
+        uniqueCardList.set(0, msg.getUniqueCardsList().get(0));
+        uniqueCardList.set(1, msg.getUniqueCardsList().get(1));
     }
 
     /**
@@ -1539,13 +1561,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareUniqueCardView() {
         uniqueCardView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(UniqueCard uniqueCard, boolean empty) {
+            protected void updateItem(IUniqueCard uniqueCard, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(uniqueCard, empty);
                     if (empty || uniqueCard == null) setText("");
-                    else {
-                        setText(uniqueCard.toString());
-                    }
+                    else setText(uniqueCard.toString());
                 });
             }
         });
@@ -1553,8 +1573,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.ARMY_SIZE));
     }
 
     /**
@@ -1604,16 +1625,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * This method sets the injected fields via parameters.
      *
-     * @param tradeService The TradeService this class should use.
-     * @param gameService  The GameService this class should use.
-     * @param theme        The theme this class should use.
+     * @param gameService The GameService this class should use.
+     * @param theme       The theme this class should use.
      *
      * @author Marvin Drees
      * @since 2021-06-09
      */
     @Inject
-    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
-        this.tradeService = tradeService;
+    private void setInjects(IGameService gameService, @Named("theme") String theme) {
         this.gameService = gameService;
         this.theme = theme;
     }

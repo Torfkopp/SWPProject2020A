@@ -2,8 +2,8 @@ package de.uol.swp.client.rules;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
@@ -122,7 +122,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe

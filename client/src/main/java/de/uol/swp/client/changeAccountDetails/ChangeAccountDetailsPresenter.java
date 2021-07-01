@@ -3,9 +3,7 @@ package de.uol.swp.client.changeAccountDetails;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
-import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
-import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.util.ResourceManager;
@@ -36,7 +34,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
     public static final int MIN_HEIGHT = 390;
     public static final int MIN_WIDTH = 395;
-    private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(ChangeAccountDetailsPresenter.class);
 
     @FXML
@@ -98,7 +95,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      *
      * @author Phillip-André Suhr
      * @see javafx.scene.input.KeyEvent
-     * @see #onSetAcceleratorsEvent(de.uol.swp.client.SetAcceleratorsEvent)
+     * @see #onSetAcceleratorsEvent(de.uol.swp.client.scene.event.SetAcceleratorsEvent)
      * @since 2021-05-20
      */
     private void handleKeyPress(KeyEvent event) {
@@ -151,14 +148,13 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * to.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2020-11-25
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(changeAccountDetailsCanceledEvent);
+        sceneService.displayMainMenuScreen();
     }
 
     /**
@@ -172,8 +168,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      *
      * @author Eric Vuong
      * @author Steven Luong
-     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2020-12-05
      */
@@ -185,7 +180,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.changepw")));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.changepw"));
         }
 
         User user = userService.getLoggedInUser();
@@ -198,19 +193,17 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         if (Strings.isNullOrEmpty(newUsernameField.getText()) && Strings
                 .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                     .isNullOrEmpty(newPasswordField2.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(
-                    ResourceManager.get("changeaccdetails.error.empty.changeaccdetails")));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.changeaccdetails"));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
-            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("register.error.invalid.email")));
+            sceneService.showError(ResourceManager.get("register.error.invalid.email"));
         } else if (Strings.isNullOrEmpty(newPasswordField.getText()) && !Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.newpw")));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpw"));
         } else if (!Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            post(new ChangeAccountDetailsErrorEvent(ResourceManager.get("changeaccdetails.error.empty.newpw")));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpw"));
         } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
-            post(new ChangeAccountDetailsErrorEvent(
-                    ResourceManager.get("changeaccdetails.error.empty.newpasswordconfirm")));
+            sceneService.showError(ResourceManager.get("changeaccdetails.error.empty.newpasswordconfirm"));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
                 newPassword = userService.hash(newPasswordField.getText());
@@ -238,7 +231,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe

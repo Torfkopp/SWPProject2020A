@@ -13,6 +13,7 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
@@ -57,6 +58,7 @@ import java.util.function.Consumer;
 
 import static de.uol.swp.common.game.RoadBuildingCardPhase.*;
 import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
+import static de.uol.swp.common.game.map.management.MapPoint.HexMapPoint;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
@@ -566,7 +568,7 @@ public class GameService extends AbstractService {
                             IResourceList resources = inv.getResources();
                             IDevelopmentCardList devCards = inv.getDevelopmentCards();
                             ResponseMessage rsp = new UpdateInventoryResponse(user, req.getOriginLobby(), resources,
-                                                                              devCards);
+                                                                              devCards, inv.getKnights());
                             rsp.initWithMessage(req);
                             LOG.debug("Sending UpdateInventoryResponse of Start Up Phase");
                             post(rsp);
@@ -757,7 +759,8 @@ public class GameService extends AbstractService {
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getActor(), req.getOriginLobby(),
                                                                     inventory.getResources(),
-                                                                    inventory.getDevelopmentCards());
+                                                                    inventory.getDevelopmentCards(),
+                                                                    inventory.getKnights());
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getActor(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getActor(), game.getCardAmounts());
@@ -1128,6 +1131,11 @@ public class GameService extends AbstractService {
         inv.increaseKnights();
         checkLargestArmy(req.getOriginLobby(), req.getUser());
         inv.decrease(DevelopmentCardType.KNIGHT_CARD);
+        ResponseMessage updateInventory = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
+                                                                      inv.getResources(), inv.getDevelopmentCards(),
+                                                                      inv.getKnights());
+        updateInventory.initWithMessage(req);
+        post(updateInventory);
 
         robberMovementPlayer(req, req.getUser());
 
@@ -1206,7 +1214,8 @@ public class GameService extends AbstractService {
                 DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
                 ResourceList resourceList = inventory.getResources();
                 ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), resourceList,
-                                                                              developmentCardList);
+                                                                              developmentCardList,
+                                                                              inventory.getKnights());
                 LOG.debug("Sending ForwardToUserInternalRequest with UpdateInventoryResponse to User {} in Lobby {}",
                           user, req.getOriginLobby());
                 post(new ForwardToUserInternalRequest(user, responseMessage));
@@ -1476,6 +1485,23 @@ public class GameService extends AbstractService {
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
         LOG.debug("Received RobberNewPositionChosenRequest for Lobby {}", msg.getLobby());
         IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
+        int newRobberPositionY = msg.getPosition().getY();
+        int newRobberPositionX = msg.getPosition().getX();
+        int oldRobberPositionY = map.getRobberPosition().getY();
+        int oldRobberPositionX = map.getRobberPosition().getX();
+        boolean newRobberPositionIsInWater = map.getHex(msg.getPosition()).getType()
+                                                .equals(IGameHex.HexType.WATER) || map.getHex(msg.getPosition())
+                                                                                      .getType()
+                                                                                      .equals(IGameHex.HexType.HARBOUR);
+        boolean newRobberPositionIsSameAsOldPosition = newRobberPositionY == oldRobberPositionY && newRobberPositionX == oldRobberPositionX;
+        if (newRobberPositionIsSameAsOldPosition || newRobberPositionIsInWater) {
+            LOG.debug("Sending RobberMovementFailedResponse for Lobby {}", msg.getLobby());
+            RobberMovementFailedResponse rsp = new RobberMovementFailedResponse(msg.getPlayer(), msg.getLobby());
+            rsp.initWithMessage(msg);
+            post(rsp);
+            return;
+        }
+
         map.moveRobber(msg.getPosition());
         LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
@@ -1796,7 +1822,8 @@ public class GameService extends AbstractService {
         DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
         ResourceList resourceList = inventory.getResources();
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getActor(), req.getOriginLobby(),
-                                                                    resourceList.create(), developmentCardList);
+                                                                    resourceList.create(), developmentCardList,
+                                                                    inventory.getKnights());
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby {}", req.getOriginLobby());
         post(returnMessage);
@@ -1877,7 +1904,7 @@ public class GameService extends AbstractService {
     private void robberMovementDummy(Dummy dummy, LobbyName lobby) {
         Game game = gameManagement.getGame(lobby);
         IGameMapManagement map = game.getMap();
-        MapPoint mapPoint = MapPoint.HexMapPoint(3, 3);
+        MapPoint mapPoint = HexMapPoint(3, 3);
         map.moveRobber(mapPoint);
         LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);

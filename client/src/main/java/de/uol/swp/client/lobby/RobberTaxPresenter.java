@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.sun.javafx.scene.control.IntegerField;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
+import de.uol.swp.client.lobby.event.RobberTaxUpdateEvent;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.Resource;
@@ -157,7 +157,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles a ShowRobberTaxUpdateEvent
+     * Handles a RobberTaxUpdateEvent
      * <p>
      * The event is sent when a new RobberTaxPresenter is created and
      * contains the relevant data to be displayed in the RobberTaxPresenter.
@@ -166,13 +166,13 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * <ul>
      *     <li> CTRL/META + P = Pay Tax button
      *
-     * @param event ShowRobberTaxUpdateEvent found on the EventBus
+     * @param event RobberTaxUpdateEvent found on the EventBus
      *
-     * @see de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent
+     * @see de.uol.swp.client.lobby.event.RobberTaxUpdateEvent
      */
     @Subscribe
-    private void onShowRobberTaxUpdateEvent(ShowRobberTaxUpdateEvent event) {
-        LOG.debug("Received ShowRobberTaxUpdateEvent");
+    private void onShowRobberTaxUpdateEvent(RobberTaxUpdateEvent event) {
+        LOG.debug("Received RobberTaxUpdateEvent");
         lobbyName = event.getLobbyName();
         taxAmount = event.getTaxAmount();
         inventory = event.getInventory();
@@ -204,6 +204,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
+        sceneService.closeRobberTaxWindow(lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 

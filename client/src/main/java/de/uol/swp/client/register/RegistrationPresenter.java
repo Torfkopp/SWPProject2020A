@@ -3,9 +3,7 @@ package de.uol.swp.client.register;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.SetAcceleratorsEvent;
-import de.uol.swp.client.register.event.RegistrationCanceledEvent;
-import de.uol.swp.client.register.event.RegistrationErrorEvent;
+import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.beans.binding.Bindings;
@@ -81,15 +79,13 @@ public class RegistrationPresenter extends AbstractPresenter {
      * of the RegistrationCanceledEvent onto the EventBus the SceneManager is subscribed
      * to.
      *
-     * @see de.uol.swp.client.register.event.RegistrationCanceledEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2019-09-02
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        LOG.debug("Sending RegistrationCanceledEvent");
-        post(new RegistrationCanceledEvent());
+        sceneService.displayLoginScreen();
     }
 
     /**
@@ -106,8 +102,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @author Marvin Drees
      * @implNote The ID of the User to create is set to -1.
      * This will NOT be its final ID and must not be used for identification in any way
-     * @see de.uol.swp.client.register.event.RegistrationErrorEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2021-02-25
      */
@@ -119,13 +114,13 @@ public class RegistrationPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
-            post(new RegistrationErrorEvent(ResourceManager.get("register.error.empty.username")));
+            sceneService.showError(ResourceManager.get("register.error.empty.username"));
         } else if (!checkMailFormat(emailField.getText())) {
-            post(new RegistrationErrorEvent(ResourceManager.get("register.error.invalid.email")));
+            sceneService.showError(ResourceManager.get("register.error.invalid.email"));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
-            post(new RegistrationErrorEvent(ResourceManager.get("register.error.notequalpw")));
+            sceneService.showError(ResourceManager.get("register.error.notequalpw"));
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
-            post(new RegistrationErrorEvent(ResourceManager.get("register.error.empty.password")));
+            sceneService.showError(ResourceManager.get("register.error.empty.password"));
         } else {
             userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
                                                emailField.getText()));
@@ -143,7 +138,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @param event The SetAcceleratorEvent found on the EventBus
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @see de.uol.swp.client.scene.event.SetAcceleratorsEvent
      * @since 2021-05-20
      */
     @Subscribe
