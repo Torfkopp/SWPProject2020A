@@ -17,15 +17,14 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
@@ -344,7 +343,7 @@ public class GameAI {
         }
 
         //Not enough Resources
-        if (inv.get(GRAIN) < 2 || inv.get(ORE) < 3) return false;
+        if (!inv.hasCityResources()) return false;
 
         IGameMapManagement map = game.getMap();
         LobbyName lobbyName = game.getLobby().getName();
@@ -366,8 +365,7 @@ public class GameAI {
             if (settlements.containsValue(i)) for (MapPoint mp : settlements.keySet())
                 if (settlements.get(mp) == i) {
                     map.upgradeSettlement(player, mp);
-                    inv.decrease(GRAIN, 2);
-                    inv.decrease(ORE, 3);
+                    inv.removeCityResources();
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
                     return true;
                 }
@@ -468,12 +466,11 @@ public class GameAI {
         LobbyName lobbyName = game.getLobby().getName();
         MapPoint mapPoint;
         for (int i = 0; i < path.size() - 1; i++) {
-            if (inv.get(BRICK) == 0 || inv.get(LUMBER) == 0) break;
+            if (!inv.hasRoadResources()) break;
             mapPoint = MapPoint.EdgeMapPoint(path.get(i), path.get(i + 1));
             if (game.getMap().roadPlaceable(game.getPlayer(ai), mapPoint)) {
                 game.getMap().placeRoad(game.getPlayer(ai), mapPoint);
-                inv.decrease(BRICK);
-                inv.decrease(LUMBER);
+                inv.removeRoadResources();
                 lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, ROAD));
             }
         }
@@ -494,7 +491,7 @@ public class GameAI {
      */
     private boolean buildSettlement(Game game, AI ai) {
         Inventory inv = game.getInventory(ai);
-        if (!(inv.get(LUMBER) >= 1 && inv.get(BRICK) >= 1 && inv.get(GRAIN) >= 1 && inv.get(WOOL) >= 1)) return false;
+        if (!inv.hasSettlementResources()) return false;
         IGameMapManagement map = game.getMap();
         List<MapPoint> intersections = new ArrayList<>();
         LobbyName lobbyName = game.getLobby().getName();
@@ -538,10 +535,7 @@ public class GameAI {
                         harbours.putIfAbsent(ai, new ArrayList<>());
                         harbours.get(ai).add(map.getHarbourResource(mp));
                     }
-                    inv.decrease(BRICK);
-                    inv.decrease(LUMBER);
-                    inv.decrease(GRAIN);
-                    inv.decrease(WOOL);
+                    inv.removeSettlementResources();
                     lobbyService
                             .sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
                     return true;
@@ -875,17 +869,15 @@ public class GameAI {
             }
 
         //Build City for Rock 'n' Roll
-        while (inv.get(GRAIN) >= 2 && inv.get(ORE) >= 3 && !cities.isEmpty()) {
+        while (inv.hasCityResources() && !cities.isEmpty()) {
             mp = cities.remove(Util.randomInt(cities.size()));
             map.upgradeSettlement(player, mp);
-            inv.decrease(GRAIN, 2);
-            inv.decrease(ORE, 3);
+            inv.removeCityResources();
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
         }
 
         //Build Settlement
-        while (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && inv.get(GRAIN) >= 1 && inv.get(WOOL) >= 1 && !settlements
-                .isEmpty()) {
+        while (inv.hasSettlementResources() && !settlements.isEmpty()) {
             mp = settlements.remove(Util.randomInt(settlements.size()));
             try {
                 map.placeSettlement(player, mp);
@@ -901,27 +893,22 @@ public class GameAI {
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
             }
-            inv.decrease(BRICK);
-            inv.decrease(LUMBER);
-            inv.decrease(GRAIN);
-            inv.decrease(WOOL);
+            inv.removeSettlementResources();
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
         }
 
         List<IEdge> roads = new ArrayList<>(edges);
         //Build Road
-        while (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && !roads.isEmpty()) {
+        while (inv.hasRoadResources() && !roads.isEmpty()) {
             IEdge edge = roads.remove(Util.randomInt(roads.size()));
             map.placeRoad(player, edge);
-            inv.decrease(BRICK);
-            inv.decrease(LUMBER);
+            inv.removeRoadResources();
             mp = map.getEdgeMapPoint(edge);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
         }
 
         //Buy Dev Card
-        while (inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1 && inv.get(ORE) >= 1 && !game.getBankInventory()
-                                                                                      .getDevelopmentCards().isEmpty())
+        while (inv.hasDevCardResources() && !game.getBankInventory().getDevelopmentCards().isEmpty())
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(ai, lobbyName));
 
         //Update Victory Points
@@ -946,8 +933,7 @@ public class GameAI {
         useHarbour(game, ai);
 
         //Random chance of buying a card increases steadily
-        if (inv.get(GRAIN) > 0 && inv.get(ORE) > 0 && inv.get(WOOL) > 0 && //
-            Util.randomInt(100) < (10 + game.getRound() * 5))
+        if (inv.hasDevCardResources() && Util.randomInt(100) < (10 + game.getRound() * 5))
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(ai, lobbyName));
 
         //The numbers may not be optimal; not enough data
@@ -991,10 +977,8 @@ public class GameAI {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
 
-        Supplier<ResourceType> getRandomResource = Util::randomResourceType;
-
         if (cards.getAmount(DevelopmentCardType.MONOPOLY_CARD) > 0) {
-            playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, getRandomResource.get(), null);
+            playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, Util.randomResourceType(), null);
             return;
         }
         if (cards.getAmount(DevelopmentCardType.ROAD_BUILDING_CARD) > 0) {
@@ -1029,8 +1013,8 @@ public class GameAI {
             return;
         }
         if (cards.getAmount(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0) {
-            playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, getRandomResource.get(),
-                       getRandomResource.get());
+            playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, Util.randomResourceType(),
+                       Util.randomResourceType());
             return;
         }
         if (cards.getAmount(DevelopmentCardType.KNIGHT_CARD) > 1)

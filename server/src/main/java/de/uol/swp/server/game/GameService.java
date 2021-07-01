@@ -519,11 +519,8 @@ public class GameService extends AbstractService {
                 if (gameMap.getIntersection(mapPoint).getState() == IIntersection.IntersectionState.CITY) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
-                    if (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1) {
-                        inv.increase(BRICK, -1);
-                        inv.increase(LUMBER, -1);
-                        inv.increase(WOOL, -1);
-                        inv.increase(GRAIN, -1);
+                    if (inv.hasSettlementResources()) {
+                        inv.removeSettlementResources();
                         try {
                             gameMap.placeSettlement(player, mapPoint);
                         } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
@@ -579,9 +576,8 @@ public class GameService extends AbstractService {
                         }
                     } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
-                    if (inv.get(ORE) >= 3 && inv.get(GRAIN) >= 2) {
-                        inv.increase(ORE, -3);
-                        inv.increase(GRAIN, -2);
+                    if (inv.hasCityResources()) {
+                        inv.removeCityResources();
                         gameMap.upgradeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, CITY));
@@ -631,9 +627,8 @@ public class GameService extends AbstractService {
                                                                                  ROAD));
                             }
                         } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
-                    } else if (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1) {
-                        inv.increase(BRICK, -1);
-                        inv.increase(LUMBER, -1);
+                    } else if (inv.hasRoadResources()) {
+                        inv.removeRoadResources();
                         gameMap.placeRoad(player, mapPoint);
                         checkLongestRoad(req.getOriginLobby(), mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
@@ -1966,10 +1961,8 @@ public class GameService extends AbstractService {
                                                               LobbyName lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null || developmentCard == null) return false;
-        if (inventory.get(ORE) >= 1 && inventory.get(GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
-            inventory.decrease(ORE);
-            inventory.decrease(GRAIN);
-            inventory.decrease(WOOL);
+        if (inventory.hasDevCardResources()) {
+            inventory.removeDevCardResources();
             inventory.increase(developmentCard);
             ResponseMessage serverMessage = new SystemMessageResponse(lobbyName, new InGameSystemMessageDTO(
                     new I18nWrapper("lobby.trade.withbank.systemresponse", developmentCard)));
