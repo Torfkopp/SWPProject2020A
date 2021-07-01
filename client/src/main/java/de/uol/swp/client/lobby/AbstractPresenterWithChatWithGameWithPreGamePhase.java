@@ -676,9 +676,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         developmentCardTableView.setMinHeight(150);
         developmentCardTableView.setPrefHeight(150);
         developmentCardTableView.setVisible(true);
-        uniqueCardView.setMaxHeight(48);
-        uniqueCardView.setMinHeight(48);
-        uniqueCardView.setPrefHeight(48);
+        uniqueCardView.setMaxHeight(75);
+        uniqueCardView.setMinHeight(75);
+        uniqueCardView.setPrefHeight(75);
         uniqueCardView.setVisible(true);
         readyCheckBox.setVisible(false);
         startSession.setVisible(false);
