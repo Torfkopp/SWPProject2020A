@@ -19,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -224,11 +223,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         for (IResource resource : rsp.getResourceList())
             ownResourceTableView.getItems().add(resource);
         setOfferLabel();
-        Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> {
-            tradeService.resetOfferTradeButton(lobbyName, offeringUser);
-            sceneService.closeAcceptTradeWindow(lobbyName);
-        });
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN), // CTRL/META + A

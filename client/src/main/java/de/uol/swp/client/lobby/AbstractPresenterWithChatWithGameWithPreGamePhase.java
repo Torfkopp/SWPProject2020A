@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.jfoenix.utils.JFXUtilities;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
@@ -19,7 +20,6 @@ import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
-import de.uol.swp.common.util.ThreadManager;
 import de.uol.swp.common.util.Util;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -29,6 +29,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 import java.util.concurrent.TimeUnit;
@@ -132,18 +133,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-06
      */
     protected void closeWindow(boolean kicked) {
-        if (lobbyName != null || !kicked) {
-            lobbyService.leaveLobby(lobbyName);
-        }
+        if (lobbyName != null || !kicked) lobbyService.leaveLobby(lobbyName);
         if (moveTimeTimer != null) moveTimeTimer.cancel();
-        window.hide();
-        ThreadManager.runNow(() -> {
-            sceneService.closeUserTradeWindow(lobbyName);
-            sceneService.closeAcceptTradeWindow(lobbyName);
-            try {
-                clearEventBus();
-            } catch (NullPointerException ignored) {}
+        JFXUtilities.runInFX(() -> {
+            if (membersView.getScene().getWindow() != null) membersView.getScene().getWindow().hide();
+            window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
         });
+        sceneService.closeUserTradeWindow(lobbyName);
+        sceneService.closeAcceptTradeWindow(lobbyName);
     }
 
     /**
@@ -668,7 +665,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
         preGameSettingBox.setMinHeight(0);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameService.updateInventory(lobbyName);
         window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);

@@ -20,7 +20,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
-import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -269,8 +268,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (lobbyName != null) return;
         LOG.debug("Received TradeWithUserUpdateEvent for Lobby {}", event.getLobbyName());
         lobbyName = event.getLobbyName();
-        Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> closeWindow());
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN), // CTRL/META + O

@@ -199,7 +199,7 @@
     </VBox>
 
     <ToolBar prefHeight="35.0" GridPane.columnSpan="3">
-        <Button text="%lobby.menu.settings"/>
+        <Button onAction="#onLobbySettingsButtonPressed" text="%lobby.menu.settings"/>
         <Button onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
             <MenuItem text="%lobby.menu.rules.overview"/>
         </Button>

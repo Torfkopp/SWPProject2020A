@@ -20,7 +20,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -251,8 +250,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (lobbyName != null) return;
         lobbyName = event.getLobbyName();
         LOG.debug("Received TradeUpdateEvent for Lobby {}", event.getLobbyName());
-        Window window = ownResourcesToTradeWith.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> sceneService.closeBankTradeWindow(lobbyName, true));
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
                          this::onBuyDevelopmentCardButtonPressed);
