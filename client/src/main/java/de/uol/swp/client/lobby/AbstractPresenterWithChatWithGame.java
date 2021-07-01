@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
@@ -159,6 +160,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected int maxTradeDiff;
     protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
     protected ActorSet inGameUserList;
+    protected boolean drawHitboxGrid;
+    protected String renderingStyle;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -217,7 +220,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         double dimension = Math.min(heightValue, widthValue);
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
@@ -324,6 +327,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
+    }
+
+    /**
+     * Handles a click on the Settings button
+     * <p>
+     * Opens the ChangeGameSettings window by asking the
+     * SceneService nicely to do so.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-14
+     */
+    @FXML
+    protected void onLobbySettingsButtonPressed() {
+        soundService.button();
+        sceneService.openChangeGameSettingsWindow();
     }
 
     /**
@@ -810,6 +828,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             }
         }
         if (helpActivated) setHelpText();
+    }
+
+    /**
+     * Handles a ChangedGameSettingsEvent
+     * <p>
+     * This method is called when a ChangedGameSettingsEvent is found on the EventBus.
+     * It changed the variables provided with the event and refreshes the Canvas.
+     *
+     * @param event The ChangedGameSettingsEvent found on the EventBus
+     *
+     * @author Marvin Drees
+     * @since 2021-06-22
+     */
+    @Subscribe
+    private void onChangedGameSettingsEvent(ChangedGameSettingsEvent event) {
+        renderingStyle = event.getRenderingStyle();
+        fitCanvasToSize();
     }
 
     /**
@@ -1625,16 +1660,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * This method sets the injected fields via parameters.
      *
-     * @param gameService The GameService this class should use.
-     * @param theme       The theme this class should use.
+     * @param gameService    The GameService this class should use.
+     * @param theme          The theme this class should use.
+     * @param drawHitboxGrid Boolean whether to render the HitboxGrid.
+     * @param renderingStyle The renderingStlye this class should use.
      *
      * @author Marvin Drees
      * @since 2021-06-09
      */
     @Inject
-    private void setInjects(IGameService gameService, @Named("theme") String theme) {
+    private void setInjects(IGameService gameService, @Named("theme") String theme,
+                            @Named("drawHitboxGrid") boolean drawHitboxGrid,
+                            @Named("renderingStyle") String renderingStyle) {
         this.gameService = gameService;
         this.theme = theme;
+        this.drawHitboxGrid = drawHitboxGrid;
+        this.renderingStyle = renderingStyle;
     }
 
     /**

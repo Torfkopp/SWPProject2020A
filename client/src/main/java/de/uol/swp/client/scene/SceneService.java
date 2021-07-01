@@ -130,6 +130,11 @@ public class SceneService implements ISceneService {
     }
 
     @Override
+    public void openChangeGameSettingsWindow() {
+        sceneManager.showChangeGameSettingsWindow();
+    }
+
+    @Override
     public void openLobbyWindow(ISimpleLobby lobby) {
         CountDownLatch latch = new CountDownLatch(1);
         sceneManager.showLobbyWindow(lobby.getName(), latch);

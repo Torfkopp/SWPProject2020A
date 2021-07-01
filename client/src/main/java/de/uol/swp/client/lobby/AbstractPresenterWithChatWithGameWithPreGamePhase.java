@@ -664,7 +664,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
         preGameSettingBox.setMinHeight(0);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameService.updateInventory(lobbyName);
         window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
