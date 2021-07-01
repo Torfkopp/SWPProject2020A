@@ -851,7 +851,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Handles a click on the construction mode check box
      * <p>
      * This method activates/ deactivates the construction mode of the player.
-     * Afterwards the gamerendering is called to redraw the map
+     * Afterwards the GameRendering is called to redraw the map
      *
      * @author Maximilian Lindner
      * @since 2021-06-11

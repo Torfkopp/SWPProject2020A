@@ -188,6 +188,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
+        if (lobbyName != null && !lobbyName.equals(event.getLobby().getName())) return;
         LOG.debug("Received LobbyUpdateEvent for Lobby {}", event.getLobby().getName());
         if (lobbyName == null) {
             lobbyName = event.getLobby().getName();
@@ -229,7 +230,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         accelerators.put(new KeyCodeCombination(KeyCode.F2), this::onRulesMenuClicked); // F2 for rules
         membersView.getScene().getAccelerators().putAll(accelerators);
 
-        this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
+        // onCloseRequest already set by SceneManager, so do not overwrite
+        this.window.setOnHiding(windowEvent -> {
+            closeWindow(false);
+            clearEventBus();
+        });
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         lobbyService.setColour(lobbyName, null);
 
