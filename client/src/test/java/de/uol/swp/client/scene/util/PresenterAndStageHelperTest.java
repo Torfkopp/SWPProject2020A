@@ -70,13 +70,27 @@ class PresenterAndStageHelperTest {
     }
 
     @Test
+    void makeAndShowLoadingLobbyWindow() {
+        try (MockedStatic<JFXUtilities> mockedUtilities = mockStatic(JFXUtilities.class)) {
+            mockedUtilities.when(() -> JFXUtilities.runInFXAndWait(isA(Runnable.class))).then(i -> null);
+
+            PresenterAndStageHelper.makeAndShowLoadingLobbyWindow(defaultLobby, mockStageMap);
+
+            /*cannot verify the executed runnable because object equality can't
+              see that a Runnable declared here is functionally identical to the
+              one declared in the real method*/
+            mockedUtilities.verify(() -> JFXUtilities.runInFXAndWait(isA(Runnable.class)));
+        }
+    }
+
+    @Test
     void makeAndShowStage() {
         try (MockedStatic<PresenterAndStageHelper> mockedHelper = mockStatic(PresenterAndStageHelper.class)) {
             mockedHelper.when(() -> PresenterAndStageHelper
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isNull(), isNull(), isA(LobbyName.class),
                                       isA(LobbyStageMap.class), isA(EventHandler.class), isA(Boolean.class),
-                                      isA(CountDownLatch.class))).then(invocation -> null);
+                                      isA(Boolean.class), isA(CountDownLatch.class))).then(invocation -> null);
             mockedHelper.when(() -> PresenterAndStageHelper
                     .makeAndShowStage(isA(Stage.class), isA(String.class), isA(String.class), isA(Integer.class),
                                       isA(Integer.class), isA(LobbyName.class), isA(LobbyStageMap.class),
@@ -89,7 +103,7 @@ class PresenterAndStageHelperTest {
 
             mockedHelper.verify(() -> PresenterAndStageHelper
                     .makeAndShowStage(eq(primary), eq("fxml"), eq("title"), eq(1), eq(1), isNull(), isNull(),
-                                      eq(defaultLobby), eq(mockStageMap), eq(mockEventHandler), eq(false),
+                                      eq(defaultLobby), eq(mockStageMap), eq(mockEventHandler), eq(false), eq(false),
                                       eq(mockLatch)));
         }
     }
@@ -101,7 +115,7 @@ class PresenterAndStageHelperTest {
 
             PresenterAndStageHelper
                     .makeAndShowStage(primary, "fxml", "title", 1, 1, 0.0, 0.0, defaultLobby, mockStageMap,
-                                      mockEventHandler, false, mockLatch);
+                                      mockEventHandler, false, false, mockLatch);
 
             /*cannot verify the executed runnable because object equality can't
               see that a Runnable declared here is functionally identical to the
