@@ -130,12 +130,18 @@ public class SceneService implements ISceneService {
     }
 
     @Override
+    public void openChangeGameSettingsWindow() {
+        sceneManager.showChangeGameSettingsWindow();
+    }
+
+    @Override
     public void openLobbyWindow(ISimpleLobby lobby) {
         CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showLoadingLobbyWindow(lobby.getName());
         sceneManager.showLobbyWindow(lobby.getName(), latch);
         try {
             //noinspection ResultOfMethodCallIgnored
-            latch.await(300, TimeUnit.MILLISECONDS);
+            latch.await(2, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {}
         lobbyService.refreshLobbyPresenterFields(lobby);
     }
