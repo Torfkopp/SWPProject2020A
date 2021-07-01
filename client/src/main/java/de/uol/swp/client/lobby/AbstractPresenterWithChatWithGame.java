@@ -25,6 +25,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.IUniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
@@ -104,7 +105,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label notice;
     @FXML
-    protected ListView<UniqueCard> uniqueCardView;
+    protected ListView<IUniqueCard> uniqueCardView;
     @FXML
     protected Label victoryPointsLabel;
     @FXML
@@ -145,7 +146,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean gamePaused = false;
     protected int moveTime;
     protected User owner;
-    protected ObservableList<UniqueCard> uniqueCardList;
+    protected ObservableList<IUniqueCard> uniqueCardList;
     protected Window window;
     protected Actor winner = null;
     protected boolean helpActivated = false;
@@ -1385,6 +1386,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             rsp.getDevelopmentCardList()
                .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
+            uniqueCardList.set(2, new UniqueCard(UniqueCardsType.ARMY_SIZE, null, rsp.getKnightAmount()));
         });
     }
 
@@ -1402,8 +1404,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
         if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
-        uniqueCardList.clear();
-        uniqueCardList.addAll(msg.getUniqueCardsList());
+        uniqueCardList.set(0, msg.getUniqueCardsList().get(0));
+        uniqueCardList.set(1, msg.getUniqueCardsList().get(1));
     }
 
     /**
@@ -1559,13 +1561,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareUniqueCardView() {
         uniqueCardView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(UniqueCard uniqueCard, boolean empty) {
+            protected void updateItem(IUniqueCard uniqueCard, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(uniqueCard, empty);
                     if (empty || uniqueCard == null) setText("");
-                    else {
-                        setText(uniqueCard.toString());
-                    }
+                    else setText(uniqueCard.toString());
                 });
             }
         });
@@ -1573,8 +1573,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.ARMY_SIZE));
     }
 
     /**
