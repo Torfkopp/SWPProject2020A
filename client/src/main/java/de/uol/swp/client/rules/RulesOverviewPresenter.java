@@ -58,6 +58,8 @@ public class RulesOverviewPresenter extends AbstractPresenter {
     @FXML
     private Tab founderPhaseTab;
     @FXML
+    private Tab shortcutsTab;
+    @FXML
     private Tab robberTab;
     @FXML
     private Tab tradingTab;
@@ -117,6 +119,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
      *     <li> CTRL/META + R = Select Robber tab
      *     <li> CTRL/META + D = Select DevelopmentCard tab
      *     <li> CTRL/META + F = Select Founding Phase tab
+     *     <li> CTRL/META + F = Select Shortcuts tab
      *     <li> ESC           = Close window
      *
      * @param event The SetAcceleratorEvent found on the EventBus
@@ -143,6 +146,8 @@ public class RulesOverviewPresenter extends AbstractPresenter {
                          () -> rulesTabPane.getSelectionModel().select(developmentCardTab));
         accelerators.put(new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN), // CTRL/META + F
                          () -> rulesTabPane.getSelectionModel().select(founderPhaseTab));
+        accelerators.put(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN), // CTRL/META + S
+                         () -> rulesTabPane.getSelectionModel().select(shortcutsTab));
         accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), // ESC to close window
                          () -> {
                              Window window = rulesTabPane.getScene().getWindow();
