@@ -233,7 +233,7 @@ public class SceneManager {
         makeAndShowStage(primaryStage, ChangeGameSettingsPresenter.fxml, ResourceManager.get(""),
                          ChangeSettingsPresenter.MIN_HEIGHT, ChangeSettingsPresenter.MIN_WIDTH,
                          primaryStage.getX() + 100, primaryStage.getY(), null, null,
-                         windowEvent -> changeGameSettingsViewIsOpen = false, false, null);
+                         windowEvent -> changeGameSettingsViewIsOpen = false, false, false, null);
     }
 
     /**
