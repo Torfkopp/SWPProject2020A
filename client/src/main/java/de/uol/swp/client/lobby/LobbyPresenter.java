@@ -199,6 +199,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (readyUsers == null) {
             readyUsers = new ActorSet();
         }
+        if (lobbyMembers == null) {
+            ActorSet actorSet = new ActorSet();
+            actorSet.addAll(event.getLobby().getActors());
+            updateUsersList(actorSet);
+        }
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
@@ -244,7 +249,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             moveTimeTextField.setText(String.valueOf(moveTime));
             maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
         });
-        setPreGameSettings();
     }
 
     /**
