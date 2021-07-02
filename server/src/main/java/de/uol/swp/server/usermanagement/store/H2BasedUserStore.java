@@ -25,12 +25,11 @@ import java.util.Optional;
  */
 public class H2BasedUserStore implements UserStore {
 
-    static final String JDBC_DRIVER = "org.h2.Driver";
-    static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
-    static final String USER = "H2";
-    static final String PASS = "123456";
-    Connection conn = null;
-    PreparedStatement pstmt = null;
+    private static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
+    private static final String USER = "H2";
+    private static final String PASS = "123456";
+    private static Connection conn = null;
+    private PreparedStatement pstmt = null;
     private int nextID;
 
     /**
@@ -47,28 +46,16 @@ public class H2BasedUserStore implements UserStore {
 
         if (findUser(username).isEmpty()) {
             try {
-                Class.forName(JDBC_DRIVER);
-                conn = DriverManager.getConnection(DB_URL, USER, PASS);
-                conn.setAutoCommit(true);
-
-                String sql = "INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)";
-                pstmt = conn.prepareStatement(sql);
+                conn = openConnection();
+                pstmt = conn.prepareStatement("INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)");
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
                 pstmt.setString(3, password);
                 pstmt.executeUpdate();
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
             } finally {
-                try {
-                    if (pstmt != null) pstmt.close();
-                } catch (SQLException ignored) {
-                }
-                try {
-                    if (conn != null) conn.close();
-                } catch (SQLException se) {
-                    se.printStackTrace();
-                }
+                closeConnection(conn, pstmt);
             }
             Optional<User> usr = findUser(username);
             if (usr.isPresent()) return usr.get().getWithoutPassword();
@@ -92,12 +79,8 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM USERDB WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
@@ -113,18 +96,10 @@ public class H2BasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
@@ -138,12 +113,8 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM USERDB WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
@@ -159,18 +130,10 @@ public class H2BasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
@@ -185,12 +148,8 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM USERDB WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
@@ -206,18 +165,10 @@ public class H2BasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
@@ -234,12 +185,9 @@ public class H2BasedUserStore implements UserStore {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM USERDB";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB");
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -252,18 +200,10 @@ public class H2BasedUserStore implements UserStore {
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return retUsers;
     }
@@ -283,33 +223,24 @@ public class H2BasedUserStore implements UserStore {
 
         String sequenceName = "";
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT SEQUENCE_NAME FROM USERDB.INFORMATION_SCHEMA.SEQUENCES LIMIT 1";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("SELECT SEQUENCE_NAME FROM USERDB.INFORMATION_SCHEMA.SEQUENCES LIMIT 1");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) sequenceName = rs.getString(1);
             rs.close();
             pstmt.close();
-            sql = "SELECT CURRENT_VALUE FROM USERDB.INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_NAME = ?";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(
+                    "SELECT CURRENT_VALUE FROM USERDB.INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_NAME = ?");
             pstmt.setString(1, sequenceName);
             rs = pstmt.executeQuery();
             while (rs.next()) nextID = rs.getInt(1) + 1;
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException ignored) {
-            }
+            closeConnection(conn, pstmt);
         }
         return nextID;
     }
@@ -326,26 +257,15 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            String sql = "DELETE FROM USERDB WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
     }
 
@@ -357,26 +277,15 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            String sql = "DELETE FROM USERDB WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
     }
 
@@ -399,29 +308,18 @@ public class H2BasedUserStore implements UserStore {
         if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            String sql = "UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         Optional<User> usr2 = findUser(username);
         if (usr2.isPresent()) return usr2.get().getWithoutPassword();
@@ -446,32 +344,44 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement("UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?");
             pstmt.setString(1, password);
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         Optional<User> user = findUser(username);
         if (user.isPresent()) return user.get().getWithoutPassword();
         else throw new RuntimeException("Something went wrong when updating the user");
+    }
+
+    /**
+     * Helper method to close a provided connection
+     * and SQL statement.
+     *
+     * @param conn  The connection to be closed
+     * @param pstmt The statement to be closed
+     *
+     * @author Marvin Drees
+     * @since 2021-07-02
+     */
+    private void closeConnection(Connection conn, PreparedStatement pstmt) {
+        try {
+            if (pstmt != null) pstmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        try {
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
@@ -483,9 +393,7 @@ public class H2BasedUserStore implements UserStore {
      */
     private void createTable() {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
 
             //@formatter:off
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
@@ -499,18 +407,25 @@ public class H2BasedUserStore implements UserStore {
 
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
+    }
+
+    /**
+     * Helper method to open a connection to the SQL database.
+     *
+     * @return The opened connection
+     *
+     * @throws SQLException Exception when something goes wrong opening the connection
+     * @author Marvin Drees
+     * @since 2021-07-02
+     */
+    private Connection openConnection() throws SQLException {
+        Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        conn.setAutoCommit(true);
+        return conn;
     }
 }
