@@ -21,6 +21,7 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
@@ -330,6 +331,29 @@ public class SceneManager {
         } catch (InterruptedException ignored) {}
         loadingDialogStages.close(lobbyName);
         if (lobbyStages.containsKey(lobbyName)) Platform.runLater(() -> lobbyStages.get(lobbyName).show());
+    }
+
+    /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-29
+     */
+    void showLogOldSessionOutScreen(User user) {
+        soundService.popup();
+        Runnable AIDS = () -> {
+            LOG.debug("Sending NukeUsersSessionsRequest");
+            ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
+        };
+        showAndGetConfirmation(ResourceManager.get("confirmation.title"), ResourceManager.get("logoldsessionout.error"),
+                               ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
+                               ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION, AIDS);
     }
 
     /**
