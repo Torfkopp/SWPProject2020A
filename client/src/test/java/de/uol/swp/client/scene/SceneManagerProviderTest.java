@@ -3,6 +3,7 @@ package de.uol.swp.client.scene;
 import com.google.common.eventbus.EventBus;
 import de.uol.swp.client.scene.util.PresenterAndStageHelper;
 import de.uol.swp.client.sound.ISoundService;
+import de.uol.swp.client.trade.ITradeService;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -20,6 +21,7 @@ class SceneManagerProviderTest {
     void provideSceneManager() {
         try (MockedStatic<PresenterAndStageHelper> helper = mockStatic(PresenterAndStageHelper.class)) {
             ISoundService soundService = mock(ISoundService.class);
+            ITradeService tradeService = mock(ITradeService.class);
             EventBus eventBus = mock(EventBus.class);
             Stage stage = mock(Stage.class);
             doNothing().when(eventBus).register(isA(SceneManager.class));
@@ -28,9 +30,9 @@ class SceneManagerProviderTest {
 
             SceneManagerProvider provider = new SceneManagerProvider();
 
-            SceneManager sceneManager = provider.provideSceneManager(soundService, eventBus, stage);
+            SceneManager sceneManager = provider.provideSceneManager(soundService, eventBus, stage, tradeService);
 
-            SceneManager sceneManager2 = provider.provideSceneManager(soundService, eventBus, stage);
+            SceneManager sceneManager2 = provider.provideSceneManager(soundService, eventBus, stage, tradeService);
 
             assertSame(sceneManager, sceneManager2);
         }

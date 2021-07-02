@@ -574,7 +574,7 @@ public class GameService extends AbstractService {
                             IResourceList resources = inv.getResources();
                             IDevelopmentCardList devCards = inv.getDevelopmentCards();
                             ResponseMessage rsp = new UpdateInventoryResponse(user, req.getOriginLobby(), resources,
-                                                                              devCards);
+                                                                              devCards, inv.getKnights());
                             rsp.initWithMessage(req);
                             LOG.debug("Sending UpdateInventoryResponse of Start Up Phase");
                             post(rsp);
@@ -772,7 +772,8 @@ public class GameService extends AbstractService {
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getActor(), req.getOriginLobby(),
                                                                     inventory.getResources(),
-                                                                    inventory.getDevelopmentCards());
+                                                                    inventory.getDevelopmentCards(),
+                                                                    inventory.getKnights());
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getActor(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getActor(), game.getCardAmounts());
@@ -1147,6 +1148,11 @@ public class GameService extends AbstractService {
         inv.decrease(DevelopmentCardType.KNIGHT_CARD);
         inv.increaseKnights();
         checkLargestArmy(req.getOriginLobby(), req.getUser());
+        ResponseMessage updateInventory = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
+                                                                      inv.getResources(), inv.getDevelopmentCards(),
+                                                                      inv.getKnights());
+        updateInventory.initWithMessage(req);
+        post(updateInventory);
 
         robberMovementPlayer(req, req.getUser());
 
@@ -1229,7 +1235,8 @@ public class GameService extends AbstractService {
                 DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
                 ResourceList resourceList = inventory.getResources();
                 ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), resourceList,
-                                                                              developmentCardList);
+                                                                              developmentCardList,
+                                                                              inventory.getKnights());
                 LOG.debug("Sending ForwardToUserInternalRequest with UpdateInventoryResponse to User {} in Lobby {}",
                           user, req.getOriginLobby());
                 post(new ForwardToUserInternalRequest(user, responseMessage));
@@ -1814,7 +1821,8 @@ public class GameService extends AbstractService {
         DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
         ResourceList resourceList = inventory.getResources();
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getActor(), req.getOriginLobby(),
-                                                                    resourceList.create(), developmentCardList);
+                                                                    resourceList.create(), developmentCardList,
+                                                                    inventory.getKnights());
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby {}", req.getOriginLobby());
         post(returnMessage);

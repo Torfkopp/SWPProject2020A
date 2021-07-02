@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.changeSettings.event.ChangedGameSettingsEvent;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
@@ -25,6 +26,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.IUniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
@@ -104,7 +106,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label notice;
     @FXML
-    protected ListView<UniqueCard> uniqueCardView;
+    protected ListView<IUniqueCard> uniqueCardView;
     @FXML
     protected Label victoryPointsLabel;
     @FXML
@@ -145,7 +147,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean gamePaused = false;
     protected int moveTime;
     protected User owner;
-    protected ObservableList<UniqueCard> uniqueCardList;
+    protected ObservableList<IUniqueCard> uniqueCardList;
     protected Window window;
     protected Actor winner = null;
     protected boolean helpActivated = false;
@@ -158,6 +160,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected int maxTradeDiff;
     protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
     protected ActorSet inGameUserList;
+    protected boolean drawHitboxGrid;
+    protected String renderingStyle;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -216,7 +220,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         double dimension = Math.min(heightValue, widthValue);
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
@@ -323,6 +327,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
+    }
+
+    /**
+     * Handles a click on the Settings button
+     * <p>
+     * Opens the ChangeGameSettings window by asking the
+     * SceneService nicely to do so.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-14
+     */
+    @FXML
+    protected void onLobbySettingsButtonPressed() {
+        soundService.button();
+        sceneService.openChangeGameSettingsWindow();
     }
 
     /**
@@ -812,10 +831,27 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a ChangedGameSettingsEvent
+     * <p>
+     * This method is called when a ChangedGameSettingsEvent is found on the EventBus.
+     * It changed the variables provided with the event and refreshes the Canvas.
+     *
+     * @param event The ChangedGameSettingsEvent found on the EventBus
+     *
+     * @author Marvin Drees
+     * @since 2021-06-22
+     */
+    @Subscribe
+    private void onChangedGameSettingsEvent(ChangedGameSettingsEvent event) {
+        renderingStyle = event.getRenderingStyle();
+        fitCanvasToSize();
+    }
+
+    /**
      * Handles a click on the construction mode check box
      * <p>
      * This method activates/ deactivates the construction mode of the player.
-     * Afterwards the gamerendering is called to redraw the map
+     * Afterwards the GameRendering is called to redraw the map
      *
      * @author Maximilian Lindner
      * @since 2021-06-11
@@ -1385,6 +1421,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             rsp.getDevelopmentCardList()
                .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
+            uniqueCardList.set(2, new UniqueCard(UniqueCardsType.ARMY_SIZE, null, rsp.getKnightAmount()));
         });
     }
 
@@ -1402,8 +1439,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
         if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
-        uniqueCardList.clear();
-        uniqueCardList.addAll(msg.getUniqueCardsList());
+        uniqueCardList.set(0, msg.getUniqueCardsList().get(0));
+        uniqueCardList.set(1, msg.getUniqueCardsList().get(1));
     }
 
     /**
@@ -1559,13 +1596,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareUniqueCardView() {
         uniqueCardView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(UniqueCard uniqueCard, boolean empty) {
+            protected void updateItem(IUniqueCard uniqueCard, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(uniqueCard, empty);
                     if (empty || uniqueCard == null) setText("");
-                    else {
-                        setText(uniqueCard.toString());
-                    }
+                    else setText(uniqueCard.toString());
                 });
             }
         });
@@ -1573,8 +1608,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
-        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.ARMY_SIZE));
     }
 
     /**
@@ -1624,16 +1660,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * This method sets the injected fields via parameters.
      *
-     * @param gameService The GameService this class should use.
-     * @param theme       The theme this class should use.
+     * @param gameService    The GameService this class should use.
+     * @param theme          The theme this class should use.
+     * @param drawHitboxGrid Boolean whether to render the HitboxGrid.
+     * @param renderingStyle The renderingStlye this class should use.
      *
      * @author Marvin Drees
      * @since 2021-06-09
      */
     @Inject
-    private void setInjects(IGameService gameService, @Named("theme") String theme) {
+    private void setInjects(IGameService gameService, @Named("theme") String theme,
+                            @Named("drawHitboxGrid") boolean drawHitboxGrid,
+                            @Named("renderingStyle") String renderingStyle) {
         this.gameService = gameService;
         this.theme = theme;
+        this.drawHitboxGrid = drawHitboxGrid;
+        this.renderingStyle = renderingStyle;
     }
 
     /**
