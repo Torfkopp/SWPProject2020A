@@ -249,25 +249,37 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Helper method to transform a resource list into the corresponding string.
+     * Helper method to transform a resource list into the corresponding
+     * I18nWrapper array.
      *
-     * @param resourceMap The resource list containing the traded resources
+     * @param resourceList The resource list containing the traded resources
      *
-     * @return The string containing the traded resources
+     * @return The I18nWrapper array representing the traded resources
      *
      * @author Marvin Drees
+     * @author Phillip-André Suhr
      * @since 2021-05-11
      */
-    private String buildTradeString(IResourceList resourceMap) {
-        StringBuilder tradeString = new StringBuilder();
-        for (IResource entry : resourceMap) {
+    private I18nWrapper[] buildTradeString(IResourceList resourceList) {
+        List<I18nWrapper> returnList = new ArrayList<>();
+        returnList.add(0, new I18nWrapper("game.trade.offer.nothing"));
+        for (IResource entry : resourceList) {
             if (entry.getAmount() > 0) {
-                tradeString.append(", ");
-                tradeString.append(entry.getAmount()).append(" ");
-                tradeString.append(entry.getType().toString());
+                I18nWrapper resourceAmount = new I18nWrapper("game.trade.offer.amount", entry.getAmount());
+                I18nWrapper resourceName = new I18nWrapper(entry.getType().getInternationalizationPropertyName());
+                if (returnList.size() == 1) {
+                    returnList.set(0, resourceAmount);
+                } else {
+                    returnList.add(resourceAmount);
+                }
+                returnList.add(resourceName);
             }
         }
-        return tradeString.toString().replaceFirst("^, ", "");
+        I18nWrapper[] returnArray = new I18nWrapper[returnList.size()];
+        for (int i = 0; i < returnList.size(); i++) {
+            returnArray[i] = returnList.get(i);
+        }
+        return returnArray;
     }
 
     /**
@@ -377,23 +389,20 @@ public class GameService extends AbstractService {
     /**
      * Helper method to create a singular I18nWrapper from the resource maps
      *
-     * @param offeringUser          The name of the offering user
-     * @param respondingUser        The name of the responding user
-     * @param offeringResourceMap   The Map of resources that were offered as a
-     *                              Map of I18nWrappers to amount
-     * @param respondingResourceMap The Map of resources that were demanded as
-     *                              a Map of I18nWrappers to amount
+     * @param offeringUser       The name of the offering user
+     * @param respondingUser     The name of the responding user
+     * @param offerResourceList  The ResourceList with the offered resources
+     * @param demandResourceList The ResourceList with the demanded resources
      *
      * @return An I18nWrapper that contains all the details provided and will
      * be displayed in the client's chosen language
      */
     private I18nWrapper makeSingularI18nWrapper(Actor offeringUser, String respondingUser,
-                                                IResourceList offeringResourceMap,
-                                                IResourceList respondingResourceMap) {
-        String offerString = buildTradeString(offeringResourceMap);
-        String demandString = buildTradeString(respondingResourceMap);
-        return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
-                               offerString, demandString);
+                                                IResourceList offerResourceList, IResourceList demandResourceList) {
+        I18nWrapper[] offer = buildTradeString(offerResourceList);
+        I18nWrapper[] demand = buildTradeString(demandResourceList);
+        return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser, offer,
+                               demand);
     }
 
     /**
@@ -942,7 +951,7 @@ public class GameService extends AbstractService {
         post(returnMessage);
 
         ServerMessage serverMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                makeSingularI18nWrapper(req.getActor(), null, offeredResourcesWrapperMap,
+                makeSingularI18nWrapper(req.getActor(), "Bank", offeredResourcesWrapperMap,
                                         respondingResourcesWrapperMap)));
         LOG.debug("Sending SystemMessageMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
@@ -1180,7 +1189,7 @@ public class GameService extends AbstractService {
         robberMovementPlayer(req, req.getUser());
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.play.card.knightcard", req.getUser())));
+                new I18nWrapper("game.play.card.knight", req.getUser())));
         LOG.debug("Sending SystemMessageMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1243,7 +1252,7 @@ public class GameService extends AbstractService {
             }
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.monopoly", req.getUser())));
+                new I18nWrapper("game.play.card.monopoly", req.getUser())));
         LOG.debug("Sending SystemMessageMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1344,7 +1353,7 @@ public class GameService extends AbstractService {
         LOG.debug("---- RoadBuildingCardPhase phase starts");
         game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.roadbuilding", req.getUser())));
+                new I18nWrapper("game.play.card.roadbuilding", req.getUser())));
         LOG.debug("Sending SystemMessageMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1402,7 +1411,7 @@ public class GameService extends AbstractService {
         inv.increase(req.getSecondResource());
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
-                new I18nWrapper("game.card.play.yearofplenty", req.getUser())));
+                new I18nWrapper("game.play.card.yearofplenty", req.getUser())));
         LOG.debug("Sending SystemMessageMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 

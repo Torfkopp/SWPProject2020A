@@ -246,7 +246,7 @@ public class SceneManager {
      * @since 2021-06-24
      */
     void showChangeSettingsScreen(User loggedInUser) {
-        showSceneOnPrimaryStage(primaryStage, changeSettingsScene, ResourceManager.get("changeproperties.window.title"),
+        showSceneOnPrimaryStage(primaryStage, changeSettingsScene, ResourceManager.get("changesettings.window.title"),
                                 ChangeSettingsPresenter.MIN_WIDTH, ChangeSettingsPresenter.MIN_HEIGHT);
         primaryStage.setOnCloseRequest(windowEvent -> showMainScreen(loggedInUser));
     }
