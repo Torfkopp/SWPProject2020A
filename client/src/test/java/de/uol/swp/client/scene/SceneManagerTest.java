@@ -306,7 +306,7 @@ class SceneManagerTest {
             mockedHelper.when(() -> PresenterAndStageHelper
                     .showSceneOnPrimaryStage(isA(Stage.class), isA(Scene.class), isA(String.class), isA(Integer.class),
                                              isA(Integer.class))).then(invocation -> null);
-            String title = ResourceManager.get("changeproperties.window.title");
+            String title = ResourceManager.get("changesettings.window.title");
             int minHeight = ChangeSettingsPresenter.MIN_HEIGHT;
             int minWidth = ChangeSettingsPresenter.MIN_WIDTH;
 
