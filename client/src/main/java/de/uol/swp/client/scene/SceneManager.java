@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
+import de.uol.swp.client.changeSettings.ChangeGameSettingsPresenter;
 import de.uol.swp.client.changeSettings.ChangeSettingsPresenter;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -15,12 +16,12 @@ import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.specialisedUtil.LobbyStageMap;
-import de.uol.swp.client.trade.TradeWithBankPresenter;
-import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
-import de.uol.swp.client.trade.TradeWithUserPresenter;
+import de.uol.swp.client.trade.*;
+import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
@@ -34,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static de.uol.swp.client.scene.util.ErrorMessageI18nHelper.internationaliseServerMessage;
 import static de.uol.swp.client.scene.util.PresenterAndStageHelper.*;
@@ -52,6 +54,8 @@ public class SceneManager {
     private final EventBus eventBus;
     private final Stage primaryStage;
     private final ISoundService soundService;
+    private final ITradeService tradeService;
+    private final LobbyStageMap loadingDialogStages = new LobbyStageMap();
     private final LobbyStageMap tradingStages = new LobbyStageMap();
     private final LobbyStageMap tradingResponseStages = new LobbyStageMap();
     private final LobbyStageMap robberTaxStages = new LobbyStageMap();
@@ -61,26 +65,30 @@ public class SceneManager {
     private Scene registrationScene;
     private Scene mainScene;
     private Scene changeAccountScene;
+    private Scene changeGameSettingsScene;
     private Scene changeSettingsScene;
     private Scene rulesScene;
     private boolean devMenuIsOpen;
     private boolean rulesOverviewIsOpen;
+    private boolean changeGameSettingsViewIsOpen;
 
     /**
      * Package-private Constructor
      *
-     * @param soundService The SoundService this class should use.
+     * @param soundService The ISoundService this class should use.
      * @param eventBus     The EventBus this class should use.
      * @param primaryStage The Primary Stage created by JavaFX.
+     * @param tradeService The ITradeService this class should use.
      *
      * @implNote This Constructor is used by {@link de.uol.swp.client.scene.SceneManagerProvider}
      */
     @Inject
-    SceneManager(ISoundService soundService, EventBus eventBus, Stage primaryStage) {
+    SceneManager(ISoundService soundService, EventBus eventBus, Stage primaryStage, ITradeService tradeService) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
         this.soundService = soundService;
         this.primaryStage = primaryStage;
+        this.tradeService = tradeService;
         initViews();
         LOG.debug("SceneManager initialised");
     }
@@ -118,6 +126,7 @@ public class SceneManager {
      * @since 2021-03-25
      */
     void closeMainScreen() {
+        Platform.setImplicitExit(true);
         Platform.runLater(primaryStage::close);
     }
 
@@ -131,7 +140,7 @@ public class SceneManager {
      */
     void closeRobberTaxWindow(LobbyName lobbyName) {
         // has to be handled like this because the window consumes all
-        // WindowEvent.CLOSE_REQUESTs which are used in the LobbyStageMap class
+        // WindowEvent.WINDOW_CLOSE_REQUESTs which are used in the LobbyStageMap class
         if (robberTaxStages.containsKey(lobbyName)) {
             Stage robberStage = robberTaxStages.get(lobbyName);
             Platform.runLater(robberStage::close);
@@ -166,10 +175,14 @@ public class SceneManager {
      */
     void showAcceptTradeWindow(LobbyName lobbyName, Actor offeringUser, CountDownLatch latch) {
         tradingStages.close(lobbyName);
+        EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
+            tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+            closeAcceptTradeWindow(lobbyName);
+        };
         makeAndShowStage(primaryStage, TradeWithUserAcceptPresenter.fxml,
                          ResourceManager.get("game.trade.window.receiving.title", offeringUser),
                          TradeWithUserAcceptPresenter.MIN_HEIGHT, TradeWithUserAcceptPresenter.MIN_WIDTH, lobbyName,
-                         tradingResponseStages, null, false, latch);
+                         tradingResponseStages, onCloseRequestHandler, false, latch);
     }
 
     /**
@@ -183,9 +196,13 @@ public class SceneManager {
      * @since 2021-06-24
      */
     void showBankTradeWindow(LobbyName lobbyName, CountDownLatch latch) {
+        EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
+            closeTradeWindow(lobbyName);
+            eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
+        };
         makeAndShowStage(primaryStage, TradeWithBankPresenter.fxml, ResourceManager.get("game.trade.window.bank.title"),
                          TradeWithBankPresenter.MIN_HEIGHT, TradeWithBankPresenter.MIN_WIDTH, lobbyName, tradingStages,
-                         null, false, latch);
+                         onCloseRequestHandler, false, latch);
     }
 
     /**
@@ -203,6 +220,21 @@ public class SceneManager {
             windowEvent.consume();
             showMainScreen(loggedInUser);
         });
+    }
+
+    /**
+     * Displays the ChangeGameSettingsView
+     *
+     * @author Marvin Drees
+     * @since 2021-06-28
+     */
+    void showChangeGameSettingsWindow() {
+        if (changeGameSettingsViewIsOpen) return;
+        changeGameSettingsViewIsOpen = true;
+        makeAndShowStage(primaryStage, ChangeGameSettingsPresenter.fxml, ResourceManager.get(""),
+                         ChangeSettingsPresenter.MIN_HEIGHT, ChangeSettingsPresenter.MIN_WIDTH,
+                         primaryStage.getX() + 100, primaryStage.getY(), null, null,
+                         windowEvent -> changeGameSettingsViewIsOpen = false, false, false, null);
     }
 
     /**
@@ -230,7 +262,7 @@ public class SceneManager {
         devMenuIsOpen = true;
         makeAndShowStage(primaryStage, DevMenuPresenter.fxml, ResourceManager.get("devmenu.window.title"),
                          DevMenuPresenter.MIN_HEIGHT, DevMenuPresenter.MIN_WIDTH, primaryStage.getX() + 100,
-                         primaryStage.getY(), null, null, windowEvent -> devMenuIsOpen = false, false, null);
+                         primaryStage.getY(), null, null, windowEvent -> devMenuIsOpen = false, false, false, null);
     }
 
     /**
@@ -261,6 +293,18 @@ public class SceneManager {
     }
 
     /**
+     * Opens a new "Loading Lobby" window for the provided LobbyName
+     *
+     * @param lobbyName The LobbyName to show a Loading Screen for
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-06-28
+     */
+    void showLoadingLobbyWindow(LobbyName lobbyName) {
+        makeAndShowLoadingLobbyWindow(lobbyName, loadingDialogStages);
+    }
+
+    /**
      * Opens a new Lobby window with the provided LobbyName
      *
      * @param lobbyName The LobbyName of the Lobby to open a window for
@@ -271,9 +315,45 @@ public class SceneManager {
      * @since 2021-06-24
      */
     void showLobbyWindow(LobbyName lobbyName, CountDownLatch latch) {
+        EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
+            windowEvent.consume();
+            // call hide() to trigger onHidingRequest which controls the Lobby's exact shutdown procedure
+            lobbyStages.get(lobbyName).hide();
+            lobbyStages.close(lobbyName);
+        };
         double xPos = Math.max(10, primaryStage.getX() - 0.5 * LobbyPresenter.MIN_WIDTH_IN_GAME);
         makeAndShowStage(primaryStage, LobbyPresenter.fxml, lobbyName.toString(), LobbyPresenter.MIN_HEIGHT_PRE_GAME,
-                         LobbyPresenter.MIN_WIDTH_PRE_GAME, xPos, 10.0, lobbyName, lobbyStages, null, false, latch);
+                         LobbyPresenter.MIN_WIDTH_PRE_GAME, xPos, 10.0, lobbyName, lobbyStages, onCloseRequestHandler,
+                         false, true, latch);
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            latch.await(2, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {}
+        loadingDialogStages.close(lobbyName);
+        if (lobbyStages.containsKey(lobbyName)) Platform.runLater(() -> lobbyStages.get(lobbyName).show());
+    }
+
+    /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-29
+     */
+    void showLogOldSessionOutScreen(User user) {
+        soundService.popup();
+        Runnable AIDS = () -> {
+            LOG.debug("Sending NukeUsersSessionsRequest");
+            ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
+        };
+        showAndGetConfirmation(ResourceManager.get("confirmation.title"), ResourceManager.get("logoldsessionout.error"),
+                               ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
+                               ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION, AIDS);
     }
 
     /**
@@ -316,6 +396,7 @@ public class SceneManager {
     void showRegistrationScreen() {
         showSceneOnPrimaryStage(primaryStage, registrationScene, ResourceManager.get("register.window.title"),
                                 RegistrationPresenter.MIN_WIDTH, RegistrationPresenter.MIN_HEIGHT);
+        primaryStage.setOnCloseRequest(windowEvent -> closeMainScreen());
     }
 
     /**
@@ -380,8 +461,13 @@ public class SceneManager {
      */
     void showUserTradeWindow(LobbyName lobbyName, Actor respondingUser, CountDownLatch latch) {
         String title = ResourceManager.get("game.trade.window.offering.title", respondingUser);
+        EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
+            closeTradeWindow(lobbyName);
+            tradeService.cancelTrade(lobbyName, respondingUser);
+        };
         makeAndShowStage(primaryStage, TradeWithUserPresenter.fxml, title, TradeWithUserPresenter.MIN_HEIGHT,
-                         TradeWithUserPresenter.MIN_WIDTH, lobbyName, tradingStages, null, false, latch);
+                         TradeWithUserPresenter.MIN_WIDTH, lobbyName, tradingStages, onCloseRequestHandler, false,
+                         latch);
     }
 
     /**
@@ -396,6 +482,7 @@ public class SceneManager {
         if (rulesScene == null) rulesScene = initPresenter(RulesOverviewPresenter.fxml);
         if (changeAccountScene == null) changeAccountScene = initPresenter(ChangeAccountDetailsPresenter.fxml);
         if (changeSettingsScene == null) changeSettingsScene = initPresenter(ChangeSettingsPresenter.fxml);
+        if (changeGameSettingsScene == null) changeGameSettingsScene = initPresenter(ChangeGameSettingsPresenter.fxml);
         eventBus.post(new SetAcceleratorsEvent());
     }
 }

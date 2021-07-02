@@ -49,7 +49,7 @@ class ClientAppTest {
             verify(mockedInjector).getInstance(IChatService.class);
             verify(mockedInjector).getInstance(IGameService.class);
             verify(mockedInjector).getInstance(ITradeService.class);
-            verify(mockedInjector).getInstance(ISoundService.class);
+            verify(mockedInjector, times(2)).getInstance(ISoundService.class);
             mockedApplication.verify(Application::launch);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             fail(e.getMessage());

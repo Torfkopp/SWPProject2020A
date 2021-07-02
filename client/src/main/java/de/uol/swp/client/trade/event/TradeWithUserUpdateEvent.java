@@ -12,7 +12,7 @@ import de.uol.swp.common.lobby.LobbyName;
  * @author Maximilian Lindner
  * @author Alwin Bossert
  * @see de.uol.swp.client.trade.TradeWithUserPresenter
- * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
+ * @see de.uol.swp.client.trade.event.TradeWithUserUpdateEvent
  * @since 2021-02-20
  */
 public class TradeWithUserUpdateEvent {

@@ -122,6 +122,15 @@ public interface ISceneService {
     void openBankTradeWindow(LobbyName lobbyName);
 
     /**
+     * Opens a new ChangeGameSettings window
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Marvin Drees
+     * @since 2021-06-28
+     */
+    void openChangeGameSettingsWindow();
+
+    /**
      * Opens a new Lobby window
      *
      * @param lobby The ISimpleLobby object describing the Lobby to be displayed

@@ -98,6 +98,11 @@ public class AsyncSceneService implements ISceneService {
     }
 
     @Override
+    public void openChangeGameSettingsWindow() {
+        ThreadManager.runNow(syncSceneService::openChangeGameSettingsWindow);
+    }
+
+    @Override
     public void openLobbyWindow(ISimpleLobby lobby) {
         ThreadManager.runNow(() -> syncSceneService.openLobbyWindow(lobby));
     }
