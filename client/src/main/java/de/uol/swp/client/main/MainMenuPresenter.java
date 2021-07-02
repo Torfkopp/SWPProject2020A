@@ -770,6 +770,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
         if (userService.getLoggedInUser() == null) return;
+        if (chatMessages == null) return;
         LOG.debug("Received UserLoggedInMessage");
         LOG.debug("---- New user {} logged in", msg.getUsername());
         Platform.runLater(() -> {
@@ -797,6 +798,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         if (userService.getLoggedInUser() == null) return;
+        if (chatMessages == null) return;
         LOG.debug("Received UserLoggedOutMessage");
         String username = msg.getUsername();
         LOG.debug("---- User {} logged out", username);

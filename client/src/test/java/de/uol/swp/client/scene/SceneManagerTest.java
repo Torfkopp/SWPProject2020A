@@ -478,7 +478,7 @@ class SceneManagerTest {
             String confirm = ResourceManager.get("button.confirm");
             String cancel = ResourceManager.get("button.cancel");
 
-            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary);
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
 
             sceneManager.showLogOldSessionOutScreen(mockUser);
 
