@@ -1,8 +1,6 @@
 package de.uol.swp.client.scene.util;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 import com.jfoenix.utils.JFXUtilities;
 import de.uol.swp.client.scene.SceneManager;
 import de.uol.swp.client.sound.ISoundService;
@@ -35,12 +33,8 @@ public class PresenterAndStageHelper {
 
     private static final Logger LOG = LogManager.getLogger(PresenterAndStageHelper.class);
 
-    @Inject
     private static Injector injector;
-    @Inject
-    @Named("styleSheet")
     private static String styleSheet;
-    @Inject
     private static ISoundService soundService;
 
     /**
@@ -69,6 +63,24 @@ public class PresenterAndStageHelper {
         } catch (IOException e) {
             throw new RuntimeException("Could not load View!" + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Static initialiser method to provide the PresenterAndStageHelper class
+     * with an ISoundService, an Injector for FXMLLoader instances, and the
+     * Stylesheet as a String
+     *
+     * @param soundService The SoundService to use
+     * @param injector     The Injector to provide the FXMLLoader instances
+     * @param styleSheet   The Stylesheet to use for all styling
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-02
+     */
+    public static void initialise(ISoundService soundService, Injector injector, String styleSheet) {
+        PresenterAndStageHelper.injector = injector;
+        PresenterAndStageHelper.styleSheet = styleSheet;
+        PresenterAndStageHelper.soundService = soundService;
     }
 
     /**
