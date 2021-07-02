@@ -146,6 +146,7 @@ public class ClientApp extends Application implements ConnectionListener {
     @Override
     public void stop() {
         if (userService != null && userService.getLoggedInUser() != null) userService.logout(false);
+        ThreadManager.shutdown();
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
@@ -154,7 +155,6 @@ public class ClientApp extends Application implements ConnectionListener {
             clientConnection.close();
         }
         LOG.info("ClientConnection shutdown");
-        ThreadManager.shutdown();
     }
 
     @Override
