@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
+import de.uol.swp.common.exception.NotEnoughResourcesException;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -203,10 +204,11 @@ public class Inventory extends AbstractInventory {
     /**
      * Removes 2 GRAIN and 3 ORE (the cost of a City)
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
      * @author Phillip-André Suhr
      * @since 2021-07-01
      */
-    public void removeCityResources() {
+    public void removeCityResources() throws NotEnoughResourcesException {
         decrease(ResourceType.GRAIN, 2);
         decrease(ResourceType.ORE, 3);
     }
@@ -214,10 +216,11 @@ public class Inventory extends AbstractInventory {
     /**
      * Removes 1 each of ORE, GRAIN, WOOL (the cost of a Development Card)
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
      * @author Phillip-André Suhr
      * @since 2021-07-01
      */
-    public void removeDevCardResources() {
+    public void removeDevCardResources() throws NotEnoughResourcesException {
         decrease(ResourceType.ORE, 1);
         decrease(ResourceType.GRAIN, 1);
         decrease(ResourceType.WOOL, 1);
@@ -226,10 +229,11 @@ public class Inventory extends AbstractInventory {
     /**
      * Removes 1 each of BRICK, LUMBER (the cost of a Road)
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
      * @author Phillip-André Suhr
      * @since 2021-07-01
      */
-    public void removeRoadResources() {
+    public void removeRoadResources() throws NotEnoughResourcesException {
         decrease(ResourceType.BRICK, 1);
         decrease(ResourceType.LUMBER, 1);
     }
@@ -237,10 +241,11 @@ public class Inventory extends AbstractInventory {
     /**
      * Removes 1 each of BRICK, GRAIN, LUMBER, WOOL (the cost of a Settlement)
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
      * @author Phillip-André Suhr
      * @since 2021-07-01
      */
-    public void removeSettlementResources() {
+    public void removeSettlementResources() throws NotEnoughResourcesException {
         decrease(ResourceType.BRICK, 1);
         decrease(ResourceType.GRAIN, 1);
         decrease(ResourceType.LUMBER, 1);
