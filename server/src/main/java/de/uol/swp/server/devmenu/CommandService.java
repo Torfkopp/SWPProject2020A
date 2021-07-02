@@ -136,7 +136,7 @@ public class CommandService extends AbstractService {
                 int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
                 for (; aiAmount > 0; aiAmount--) {
-                    LOG.debug("Sending JoinLobbyRequest");
+                    LOG.debug("Sending JoinLobbyRequest for Lobby {}", lobbyName);
                     post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
                 }
             }
@@ -172,7 +172,7 @@ public class CommandService extends AbstractService {
                 int freeUsers = lobby.getMaxPlayers() - lobby.getActors().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
-                    LOG.debug("Sending JoinLobbyRequest");
+                    LOG.debug("Sending JoinLobbyRequest for Lobby {}", lobbyName);
                     post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
                 }
             }
