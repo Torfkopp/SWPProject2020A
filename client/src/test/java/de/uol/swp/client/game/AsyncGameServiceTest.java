@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncGameServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final LobbyName defaultLobby = mock(LobbyName.class);
     private final GameService syncGameService = mock(GameService.class);
     private AsyncGameService gameService;
@@ -38,7 +38,7 @@ class AsyncGameServiceTest {
 
         gameService.buildRequest(defaultLobby, edgeMapPoint);
 
-        verify(syncGameService, after(DURATION)).buildRequest(defaultLobby, edgeMapPoint);
+        verify(syncGameService, timeout(DURATION)).buildRequest(defaultLobby, edgeMapPoint);
     }
 
     @Test
@@ -47,7 +47,7 @@ class AsyncGameServiceTest {
 
         gameService.changeAutoRollState(defaultLobby, true);
 
-        verify(syncGameService, after(DURATION)).changeAutoRollState(defaultLobby, true);
+        verify(syncGameService, timeout(DURATION)).changeAutoRollState(defaultLobby, true);
     }
 
     @Test
@@ -56,7 +56,7 @@ class AsyncGameServiceTest {
 
         gameService.endTurn(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).endTurn(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).endTurn(defaultLobby);
     }
 
     @Test
@@ -65,7 +65,7 @@ class AsyncGameServiceTest {
 
         gameService.pauseGame(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).pauseGame(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).pauseGame(defaultLobby);
     }
 
     @Test
@@ -74,7 +74,7 @@ class AsyncGameServiceTest {
 
         gameService.playKnightCard(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).playKnightCard(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).playKnightCard(defaultLobby);
     }
 
     @Test
@@ -84,7 +84,7 @@ class AsyncGameServiceTest {
 
         gameService.playMonopolyCard(defaultLobby, resource);
 
-        verify(syncGameService, after(DURATION)).playMonopolyCard(defaultLobby, resource);
+        verify(syncGameService, timeout(DURATION)).playMonopolyCard(defaultLobby, resource);
     }
 
     @Test
@@ -93,7 +93,7 @@ class AsyncGameServiceTest {
 
         gameService.playRoadBuildingCard(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).playRoadBuildingCard(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).playRoadBuildingCard(defaultLobby);
     }
 
     @Test
@@ -105,7 +105,7 @@ class AsyncGameServiceTest {
 
         gameService.playYearOfPlentyCard(defaultLobby, resource1, resource2);
 
-        verify(syncGameService, after(DURATION)).playYearOfPlentyCard(defaultLobby, resource1, resource2);
+        verify(syncGameService, timeout(DURATION)).playYearOfPlentyCard(defaultLobby, resource1, resource2);
     }
 
     @Test
@@ -115,7 +115,7 @@ class AsyncGameServiceTest {
 
         gameService.robberChooseVictim(defaultLobby, actor);
 
-        verify(syncGameService, after(DURATION)).robberChooseVictim(defaultLobby, actor);
+        verify(syncGameService, timeout(DURATION)).robberChooseVictim(defaultLobby, actor);
     }
 
     @Test
@@ -125,7 +125,7 @@ class AsyncGameServiceTest {
 
         gameService.robberNewPosition(defaultLobby, newRobberPosition);
 
-        verify(syncGameService, after(DURATION)).robberNewPosition(defaultLobby, newRobberPosition);
+        verify(syncGameService, timeout(DURATION)).robberNewPosition(defaultLobby, newRobberPosition);
     }
 
     @Test
@@ -134,7 +134,7 @@ class AsyncGameServiceTest {
 
         gameService.rollDice(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).rollDice(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).rollDice(defaultLobby);
     }
 
     @Test
@@ -143,7 +143,7 @@ class AsyncGameServiceTest {
 
         gameService.startSession(defaultLobby, 69);
 
-        verify(syncGameService, after(DURATION)).startSession(defaultLobby, 69);
+        verify(syncGameService, timeout(DURATION)).startSession(defaultLobby, 69);
     }
 
     @Test
@@ -153,7 +153,7 @@ class AsyncGameServiceTest {
 
         gameService.taxPayed(defaultLobby, resources);
 
-        verify(syncGameService, after(DURATION)).taxPayed(defaultLobby, resources);
+        verify(syncGameService, timeout(DURATION)).taxPayed(defaultLobby, resources);
     }
 
     @Test
@@ -162,7 +162,7 @@ class AsyncGameServiceTest {
 
         gameService.updateGameMap(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).updateGameMap(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).updateGameMap(defaultLobby);
     }
 
     @Test
@@ -171,6 +171,6 @@ class AsyncGameServiceTest {
 
         gameService.updateInventory(defaultLobby);
 
-        verify(syncGameService, after(DURATION)).updateInventory(defaultLobby);
+        verify(syncGameService, timeout(DURATION)).updateInventory(defaultLobby);
     }
 }
