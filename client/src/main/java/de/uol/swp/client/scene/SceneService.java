@@ -3,6 +3,7 @@ package de.uol.swp.client.scene;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.client.auth.event.RetryLoginEvent;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.event.RobberTaxUpdateEvent;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
@@ -15,9 +16,7 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
@@ -202,6 +201,26 @@ public class SceneService implements ISceneService {
     }
 
     /**
+     * Handles an old session
+     * <p>
+     * If an AlreadyLoggedInResponse object is found on the EventBus this method
+     * is called. If a client attempts to log in but the user is already
+     * logged in elsewhere this method tells the SceneManager to open a popup
+     * which prompts the user to log the old session out.
+     *
+     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
+        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
+        sceneManager.showLogOldSessionOutScreen(rsp.getLoggedInUser());
+    }
+
+    /**
      * Handles a successful account detail changing process
      * <p>
      * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
@@ -257,6 +276,26 @@ public class SceneService implements ISceneService {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
         sceneManager.showMainScreen(rsp.getUser());
+    }
+
+    /**
+     * Handles the NukedUsersSessionsResponse detected on the EventBus
+     * <p>
+     * If this method is called, it means all sessions belonging to a
+     * user have been nuked, therefore it posts a RetryLoginEvent
+     * on the EventBus to create a new session for the user.
+     *
+     * @param rsp The NukedUsersSessionsResponse detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukedUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
+        LOG.debug("Received NukedUsersSessionsResponse");
+        eventBus.post(new RetryLoginEvent());
     }
 
     /**

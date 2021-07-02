@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
+import de.uol.swp.common.exception.NotEnoughResourcesException;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -424,6 +425,8 @@ public class GameService extends AbstractService {
         boolean enoughToOffer = checkEnoughResourcesInInventory(offeringInventory, req.getOfferedResources());
         boolean enoughToDemand = checkEnoughResourcesInInventory(respondingInventory, req.getDemandedResources());
         if (enoughToOffer && enoughToDemand) {
+            // NotEnoughResourcesExceptions can be ignored here because the if clause
+            // and its booleans already check for sufficient resources
             for (IResource resource : req.getOfferedResources()) {
                 offeringInventory.decrease(resource.getType(), resource.getAmount());
                 respondingInventory.increase(resource.getType(), resource.getAmount());
@@ -520,6 +523,8 @@ public class GameService extends AbstractService {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
                     if (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1) {
+                        // NotEnoughResourcesExceptions can be ignored here because
+                        // the if clause guarantees enough resources
                         inv.increase(BRICK, -1);
                         inv.increase(LUMBER, -1);
                         inv.increase(WOOL, -1);
@@ -580,6 +585,8 @@ public class GameService extends AbstractService {
                     } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
                     if (inv.get(ORE) >= 3 && inv.get(GRAIN) >= 2) {
+                        // NotEnoughResourcesExceptions can be ignored here because the if clause guarantees
+                        // enough resources
                         inv.increase(ORE, -3);
                         inv.increase(GRAIN, -2);
                         gameMap.upgradeSettlement(player, mapPoint);
@@ -632,6 +639,8 @@ public class GameService extends AbstractService {
                             }
                         } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                     } else if (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1) {
+                        // NotEnoughResourcesExceptions can be ignored here because the if clause guarantees
+                        // enough resources
                         inv.increase(BRICK, -1);
                         inv.increase(LUMBER, -1);
                         gameMap.placeRoad(player, mapPoint);
@@ -754,6 +763,9 @@ public class GameService extends AbstractService {
         if (req.getActor() == null) return;
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getActor());
+        // we ignore Exceptions here because this Request is already a cheat
+        // and the error notification would go to the inventory owner, who
+        // might not even know that their inventory was being tampered with
         if (req.getResource() != null) inventory.increase(req.getResource(), req.getAmount());
         else if (req.getDevelopmentCard() != null) inventory.increase(req.getDevelopmentCard(), req.getAmount());
         else if (req.isGiveAllCards()) inventory.increaseAll(req.getAmount());
@@ -900,6 +912,8 @@ public class GameService extends AbstractService {
             //user gets the resource he demands
             inventory.increase(req.getGetResource());
             //user gives the resource he offers according to the harbours
+            // NotEnoughResourcesExceptions can be ignored here because the if clause already
+            // checks for sufficient resources
             inventory.decrease(req.getGiveResource(),
                                tradingRatio.get(IHarbourHex.getHarbourResource(req.getGiveResource())));
         }
@@ -1129,9 +1143,11 @@ public class GameService extends AbstractService {
             LOG.debug("---- Not enough Knight cards");
             return;
         }
+        // NotEnoughResourcesExceptions can be ignored here because the if clause above guarantees
+        // at least one Knight Card
+        inv.decrease(DevelopmentCardType.KNIGHT_CARD);
         inv.increaseKnights();
         checkLargestArmy(req.getOriginLobby(), req.getUser());
-        inv.decrease(DevelopmentCardType.KNIGHT_CARD);
         ResponseMessage updateInventory = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                       inv.getResources(), inv.getDevelopmentCards(),
                                                                       inv.getKnights());
@@ -1189,13 +1205,17 @@ public class GameService extends AbstractService {
         }
         Inventory[] inventories = game.getAllInventories();
 
+        // NotEnoughResourcesExceptions can be ignored here because the if clause above guarantees
+        // at least one Monopoly Card
+        invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
+
         for (Inventory inv : inventories)
             if (inv.get(req.getResource()) > 0) {
+                // the exact amount the inventory says it has
+                // exception can be ignored here because the decrease method removes
                 invMono.increase(req.getResource(), inv.get(req.getResource()));
                 inv.decrease(req.getResource(), inv.get(req.getResource()));
             }
-
-        invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
                 new I18nWrapper("game.card.play.monopoly", req.getUser())));
@@ -1284,8 +1304,17 @@ public class GameService extends AbstractService {
         Inventory inv = game.getInventory(req.getUser());
 
         LOG.debug("---- RoadBuildingCardPhase phase starts");
+        try {
+            inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+        } catch (NotEnoughResourcesException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage("Not enough Road Building Cards in the Inventory");
+            exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+            return;
+        }
+
         game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
-        inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
                 new I18nWrapper("game.card.play.roadbuilding", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
@@ -1335,10 +1364,12 @@ public class GameService extends AbstractService {
             return;
         }
 
+        // NotEnoughResourcesExceptions can be ignored here because the if clause above guarantees
+        // at least one Year Of Plenty Card
+        inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
+
         inv.increase(req.getFirstResource());
         inv.increase(req.getSecondResource());
-
-        inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
 
         ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
                 new I18nWrapper("game.card.play.yearofplenty", req.getUser())));
@@ -1496,7 +1527,15 @@ public class GameService extends AbstractService {
         LOG.debug("Received RobberTaxChosenRequest for Lobby {}", req.getLobby());
         Inventory i = gameManagement.getGame(req.getLobby()).getInventory(req.getPlayer());
         for (IResource r : req.getResources()) {
-            i.decrease(r.getType(), r.getAmount());
+            try {
+                i.decrease(r.getType(), r.getAmount());
+            } catch (NotEnoughResourcesException e) {
+                ExceptionMessage exceptionMessage = new ExceptionMessage("Not enough Resources in the Inventory");
+                exceptionMessage.initWithMessage(req);
+                LOG.debug("Sending ExceptionMessage");
+                post(exceptionMessage);
+                return;
+            }
         }
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getLobby());
         ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(),
@@ -1841,6 +1880,8 @@ public class GameService extends AbstractService {
         if (victimInventory.get(ORE) > 0) victimsResource.add(ORE);
         if (victimInventory.get(WOOL) > 0) victimsResource.add(WOOL);
         ResourceType stolenResource = victimsResource.get(Util.randomInt(victimsResource.size()));
+        // NotEnoughResourcesExceptions can be ignored here because the victimsResource List is only
+        // filled with Resources that the victim has at least +1 of
         victimInventory.decrease(stolenResource);
         receiverInventory.increase(stolenResource);
 
@@ -1975,6 +2016,8 @@ public class GameService extends AbstractService {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null || developmentCard == null) return false;
         if (inventory.get(ORE) >= 1 && inventory.get(GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
+            // NotEnoughResourcesExceptions can be ignored here because the if condition guarantees
+            // enough resources
             inventory.decrease(ORE);
             inventory.decrease(GRAIN);
             inventory.decrease(WOOL);

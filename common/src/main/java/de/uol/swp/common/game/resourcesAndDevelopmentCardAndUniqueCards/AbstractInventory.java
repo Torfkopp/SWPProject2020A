@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
+import de.uol.swp.common.exception.NotEnoughResourcesException;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
@@ -26,10 +27,11 @@ public abstract class AbstractInventory implements Serializable {
      * @param resource The resource
      * @param i        The amount to decrease the resource in the inventory by
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the decrease would make the Resource amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void decrease(ResourceType resource, int i) {
+    public void decrease(ResourceType resource, int i) throws NotEnoughResourcesException {
         increase(resource, -i);
     }
 
@@ -39,10 +41,11 @@ public abstract class AbstractInventory implements Serializable {
      * @param developmentCard The development card
      * @param i               The amount to decrease the DevelopmentCard in the inventory by
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the decrease would make the Development Card amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void decrease(DevelopmentCardType developmentCard, int i) {
+    public void decrease(DevelopmentCardType developmentCard, int i) throws NotEnoughResourcesException {
         increase(developmentCard, -i);
     }
 
@@ -51,10 +54,11 @@ public abstract class AbstractInventory implements Serializable {
      *
      * @param resource The resource
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the decrease would make the Resource amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void decrease(ResourceType resource) {
+    public void decrease(ResourceType resource) throws NotEnoughResourcesException {
         increase(resource, -1);
     }
 
@@ -63,10 +67,11 @@ public abstract class AbstractInventory implements Serializable {
      *
      * @param developmentCard The development card
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the decrease would make the Development Card amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void decrease(DevelopmentCardType developmentCard) {
+    public void decrease(DevelopmentCardType developmentCard) throws NotEnoughResourcesException {
         increase(developmentCard, -1);
     }
 
@@ -122,10 +127,13 @@ public abstract class AbstractInventory implements Serializable {
      * @param resource The resource
      * @param i        The amount to increase the resource in the inventory by
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the increase would make the Resource amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void increase(ResourceType resource, int i) {
+    public void increase(ResourceType resource, int i) throws NotEnoughResourcesException {
+        if (resources.get(resource).getAmount() + i < 0)
+            throw new NotEnoughResourcesException("Can't have a negative amount of Resources");
         resources.increase(resource, i);
     }
 
@@ -135,10 +143,13 @@ public abstract class AbstractInventory implements Serializable {
      * @param developmentCard The development card
      * @param i               The
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the increase would make the Development Card amount negative
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public void increase(DevelopmentCardType developmentCard, int i) {
+    public void increase(DevelopmentCardType developmentCard, int i) throws NotEnoughResourcesException {
+        if (developmentCards.get(developmentCard).getAmount() + i < 0)
+            throw new NotEnoughResourcesException("Can't have a negative amount of Development Cards");
         developmentCards.increase(developmentCard, i);
     }
 
@@ -151,7 +162,10 @@ public abstract class AbstractInventory implements Serializable {
      * @since 2021-04-23
      */
     public void increase(ResourceType resource) {
-        increase(resource, 1);
+        try {
+            increase(resource, 1);
+            // we can ignore this exception because we guarantee an _increase_
+        } catch (NotEnoughResourcesException ignored) {}
     }
 
     /**
@@ -163,7 +177,10 @@ public abstract class AbstractInventory implements Serializable {
      * @since 2021-04-23
      */
     public void increase(DevelopmentCardType developmentCard) {
-        increase(developmentCard, 1);
+        try {
+            increase(developmentCard, 1);
+            // we can ignore this exception because we guarantee an _increase_
+        } catch (NotEnoughResourcesException ignored) {}
     }
 
     /**
@@ -171,10 +188,11 @@ public abstract class AbstractInventory implements Serializable {
      *
      * @param i The amount to increase the resources in the inventory by
      *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the increase would make the Resource amount negative
      * @author Maximilian Lindner
-     * @since 2021-05-12
+     * @since 2021 -05-12
      */
-    public void increaseAll(int i) {
+    public void increaseAll(int i) throws NotEnoughResourcesException {
         for (IResource resource : resources) {
             increase(resource.getType(), i);
         }
