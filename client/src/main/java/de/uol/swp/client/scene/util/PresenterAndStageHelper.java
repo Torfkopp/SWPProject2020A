@@ -1,20 +1,19 @@
 package de.uol.swp.client.scene.util;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 import com.jfoenix.utils.JFXUtilities;
 import de.uol.swp.client.scene.SceneManager;
 import de.uol.swp.client.sound.ISoundService;
+import de.uol.swp.client.specialisedUtil.LobbyStageMap;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,12 +35,8 @@ public class PresenterAndStageHelper {
 
     private static final Logger LOG = LogManager.getLogger(PresenterAndStageHelper.class);
 
-    @Inject
     private static Injector injector;
-    @Inject
-    @Named("styleSheet")
     private static String styleSheet;
-    @Inject
     private static ISoundService soundService;
 
     /**
@@ -73,33 +68,45 @@ public class PresenterAndStageHelper {
     }
 
     /**
-     * Utility method used to instantiate and display a new Stage object with
-     * the provided parameters
-     * <p>
-     * This method can be used for windows that don't require specified coordinates.
+     * Static initialiser method to provide the PresenterAndStageHelper class
+     * with an ISoundService, an Injector for FXMLLoader instances, and the
+     * Stylesheet as a String
      *
-     * @param primaryStage          The primary Stage created by JavaFX
-     * @param fxmlPath              The path to the FXML file of the View to
-     *                              display
-     * @param title                 The title of the window
-     * @param minHeight             The minimum height of the window
-     * @param minWidth              The minimum width of the window
-     * @param lobbyName             The LobbyName with which to associate the
-     *                              new window
-     * @param stageMap              The LobbyStageMap to store the Stage in
-     * @param onCloseRequestHandler A WindowEvent Handler to be set for the
-     *                              window's onCloseRequest
-     * @param isRobberTaxStage      Whether the window to be opened is the Robber
-     *                              Tax window or not
-     * @param latch                 The CountDownLatch to use to signal the
-     *                              SceneService that the window is ready
+     * @param soundService The SoundService to use
+     * @param injector     The Injector to provide the FXMLLoader instances
+     * @param styleSheet   The Stylesheet to use for all styling
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-02
      */
-    public static void makeAndShowStage(Stage primaryStage, String fxmlPath, String title, int minHeight, int minWidth,
-                                        LobbyName lobbyName, Map<LobbyName, Stage> stageMap,
-                                        EventHandler<WindowEvent> onCloseRequestHandler, boolean isRobberTaxStage,
-                                        CountDownLatch latch) {
-        makeAndShowStage(primaryStage, fxmlPath, title, minHeight, minWidth, null, null, lobbyName, stageMap,
-                         onCloseRequestHandler, isRobberTaxStage, latch);
+    public static void initialise(ISoundService soundService, Injector injector, String styleSheet) {
+        PresenterAndStageHelper.injector = injector;
+        PresenterAndStageHelper.styleSheet = styleSheet;
+        PresenterAndStageHelper.soundService = soundService;
+    }
+
+    /**
+     * Utility method used to instantiate and display a new Stage object which
+     * serves as a Loading Screen for a Lobby Window
+     *
+     * @param lobbyName      The LobbyName for which to display a Loading Screen
+     * @param loadingDialogs The LobbyStageMap to store the Stage in
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-06-28
+     */
+    public static void makeAndShowLoadingLobbyWindow(LobbyName lobbyName, LobbyStageMap loadingDialogs) {
+        JFXUtilities.runInFXAndWait(() -> {
+            Label label = new Label(ResourceManager.get("lobby.window.loadingtext", lobbyName));
+            ProgressIndicator progressIndicator = new ProgressIndicator();
+            VBox root = new VBox(10, label, progressIndicator);
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initStyle(StageStyle.UNDECORATED);
+            loadingDialogs.put(lobbyName, stage);
+            stage.show();
+        });
     }
 
     /**
@@ -123,13 +130,14 @@ public class PresenterAndStageHelper {
      *                              window's onCloseRequest
      * @param isRobberTaxStage      Whether the window to be opened is the Robber
      *                              Tax window or not
+     * @param doNotShow             If the Stage.show() call should be skipped
      * @param latch                 The CountDownLatch to use to signal the
      *                              SceneService that the window is ready
      */
     public static void makeAndShowStage(Stage primaryStage, String fxmlPath, String title, int minHeight, int minWidth,
-                                        Double x, Double y, LobbyName lobbyName, Map<LobbyName, Stage> stageMap,
+                                        Double x, Double y, LobbyName lobbyName, LobbyStageMap stageMap,
                                         EventHandler<WindowEvent> onCloseRequestHandler, boolean isRobberTaxStage,
-                                        CountDownLatch latch) {
+                                        boolean doNotShow, CountDownLatch latch) {
         JFXUtilities.runInFX(() -> {
             Stage stage = new Stage();
             stage.setTitle(title);
@@ -153,10 +161,42 @@ public class PresenterAndStageHelper {
 
             if (onCloseRequestHandler != null) stage.setOnCloseRequest(onCloseRequestHandler);
 
-            stage.show();
+            if (!doNotShow) stage.show();
 
             if (latch != null) latch.countDown();
         });
+    }
+
+    /**
+     * Utility method used to instantiate and display a new Stage object with
+     * the provided parameters
+     * <p>
+     * This method can be used for windows that don't require specified
+     * coordinates and doesn't need to delay its display (generally only
+     * applicable to the Lobby Window).
+     *
+     * @param primaryStage          The primary Stage created by JavaFX
+     * @param fxmlPath              The path to the FXML file of the View to
+     *                              display
+     * @param title                 The title of the window
+     * @param minHeight             The minimum height of the window
+     * @param minWidth              The minimum width of the window
+     * @param lobbyName             The LobbyName with which to associate the
+     *                              new window
+     * @param stageMap              The LobbyStageMap to store the Stage in
+     * @param onCloseRequestHandler A WindowEvent Handler to be set for the
+     *                              window's onCloseRequest
+     * @param isRobberTaxStage      Whether the window to be opened is the Robber
+     *                              Tax window or not
+     * @param latch                 The CountDownLatch to use to signal the
+     *                              SceneService that the window is ready
+     */
+    public static void makeAndShowStage(Stage primaryStage, String fxmlPath, String title, int minHeight, int minWidth,
+                                        LobbyName lobbyName, LobbyStageMap stageMap,
+                                        EventHandler<WindowEvent> onCloseRequestHandler, boolean isRobberTaxStage,
+                                        CountDownLatch latch) {
+        makeAndShowStage(primaryStage, fxmlPath, title, minHeight, minWidth, null, null, lobbyName, stageMap,
+                         onCloseRequestHandler, isRobberTaxStage, false, latch);
     }
 
     /**

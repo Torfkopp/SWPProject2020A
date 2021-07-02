@@ -5,7 +5,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
-import de.uol.swp.client.*;
+import de.uol.swp.client.ClientApp;
+import de.uol.swp.client.ClientConnection;
+import de.uol.swp.client.ClientConnectionFactory;
 import de.uol.swp.client.chat.AsyncChatService;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
@@ -16,7 +18,6 @@ import de.uol.swp.client.lobby.AsyncLobbyService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.scene.*;
-import de.uol.swp.client.scene.util.PresenterAndStageHelper;
 import de.uol.swp.client.sound.AsyncSoundService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.sound.SoundService;
@@ -70,6 +71,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
         defaultProps
                 .setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
+        defaultProps.setProperty("renderingstyle", preferences.get("renderingstyle", "plain"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -93,19 +95,22 @@ public class ClientModule extends AbstractModule {
         //Reading the language property
         String lang = properties.getProperty("lang");
 
+        //Setting the rendering style
+        String renderingStyle = properties.getProperty("renderingstyle");
+
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
         String theme = properties.getProperty("theme");
         if (!theme.equals("default") && !theme.equals("dark") && !theme.equals("classic") && !theme.equals("cursed"))
             theme = "default";
-        final String styleSheet = "css/" + theme + ".css";
+        String styleSheet = "css/" + theme + ".css";
 
         //Setting the sound pack and volume
         LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
                   properties.getProperty("volume"));
         String pack = properties.getProperty("soundpack");
         if (!pack.equals("default") && !pack.equals("classic") && !pack.equals("cursed")) pack = "default";
-        final String soundPack = "client/src/main/resources/sounds/" + pack + "/";
+        String soundPack = "client/src/main/resources/sounds/" + pack + "/";
         double volume;
         double backgroundVolume;
         try {
@@ -157,6 +162,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
         bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
         bindConstant().annotatedWith(Names.named("lang")).to(lang);
+        bindConstant().annotatedWith(Names.named("renderingStyle")).to(renderingStyle);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(AsyncUserService.class).in(Scopes.SINGLETON);
@@ -173,8 +179,6 @@ public class ClientModule extends AbstractModule {
         bind(SoundService.class).in(Scopes.SINGLETON);
         bind(ISceneService.class).to(AsyncSceneService.class).in(Scopes.SINGLETON);
         bind(SceneService.class).in(Scopes.SINGLETON);
-        requestStaticInjection(GameRendering.class);
-        requestStaticInjection(PresenterAndStageHelper.class);
         requestStaticInjection(ResourceManager.class);
     }
 }

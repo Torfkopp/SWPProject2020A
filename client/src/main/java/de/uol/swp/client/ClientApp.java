@@ -5,11 +5,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.scene.ISceneService;
+import de.uol.swp.client.scene.util.PresenterAndStageHelper;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
@@ -53,6 +56,19 @@ public class ClientApp extends Application implements ConnectionListener {
     // ----------------------------------------------------
 
     /**
+     * Default startup method for javafx applications
+     *
+     * @param args Any arguments given when starting the application
+     *
+     * @since 2017-03-17
+     */
+    public static void main(String[] args) {
+        injector = Guice.createInjector(new ClientModule());
+        createServices();
+        launch(args);
+    }
+
+    /**
      * Helper method to instantiate all services.
      * <p>
      * This method is called from the main method of the application and handles
@@ -75,19 +91,8 @@ public class ClientApp extends Application implements ConnectionListener {
         injector.getInstance(IGameService.class);
         injector.getInstance(ITradeService.class);
         injector.getInstance(ISoundService.class);
-    }
-
-    /**
-     * Default startup method for javafx applications
-     *
-     * @param args Any arguments given when starting the application
-     *
-     * @since 2017-03-17
-     */
-    public static void main(String[] args) {
-        injector = Guice.createInjector(new ClientModule());
-        createServices();
-        launch(args);
+        PresenterAndStageHelper.initialise(injector.getInstance(ISoundService.class), injector,
+                                           injector.getInstance(Key.get(String.class, Names.named("styleSheet"))));
     }
 
     @Override
@@ -98,8 +103,8 @@ public class ClientApp extends Application implements ConnectionListener {
         if (args.size() != 2) {
             host = "localhost";
             port = 50010;
-            System.err.println("Usage: " + ClientConnection.class.getSimpleName() + " host port");
-            System.err.println("Using default port " + port + " on " + host);
+            System.out.println("Usage: " + ClientConnection.class.getSimpleName() + " host port");
+            System.out.println("Using default port " + port + " on " + host);
         } else {
             host = args.get(0);
             port = Integer.parseInt(args.get(1));
