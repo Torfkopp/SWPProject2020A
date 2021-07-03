@@ -1,8 +1,7 @@
 package de.uol.swp.common.util;
 
 import com.google.common.base.Strings;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import de.uol.swp.common.I18nWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,37 +15,8 @@ import java.util.*;
  */
 public class ResourceManager {
 
-    private static ResourceBundle resourceBundle;
     private static final Logger LOG = LogManager.getLogger(ResourceManager.class);
-    @Inject
-    @Named("lang")
-    private static String lang;
-
-    static {
-        Locale locale;
-        if (Strings.isNullOrEmpty(lang)) locale = Locale.UK;
-        else {
-            String[] splitLang = lang.split("_");
-            switch (splitLang.length) {
-                case 1:
-                    locale = new Locale(splitLang[0]);
-                    break;
-                case 2:
-                    locale = new Locale(splitLang[0], splitLang[1]);
-                    break;
-                case 3:
-                    locale = new Locale(splitLang[0], splitLang[1], splitLang[2]);
-                    break;
-                default:
-                    locale = Locale.UK;
-            }
-        }
-        try {
-            resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
-        } catch (NullPointerException | MissingResourceException e) {
-            resourceBundle = null;
-        }
-    }
+    private static ResourceBundle resourceBundle = null;
 
     /**
      * Gets a specified key from the resource bundle.
@@ -80,13 +50,23 @@ public class ResourceManager {
     public static String get(String key, Object... args) {
         if (args == null) return get(key);
         try {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof I18nWrapper[]) {
+                    // Call toString on each array element
+                    var x = Arrays.toString((I18nWrapper[]) args[i]);
+                    // remove the array brackets
+                    x = x.substring(x.indexOf("[") + 1, x.lastIndexOf("]"));
+                    // match every comma that is preceded by a digit and followed by a space and return String to array
+                    args[i] = x.replaceAll("(?<=[\\d]),(?=[ ])", "");
+                }
+            }
             return String.format(resourceBundle.getString(key), args);
         } catch (NullPointerException | MissingResourceException | ClassCastException | IllegalFormatException error) {
             try {
                 LOG.error("Couldn't find or format resource \"{}\"", key);
                 return resourceBundle.getString("missingresource");
             } catch (NullPointerException | MissingResourceException | ClassCastException otherError) {
-                LOG.error("---- Also could't find backup resource; using generic text");
+                LOG.error("---- Also couldn't find backup resource; using generic text");
                 return "Missing Resource";
             }
         }
@@ -132,6 +112,32 @@ public class ResourceManager {
      */
     public static ResourceBundle getResourceBundle() {
         return resourceBundle;
+    }
+
+    public static void initialize(String lang) {
+        Locale locale;
+        if (Strings.isNullOrEmpty(lang)) locale = Locale.UK;
+        else {
+            String[] splitLang = lang.split("_");
+            switch (splitLang.length) {
+                case 1:
+                    locale = new Locale(splitLang[0]);
+                    break;
+                case 2:
+                    locale = new Locale(splitLang[0], splitLang[1]);
+                    break;
+                case 3:
+                    locale = new Locale(splitLang[0], splitLang[1], splitLang[2]);
+                    break;
+                default:
+                    locale = Locale.UK;
+            }
+        }
+        try {
+            resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
+        } catch (NullPointerException | MissingResourceException e) {
+            resourceBundle = null;
+        }
     }
 
     /**

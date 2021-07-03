@@ -113,6 +113,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        if (chatMessages == null) return;
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received CreatedChatMessageMessage for Lobby {}", msg.getLobbyName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
@@ -274,6 +275,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageMessage msg) {
+        if (chatMessages == null) return;
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
@@ -338,6 +340,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (chatMessages == null) return;
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));

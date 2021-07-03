@@ -14,9 +14,7 @@ import java.io.Serializable;
  */
 public class I18nWrapper implements Serializable {
 
-    //Will only be injected on the client side with a static injection requested in the ClientModule
     private final String attributeName;
-    private final String insertString;
     private final Object[] insertStrings;
 
     /**
@@ -26,7 +24,6 @@ public class I18nWrapper implements Serializable {
      */
     public I18nWrapper(String attributeName) {
         this.attributeName = attributeName;
-        this.insertString = null;
         this.insertStrings = null;
     }
 
@@ -43,7 +40,6 @@ public class I18nWrapper implements Serializable {
      */
     public I18nWrapper(String attributeName, Object... insertStrings) {
         this.attributeName = attributeName;
-        this.insertString = null;
         this.insertStrings = insertStrings;
     }
 
