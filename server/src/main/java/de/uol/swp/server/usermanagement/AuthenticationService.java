@@ -72,20 +72,24 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onLoginRequest(LoginRequest msg) {
-        LOG.debug("Received LoginRequest for User {}", msg.getUsername());
+        String username = msg.getUsername();
+        LOG.debug("Received LoginRequest for User {}", username);
         ServerInternalMessage returnMessage;
         try {
             if (userManagement.isLoggedIn(msg.getUsername())) {
                 // Don't need isPresent check here as it is implied by isLoggedIn
                 returnMessage = new ClientAuthorisedMessage(userManagement.getUser(msg.getUsername()).get(), true);
             } else {
-                User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
+                User newUser = userManagement.login(username, msg.getPassword());
                 returnMessage = new ClientAuthorisedMessage(newUser, false);
                 returnMessage.setSession(sessionManagement.createSession(newUser));
             }
+            LOG.debug("Sending ClientAuthorisedMessage for User {}", username);
         } catch (SecurityException e) {
             LOG.error(e);
-            returnMessage = new ServerExceptionMessage(new LoginException("Cannot auth user " + msg.getUsername()));
+            LoginException e1 = new LoginException("Cannot auth user " + username);
+            returnMessage = new ServerExceptionMessage(e1);
+            LOG.debug("Sending ServerExceptionMessage [{}]", e1.getMessage());
         }
         returnMessage.initWithMessage(msg);
         post(returnMessage);
@@ -121,6 +125,7 @@ public class AuthenticationService extends AbstractService {
             LOG.error(e);
         }
         Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+        LOG.debug("Sending UserLoggedOutMessage");
         post(returnMessage);
     }
 
@@ -151,6 +156,7 @@ public class AuthenticationService extends AbstractService {
         userManagement.logout(userToLogOut);
         // With the current logic there should only ever be one session but keep this to be safe.
         while (sessionManagement.getSession(userToLogOut).isPresent()) {
+            LOG.debug("Sending FetchUserContextInternalRequest containing KillOldClientResponse");
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
                                                      new KillOldClientResponse()));
             try {
@@ -162,6 +168,7 @@ public class AuthenticationService extends AbstractService {
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
         ResponseMessage response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
+        LOG.debug("Sending NukedUsersSessionsResponse");
         post(response);
     }
 
@@ -180,8 +187,10 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onRetrieveAllOnlineUsersRequest(RetrieveAllOnlineUsersRequest msg) {
+        LOG.debug("Received RetrieveAllOnlineUsersRequest");
         Message response = new AllOnlineUsersResponse(sessionManagement.getAllUsers());
         response.initWithMessage(msg);
+        LOG.debug("Sending AllOnlineUsersResponse");
         post(response);
     }
 }

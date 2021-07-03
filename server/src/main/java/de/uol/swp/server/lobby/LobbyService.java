@@ -15,8 +15,8 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
-import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 import de.uol.swp.common.specialisedUtil.ActorSet;
+import de.uol.swp.common.specialisedUtil.SimpleLobbyMap;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
@@ -96,7 +96,10 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onAddAIRequest(AddAIRequest req) {
-        post(new JoinLobbyRequest(req.getName(), req.getActor()));
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received AddAIRequest for Lobby {}", lobbyName);
+        LOG.debug("Sending JoinLobbyRequest for Lobby {}", lobbyName);
+        post(new JoinLobbyRequest(lobbyName, req.getActor()));
     }
 
     /**
@@ -120,20 +123,24 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onChangeLobbySettingsRequest(ChangeLobbySettingsRequest req) {
-        LOG.debug("Received ChangeLobbySettingsRequest");
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
-        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getActor())) return;
-        if (lobby.get().getActors().size() > req.getAllowedPlayers()) return;
-        if (lobby.get().isInGame()) return;
-        lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
-                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(),
-                                            req.getMaxTradeDiff());
-        post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getActor()));
-        Optional<ILobby> updatedLobby = lobbyManagement.getLobby(req.getName());
-        if (updatedLobby.isEmpty()) return;
-        ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getActor(),
-                                                   ILobby.getSimpleLobby(updatedLobby.get()));
-        sendToAllInLobby(req.getName(), msg);
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received ChangeLobbySettingsRequest for Lobby {}", lobbyName);
+        Optional<ILobby> lobbyOptional = lobbyManagement.getLobby(lobbyName);
+        if (lobbyOptional.isEmpty() || !lobbyOptional.get().getOwner().equals(req.getActor())) return;
+        ILobby lobby = lobbyOptional.get();
+        int oldMaxPlayers = lobby.getMaxPlayers();
+        if (lobby.getActors().size() > req.getAllowedPlayers() || lobby.isInGame()) return;
+        lobbyManagement
+                .updateLobbySettings(lobbyName, req.getAllowedPlayers(), req.getMoveTime(), req.isStartUpPhaseEnabled(),
+                                     req.isRandomPlayFieldEnabled(), req.getMaxTradeDiff());
+
+        if (lobby.getMaxPlayers() != oldMaxPlayers) {
+            LOG.debug("Sending AllowedAmountsOfPlayersChangedMessage for Lobby {}", lobbyName);
+            post(new AllowedAmountOfPlayersChangedMessage(lobbyName, req.getActor()));
+        }
+        ServerMessage msg = new UpdateLobbyMessage(lobbyName, req.getActor(), ILobby.getSimpleLobby(lobby));
+        LOG.debug("Sending UpdateLobbyMessage for Lobby {}", lobbyName);
+        sendToAllInLobby(lobbyName, msg);
     }
 
     /**
@@ -152,21 +159,21 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onChangeOwnerRequest(ChangeOwnerRequest req) {
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received ChangeOwnerRequest for Lobby {}", lobbyName);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getActor())) return;
         if (!(req.getNewOwner() instanceof User)) {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Just User can be Owner");
             exceptionMessage.initWithMessage(req);
-            LOG.debug("Sending ExceptionMessage");
+            LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
             post(exceptionMessage);
         } else {
             User newOwner = (User) req.getNewOwner();
             lobby.get().updateOwner(newOwner);
-            Optional<ILobby> updatedLobby = lobbyManagement.getLobby(req.getName());
-            if (updatedLobby.isEmpty()) return;
-            ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getActor(),
-                                                       ILobby.getSimpleLobby(updatedLobby.get()));
-            sendToAllInLobby(req.getName(), msg);
+            ServerMessage msg = new UpdateLobbyMessage(lobbyName, req.getActor(), ILobby.getSimpleLobby(lobby.get()));
+            LOG.debug("Sending UpdateLobbyMessage for Lobby {}", lobbyName);
+            sendToAllInLobby(lobbyName, msg);
         }
     }
 
@@ -190,6 +197,7 @@ public class LobbyService extends AbstractService {
         boolean isInLobby = lobbyManagement.getLobbies().isInALobby(user);
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
+        LOG.debug("Sending CheckUserInLobbyResponse");
         post(responseMessage);
     }
 
@@ -220,13 +228,15 @@ public class LobbyService extends AbstractService {
             responseMessage = new CreateLobbyResponse(req.getName(), ILobby.getSimpleLobby(lobby.get()),
                                                       req.getPassword());
             responseMessage.initWithMessage(req);
+            LOG.debug("Sending CreateLobbyResponse for Lobby {}", req.getName());
             post(responseMessage);
+            LOG.debug("Sending LobbyCreatedMessage");
             sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
         } catch (IllegalArgumentException e) {
-            Message exceptionMessage = new LobbyExceptionMessage(e.getMessage());
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage(e.getMessage());
             exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
             post(exceptionMessage);
-            LOG.debug(e.getMessage());
         }
     }
 
@@ -245,20 +255,23 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onJoinLobbyRequest(JoinLobbyRequest req) {
-        LOG.debug("Received LobbyJoinUserRequest for Lobby {}", req.getName());
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received LobbyJoinUserRequest for Lobby {}", lobbyName);
+        Actor actor = req.getActor();
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             if (lobby.get().getActors().size() < lobby.get().getMaxPlayers()) {
-                if (!lobby.get().getActors().contains(req.getActor())) {
+                if (!lobby.get().getActors().contains(actor)) {
                     if (!lobby.get().isInGame()) {
-                        if (lobby.get().hasPassword() && req.getActor() instanceof User) {
-                            Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(),
+                        if (lobby.get().hasPassword() && actor instanceof User) {
+                            Message responseMessage = new JoinLobbyWithPasswordResponse(lobbyName,
                                                                                         ILobby.getSimpleLobby(
                                                                                                 lobby.get()));
                             responseMessage.initWithMessage(req);
+                            LOG.debug("Sending JoinLobbyWithPasswordResponse for Lobby {}", lobbyName);
                             post(responseMessage);
                         } else {
-                            Actor user = req.getActor();
+                            Actor user = actor;
                             //To ensure that the AI's name is unique for that lobby
                             if (user instanceof AI) {
                                 for (Actor u : lobby.get().getActors()) {
@@ -269,39 +282,44 @@ public class LobbyService extends AbstractService {
                                 }
                             }
                             lobby.get().joinUser(user);
-                            lobby = lobbyManagement.getLobby(req.getName());
+                            lobby = lobbyManagement.getLobby(lobbyName);
                             if (lobby.isEmpty()) return;
-                            Message responseMessage = new JoinLobbyResponse(req.getName(),
+                            Message responseMessage = new JoinLobbyResponse(lobbyName,
                                                                             ILobby.getSimpleLobby(lobby.get()));
                             responseMessage.initWithMessage(req);
+                            LOG.debug("Sending JoinLobbyResponse for Lobby {}", lobbyName);
                             post(responseMessage);
-                            sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), user));
+
+                            LOG.debug("Sending UserJoinedLobbyMessage for Lobby {}", lobbyName);
+                            sendToAllInLobby(lobbyName, new UserJoinedLobbyMessage(lobbyName, user));
+
+                            LOG.debug("Sending AllLobbiesMessage");
                             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
                             sendColourChangedMessage(lobby.get(), user);
                         }
                     } else {
                         ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
                         exceptionMessage.initWithMessage(req);
+                        LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
                         post(exceptionMessage);
-                        LOG.debug(exceptionMessage.getException());
                     }
                 } else {
                     ExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
                     exceptionMessage.initWithMessage(req);
+                    LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
                     post(exceptionMessage);
-                    LOG.debug(exceptionMessage.getException());
                 }
             } else {
                 ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby is full!");
                 exceptionMessage.initWithMessage(req);
+                LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
                 post(exceptionMessage);
-                LOG.debug(exceptionMessage.getException());
             }
         } else {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby does not exist!");
             exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
             post(exceptionMessage);
-            LOG.debug(exceptionMessage.getException());
         }
     }
 
@@ -321,28 +339,86 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onJoinLobbyWithPasswordConfirmationRequest(JoinLobbyWithPasswordConfirmationRequest req) {
-        LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby {}", req.getName());
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName(), req.getPassword());
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby {}", lobbyName);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName, req.getPassword());
         if (lobby.isPresent()) {
             if (req.getPassword().equals(lobby.get().getPassword())) {
                 lobby.get().joinUser(req.getActor());
-                Message responseMessage = new JoinLobbyResponse(req.getName(), ILobby.getSimpleLobby(lobby.get()));
+                Message responseMessage = new JoinLobbyResponse(lobbyName, ILobby.getSimpleLobby(lobby.get()));
                 responseMessage.initWithMessage(req);
+                LOG.debug("Sending JoinLobbyResponse for Lobby {}", lobbyName);
                 post(responseMessage);
-                sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getActor()));
+                LOG.debug("Sending UserJoinedLobbyMessage for Lobby {}", lobbyName);
+                sendToAllInLobby(lobbyName, new UserJoinedLobbyMessage(lobbyName, req.getActor()));
+
+                LOG.debug("Sending AllLobbiesMessage");
                 post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
                 sendColourChangedMessage(lobby.get(), req.getActor());
             } else {
                 ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Wrong Password!");
                 exceptionMessage.initWithMessage(req);
+                LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
                 post(exceptionMessage);
-                LOG.debug(exceptionMessage.getException());
             }
         } else {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Lobby not found!");
             exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage [{}]", exceptionMessage.getException());
             post(exceptionMessage);
-            LOG.debug(exceptionMessage.getException());
+        }
+    }
+
+    /**
+     * Handles a LobbyJoinRandomUserRequest found on the EventBus
+     * <p>
+     * If a LobbyJoinRandomUserRequest is detected on the EventBus, this method is called.
+     * It adds a user to a random lobby stored in the LobbyManagement and
+     * sends a UserJoinedLobbyMessage to every user in the lobby.
+     *
+     * @param req The LobbyJoinRandomUserRequest found on the EventBus
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see ILobby
+     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onJoinRandomLobbyRequest(JoinRandomLobbyRequest req) {
+        LOG.debug("Received JoinRandomLobbyRequest");
+        LobbyMap lobbies = lobbyManagement.getLobbies();
+        List<ILobby> filteredLobbies = new ArrayList<>();
+
+        lobbies.forEach((String, lobby) -> {
+            if (lobby.getActors().size() < lobby.getMaxPlayers() && !lobby.getActors()
+                                                                          .contains(req.getActor()) && !lobby
+                    .isInGame() && !lobby.hasPassword()) {
+                filteredLobbies.add(lobby);
+            }
+        });
+        if (!filteredLobbies.isEmpty()) {
+            int i = Util.randomInt(filteredLobbies.size());
+            ILobby randomLobby = filteredLobbies.get(i);
+
+            randomLobby.joinUser(req.getActor());
+
+            Message responseMessage = new JoinLobbyResponse(randomLobby.getName(), ILobby.getSimpleLobby(randomLobby));
+            responseMessage.initWithMessage(req);
+            LOG.debug("Sending JoinLobbyResponse for Lobby {}", randomLobby.getName());
+            post(responseMessage);
+
+            LOG.debug("Sending UserJoinedLobbyMessage for Lobby {}", randomLobby.getName());
+            sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getActor()));
+
+            LOG.debug("Sending AllLobbiesMessage");
+            post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+            sendColourChangedMessage(randomLobby, req.getActor());
+        } else {
+            Message responseMessage = new JoinRandomLobbyFailedResponse();
+            responseMessage.initWithMessage(req);
+            LOG.debug("Sending JoinRandomLobbyFailedResponse");
+            post(responseMessage);
         }
     }
 
@@ -370,60 +446,23 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onKickUserEvent(KickUserEvent event) {
         KickUserRequest req = event.getRequest();
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received KickUserEvent for Lobby {}", lobbyName);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (req.getToBeKickedUser().equals(req.getActor())) return;
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getActor())) return;
         Actor toBeKickedUser = req.getToBeKickedUser();
         lobby.get().leaveUser(toBeKickedUser);
-        ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
+
+        ResponseMessage kickResponse = new KickUserResponse(lobbyName, toBeKickedUser);
+        LOG.debug("Sending ForwardToUserInternalRequest containing KickUserResponse for Lobby {}", lobbyName);
         post(new ForwardToUserInternalRequest(toBeKickedUser, kickResponse));
-        sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
+
+        LOG.debug("Sending UserLeftLobbyMessage for Lobby {}", lobbyName);
+        sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, toBeKickedUser));
+
+        LOG.debug("Sending AllLobbiesMessage");
         post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
-    }
-
-    /**
-     * Handles a LobbyJoinRandomUserRequest found on the EventBus
-     * <p>
-     * If a LobbyJoinRandomUserRequest is detected on the EventBus, this method is called.
-     * It adds a user to a random lobby stored in the LobbyManagement and
-     * sends a UserJoinedLobbyMessage to every user in the lobby.
-     *
-     * @param req The LobbyJoinRandomUserRequest found on the EventBus
-     *
-     * @author Finn Haase
-     * @author Sven Ahrens
-     * @see ILobby
-     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
-     * @since 2021-04-08
-     */
-    @Subscribe
-    private void onLobbyJoinRandomUserRequest(JoinRandomLobbyRequest req) {
-        LobbyMap lobbies = lobbyManagement.getLobbies();
-        List<ILobby> filteredLobbies = new ArrayList<>();
-
-        lobbies.forEach((String, lobby) -> {
-            if (lobby.getActors().size() < lobby.getMaxPlayers() && !lobby.getActors().contains(req.getActor()) && !lobby
-                    .isInGame() && !lobby.hasPassword()) {
-                filteredLobbies.add(lobby);
-            }
-        });
-        if (!filteredLobbies.isEmpty()) {
-            int i = Util.randomInt(filteredLobbies.size());
-            ILobby randomLobby = filteredLobbies.get(i);
-
-            randomLobby.joinUser(req.getActor());
-
-            Message responseMessage = new JoinLobbyResponse(randomLobby.getName(), ILobby.getSimpleLobby(randomLobby));
-            responseMessage.initWithMessage(req);
-            post(responseMessage);
-            sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getActor()));
-            post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
-            sendColourChangedMessage(randomLobby, req.getActor());
-        } else {
-            Message responseMessage = new JoinRandomLobbyFailedResponse();
-            responseMessage.initWithMessage(req);
-            post(responseMessage);
-        }
     }
 
     /**
@@ -440,17 +479,22 @@ public class LobbyService extends AbstractService {
      * @since 2019-10-08
      */
     @Subscribe
-    private void onLobbyLeaveUserRequest(LeaveLobbyRequest req) {
-        LOG.debug("Received LobbyLeaveUserRequest for Lobby {}", req.getName());
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
+    private void onLeaveLobbyRequest(LeaveLobbyRequest req) {
+        LobbyName lobbyName = req.getName();
+        LOG.debug("Received LeaveLobbyRequest for Lobby {}", lobbyName);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isEmpty()) return;
         try {
             lobby.get().leaveUser(req.getActor());
-            sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getActor()));
+            LOG.debug("Sending UserLeftLobbyMessage for Lobby {}", lobbyName);
+            sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, req.getActor()));
+
+            LOG.debug("Sending AllLobbiesMessage");
             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
         } catch (IllegalArgumentException exception) {
-            lobbyManagement.dropLobby(lobby.get().getName());
-            sendToAll(new LobbyDeletedMessage(req.getName()));
+            lobbyManagement.dropLobby(lobbyName);
+            LOG.debug("Sending LobbyDeletedMessage for Lobby {}", lobbyName);
+            sendToAll(new LobbyDeletedMessage(lobbyName));
         }
     }
 
@@ -481,18 +525,22 @@ public class LobbyService extends AbstractService {
             if (lobby.getActors().contains(user)) {
                 LobbyName name = lobby.getName();
                 lobbiesWithUser.put(name, ILobby.getSimpleLobby(lobby));
-
                 try {
                     lobby.leaveUser(user);
+                    LOG.debug("Sending UserLeftLobbyMessage for Lobby {}", name);
                     sendToAllInLobby(name, new UserLeftLobbyMessage(name, user));
                 } catch (IllegalArgumentException exception) {
                     lobbyManagement.dropLobby(name);
+                    LOG.debug("Sending LobbyDeletedMessage for Lobby {}", name);
                     sendToAll(new LobbyDeletedMessage(name));
                 }
             }
         }
         Message response = new RemoveFromLobbiesResponse(lobbiesWithUser);
+        LOG.debug("Sending RemoveFromLobbiesResponse");
         post(response);
+
+        LOG.debug("Sending AllLobbiesMessage");
         post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
 
@@ -512,6 +560,7 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received RetrieveAllLobbiesRequest");
         Message response = new AllLobbiesResponse(lobbyManagement.getSimpleLobbies());
         response.initWithMessage(req);
+        LOG.debug("Sending AllLobbiesResponse");
         post(response);
     }
 
@@ -531,13 +580,15 @@ public class LobbyService extends AbstractService {
     private void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest req) {
         LOG.debug("Received RetrieveAllLobbyMembersRequest for Lobby {}", req.getLobbyName());
         LobbyName lobbyName = req.getLobbyName();
-        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
-        if (lobby.isPresent()) {
-            ActorSet lobbyMembers = lobby.get().getActors();
-            int maxPlayers = lobby.get().getMaxPlayers();
-            Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
-                                                           lobby.get().getReadyUsers(), maxPlayers);
+        Optional<ILobby> lobbyOptional = lobbyManagement.getLobby(lobbyName);
+        if (lobbyOptional.isPresent()) {
+            ILobby lobby = lobbyOptional.get();
+            ActorSet lobbyMembers = lobby.getActors();
+            int maxPlayers = lobby.getMaxPlayers();
+            Message response = new AllLobbyMembersResponse(lobby.getName(), lobbyMembers, lobby.getOwner(),
+                                                           lobby.getReadyUsers(), maxPlayers);
             response.initWithMessage(req);
+            LOG.debug("Sending AllLobbyMembersResponse for Lobby {}", lobbyName);
             post(response);
         } else {
             LOG.error("---- Lobby {} not found.", lobbyName);
@@ -563,15 +614,19 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onReturnToPreGameLobbyRequest(ReturnToPreGameLobbyRequest req) {
-        LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby {}", req.getLobbyName());
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getLobbyName());
+        LobbyName lobbyName = req.getLobbyName();
+        LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby {}", lobbyName);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isEmpty()) return;
-        lobbyManagement.setInGame(req.getLobbyName(), false);
+        lobbyManagement.setInGame(lobbyName, false);
         for (User user : lobby.get().getRealUsers()) {
-            post(new UserReadyRequest(req.getLobbyName(), user, false));
+            LOG.debug("Sending UserReadyRequest for Lobby {}", lobbyName);
+            post(new UserReadyRequest(lobbyName, user, false));
         }
-        sendToAllInLobby(req.getLobbyName(),
-                         new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
+        LOG.debug("Sending ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
+        sendToAllInLobby(lobbyName, new ReturnToPreGameLobbyMessage(lobbyName, lobby.get().getOwner()));
+
+        LOG.debug("Sending AllLobbiesMessage");
         sendToAll(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
 
@@ -618,8 +673,10 @@ public class LobbyService extends AbstractService {
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (!req.getActor().equals(lobby.get().getOwner())) return;
-        if (lobby.get().getActors().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActors()))) return;
+        if (lobby.get().getActors().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getActors())))
+            return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
+        LOG.debug("Sending CreateGameInternalRequest for Lobby {}", req.getName());
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getActor(), req.getMoveTime());
         post(msg);
     }
@@ -649,6 +706,7 @@ public class LobbyService extends AbstractService {
             lobby.get().unsetUserReady(req.getActor());
         }
         ServerMessage msg = new UserReadyMessage(req.getName(), req.getActor());
+        LOG.debug("Sending UserReadyMessage for Lobby {}", req.getName());
         sendToAllInLobby(req.getName(), msg);
     }
 
@@ -669,7 +727,7 @@ public class LobbyService extends AbstractService {
      */
     private void sendColourChangedMessage(ILobby lobby, Actor user) {
         LobbyName name = lobby.getName();
-        LOG.debug("Sending a ColourChangedMessage for {}", name);
+        LOG.debug("Sending ColourChangedMessage for Lobby {}", name);
         sendToAllInLobby(name, new ColourChangedMessage(name, user, lobby.getUserColourMap()));
     }
 }
