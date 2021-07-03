@@ -93,7 +93,7 @@ public class ClientModule extends AbstractModule {
         LOG.debug("Selected Language in config File: {}", properties.getProperty("lang"));
 
         //Reading the language property
-        String lang = properties.getProperty("lang");
+        ResourceManager.initialize(properties.getProperty("lang"));
 
         //Setting the rendering style
         String renderingStyle = properties.getProperty("renderingstyle");
@@ -161,7 +161,6 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
         bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
         bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
-        bindConstant().annotatedWith(Names.named("lang")).to(lang);
         bindConstant().annotatedWith(Names.named("renderingStyle")).to(renderingStyle);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
@@ -179,6 +178,5 @@ public class ClientModule extends AbstractModule {
         bind(SoundService.class).in(Scopes.SINGLETON);
         bind(ISceneService.class).to(AsyncSceneService.class).in(Scopes.SINGLETON);
         bind(SceneService.class).in(Scopes.SINGLETON);
-        requestStaticInjection(ResourceManager.class);
     }
 }

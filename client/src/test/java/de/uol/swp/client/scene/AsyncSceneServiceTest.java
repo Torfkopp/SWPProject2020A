@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncSceneServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final LobbyName defaultLobby = mock(LobbyName.class);
     private final SceneService syncSceneService = mock(SceneService.class);
     private AsyncSceneService sceneService;
@@ -37,7 +37,7 @@ class AsyncSceneServiceTest {
 
         sceneService.closeAcceptTradeWindow(defaultLobby);
 
-        verify(syncSceneService, after(DURATION)).closeAcceptTradeWindow(defaultLobby);
+        verify(syncSceneService, timeout(DURATION)).closeAcceptTradeWindow(defaultLobby);
     }
 
     @Test
@@ -46,7 +46,7 @@ class AsyncSceneServiceTest {
 
         sceneService.closeAllLobbyWindows();
 
-        verify(syncSceneService, after(DURATION)).closeAllLobbyWindows();
+        verify(syncSceneService, timeout(DURATION)).closeAllLobbyWindows();
     }
 
     @Test
@@ -55,7 +55,7 @@ class AsyncSceneServiceTest {
 
         sceneService.closeBankTradeWindow(defaultLobby, false);
 
-        verify(syncSceneService, after(DURATION)).closeBankTradeWindow(defaultLobby, false);
+        verify(syncSceneService, timeout(DURATION)).closeBankTradeWindow(defaultLobby, false);
     }
 
     @Test
@@ -64,7 +64,7 @@ class AsyncSceneServiceTest {
 
         sceneService.closeRobberTaxWindow(defaultLobby);
 
-        verify(syncSceneService, after(DURATION)).closeRobberTaxWindow(defaultLobby);
+        verify(syncSceneService, timeout(DURATION)).closeRobberTaxWindow(defaultLobby);
     }
 
     @Test
@@ -73,7 +73,7 @@ class AsyncSceneServiceTest {
 
         sceneService.closeUserTradeWindow(defaultLobby);
 
-        verify(syncSceneService, after(DURATION)).closeUserTradeWindow(defaultLobby);
+        verify(syncSceneService, timeout(DURATION)).closeUserTradeWindow(defaultLobby);
     }
 
     @Test
@@ -82,7 +82,7 @@ class AsyncSceneServiceTest {
 
         sceneService.displayChangeAccountDetailsScreen();
 
-        verify(syncSceneService, after(DURATION)).displayChangeAccountDetailsScreen();
+        verify(syncSceneService, timeout(DURATION)).displayChangeAccountDetailsScreen();
     }
 
     @Test
@@ -91,7 +91,7 @@ class AsyncSceneServiceTest {
 
         sceneService.displayChangeSettingsScreen();
 
-        verify(syncSceneService, after(DURATION)).displayChangeSettingsScreen();
+        verify(syncSceneService, timeout(DURATION)).displayChangeSettingsScreen();
     }
 
     @Test
@@ -100,7 +100,7 @@ class AsyncSceneServiceTest {
 
         sceneService.displayLoginScreen();
 
-        verify(syncSceneService, after(DURATION)).displayLoginScreen();
+        verify(syncSceneService, timeout(DURATION)).displayLoginScreen();
     }
 
     @Test
@@ -109,7 +109,7 @@ class AsyncSceneServiceTest {
 
         sceneService.displayMainMenuScreen();
 
-        verify(syncSceneService, after(DURATION)).displayMainMenuScreen();
+        verify(syncSceneService, timeout(DURATION)).displayMainMenuScreen();
     }
 
     @Test
@@ -118,7 +118,7 @@ class AsyncSceneServiceTest {
 
         sceneService.displayRegistrationScreen();
 
-        verify(syncSceneService, after(DURATION)).displayRegistrationScreen();
+        verify(syncSceneService, timeout(DURATION)).displayRegistrationScreen();
     }
 
     @Test
@@ -130,7 +130,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openAcceptTradeWindow(defaultLobby, actor, response);
 
-        verify(syncSceneService, after(DURATION)).openAcceptTradeWindow(defaultLobby, actor, response);
+        verify(syncSceneService, timeout(DURATION)).openAcceptTradeWindow(defaultLobby, actor, response);
     }
 
     @Test
@@ -139,7 +139,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openBankTradeWindow(defaultLobby);
 
-        verify(syncSceneService, after(DURATION)).openBankTradeWindow(defaultLobby);
+        verify(syncSceneService, timeout(DURATION)).openBankTradeWindow(defaultLobby);
     }
 
     @Test
@@ -149,7 +149,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openLobbyWindow(lobby);
 
-        verify(syncSceneService, after(DURATION)).openLobbyWindow(lobby);
+        verify(syncSceneService, timeout(DURATION)).openLobbyWindow(lobby);
     }
 
     @Test
@@ -160,7 +160,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openRobberTaxWindow(defaultLobby, 69, inventory);
 
-        verify(syncSceneService, after(DURATION)).openRobberTaxWindow(defaultLobby, 69, inventory);
+        verify(syncSceneService, timeout(DURATION)).openRobberTaxWindow(defaultLobby, 69, inventory);
     }
 
     @Test
@@ -169,7 +169,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openRulesWindow();
 
-        verify(syncSceneService, after(DURATION)).openRulesWindow();
+        verify(syncSceneService, timeout(DURATION)).openRulesWindow();
     }
 
     @Test
@@ -180,7 +180,7 @@ class AsyncSceneServiceTest {
 
         sceneService.openUserTradeWindow(defaultLobby, actor, false);
 
-        verify(syncSceneService, after(DURATION)).openUserTradeWindow(defaultLobby, actor, false);
+        verify(syncSceneService, timeout(DURATION)).openUserTradeWindow(defaultLobby, actor, false);
     }
 
     @Test
@@ -190,7 +190,7 @@ class AsyncSceneServiceTest {
 
         sceneService.showError(message);
 
-        verify(syncSceneService, after(DURATION)).showError(message);
+        verify(syncSceneService, timeout(DURATION)).showError(message);
     }
 
     @Test
@@ -200,7 +200,7 @@ class AsyncSceneServiceTest {
 
         sceneService.showServerError(message);
 
-        verify(syncSceneService, after(DURATION)).showServerError(message);
+        verify(syncSceneService, timeout(DURATION)).showServerError(message);
     }
 
     @Test
@@ -211,6 +211,6 @@ class AsyncSceneServiceTest {
 
         sceneService.showServerError(throwable, message);
 
-        verify(syncSceneService, after(DURATION)).showServerError(throwable, message);
+        verify(syncSceneService, timeout(DURATION)).showServerError(throwable, message);
     }
 }
