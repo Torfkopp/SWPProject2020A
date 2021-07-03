@@ -188,7 +188,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
-        if (!Util.equals(lobbyName, event.getLobby().getName())) return;
+        if (lobbyName != null) return;
         LOG.debug("Received LobbyUpdateEvent for Lobby {}", event.getLobby().getName());
         if (lobbyName == null) {
             lobbyName = event.getLobby().getName();
