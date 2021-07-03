@@ -143,10 +143,10 @@ public class GameAI {
                 }
         }
         mapPoint = MapPoint.HexMapPoint(y, x);
-        GameService.LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
+        LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
         map.moveRobber(mapPoint);
-        GameService.LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, ai, mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
@@ -186,7 +186,7 @@ public class GameAI {
         int i = inv.getResourceAmount() / 2;
         writeChatMessageAI(ai, game.getLobby().getName(), AI.WriteType.TAX);
 
-        GameService.LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
+        LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
         switch (ai.getDifficulty()) {
             case EASY:
                 while (i > 0) {
@@ -381,6 +381,7 @@ public class GameAI {
                     // NotEnoughResourcesExceptions can be ignored because of the
                     // if clause several lines higher which guarantees enough GRAIN and ORE
                     inv.removeCityResources();
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
                     return true;
                 }
@@ -488,6 +489,7 @@ public class GameAI {
                 // NotEnoughResourcesExceptions can be ignored because of the if clause
                 // which guarantees enough resources
                 inv.removeRoadResources();
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, ROAD));
             }
         }
@@ -548,6 +550,7 @@ public class GameAI {
                             game.setPlayerWithLongestRoad(null);
                             game.setLongestRoadLength(0);
                         }
+                        LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                         lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName,
                                                                                                   game.getUniqueCardsList()));
                     }
@@ -555,6 +558,7 @@ public class GameAI {
                         harbours.putIfAbsent(ai, new ArrayList<>());
                         harbours.get(ai).add(map.getHarbourResource(mp));
                     }
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService
                             .sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
                     return true;
@@ -809,6 +813,7 @@ public class GameAI {
             System.err.println(mp.getY() + " " + mp.getX());
             built = map.placeFoundingSettlement(player, mp);
         }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
 
         List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
@@ -821,6 +826,7 @@ public class GameAI {
             built = map.placeRoad(player, edge);
         }
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName,
                                       new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge), ROAD));
     }
@@ -858,6 +864,7 @@ public class GameAI {
                 mapPoint = mp;
                 break;
             }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, SETTLEMENT));
 
         //Build road in the direction of the next best rated point
@@ -875,6 +882,7 @@ public class GameAI {
 
         map.placeRoad(player, road);
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, road, ROAD));
     }
 
@@ -920,6 +928,7 @@ public class GameAI {
             // at least 2 GRAIN and 3 ORE
             inv.removeCityResources();
             map.upgradeSettlement(player, mp);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
         }
 
@@ -940,9 +949,11 @@ public class GameAI {
                     game.setPlayerWithLongestRoad(null);
                     game.setLongestRoadLength(0);
                 }
+                LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
             }
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
         }
 
@@ -955,6 +966,7 @@ public class GameAI {
             // at least +1 of each resource
             inv.removeRoadResources();
             mp = map.getEdgeMapPoint(edge);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
         }
 
@@ -1052,12 +1064,14 @@ public class GameAI {
                 // exception can be ignored because the if condition above guarantees
                 // at least 1 Road Building Card
                 inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge),
                                                                             ROAD));
                 if (roads.size() > 2) {
                     edge = roads.remove(Util.randomInt(roads.size()));
                     game.getMap().placeRoad(player, roads.remove(Util.randomInt(roads.size())));
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai,
                                                                                            map.getEdgeMapPoint(edge),
                                                                                            ROAD));
