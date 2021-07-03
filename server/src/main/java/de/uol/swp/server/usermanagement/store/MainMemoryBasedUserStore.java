@@ -16,7 +16,7 @@ import java.util.*;
  *
  * @author Marco Grawunder
  * @implNote This store will never return the password of a user!
- * @see IUserStore
+ * @see de.uol.swp.server.usermanagement.store.IUserStore
  * @since 2019-08-05
  */
 public class MainMemoryBasedUserStore implements IUserStore {

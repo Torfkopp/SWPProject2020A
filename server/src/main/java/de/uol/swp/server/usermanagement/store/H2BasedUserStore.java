@@ -22,7 +22,7 @@ import java.util.Optional;
  * @author Aldin Dervisi
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see IUserStore
+ * @see de.uol.swp.server.usermanagement.store.IUserStore
  * @since 2021-01-20
  */
 public class H2BasedUserStore implements IUserStore {
