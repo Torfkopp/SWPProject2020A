@@ -58,6 +58,7 @@ public class Game {
     private boolean pausedByVoting = false;
     private int round = 1;
     private ActorPair robResourceReceiverVictimPair = null;
+    private Actor robberMover = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -229,17 +230,6 @@ public class Game {
     }
 
     /**
-     * Returns the user corresponding with the given player
-     *
-     * @param player The player whose User is required
-     *
-     * @return The user needed
-     */
-    public Actor getActorFromPlayer(Player player) {
-        return players.getActorFromPlayer(player);
-    }
-
-    /**
      * Sets the active player
      *
      * @param newActivePlayer The active player who gets set
@@ -249,6 +239,17 @@ public class Game {
      */
     private void setActivePlayer(Actor newActivePlayer) {
         activePlayer = newActivePlayer;
+    }
+
+    /**
+     * Returns the user corresponding with the given player
+     *
+     * @param player The player whose User is required
+     *
+     * @return The user needed
+     */
+    public Actor getActorFromPlayer(Player player) {
+        return players.getActorFromPlayer(player);
     }
 
     /**
@@ -560,6 +561,30 @@ public class Game {
     }
 
     /**
+     * Gets the user who currently has to move the robber
+     *
+     * @return The user who has to move the robber, null if not applicable
+     *
+     * @author Eric Vuong
+     * @since 2021-07-03
+     */
+    public Actor getRobberMover() {
+        return robberMover;
+    }
+
+    /**
+     * Sets the user who currently has to move the robber
+     *
+     * @param robberMover The user who has to move the robber
+     *
+     * @author Eric Vuong
+     * @since 2021-07-03
+     */
+    public void setRobberMover(Actor robberMover) {
+        this.robberMover = robberMover;
+    }
+
+    /**
      * Gets the current Round the Game is in
      *
      * @author Aldin Dervisi
@@ -761,8 +786,8 @@ public class Game {
     /**
      * Replace a User who leaves a lobby in Game with an AI
      *
-     * @param userToReplace     The user who left the lobby and should be replace
-     * @param userToReplaceWith The AI that replace the user who left the lobby
+     * @param userToReplace     The user who left the lobby and should be replaced
+     * @param userToReplaceWith The AI that replaces the user who left the lobby
      *
      * @author Eric Vuong
      * @since 2021-06-10
@@ -774,6 +799,9 @@ public class Game {
         pauseGameMap.put(userToReplaceWith, true);
         StartUpPhaseBuiltStructures build = playersStartUpBuiltMap.remove(userToReplace);
         playersStartUpBuiltMap.put(userToReplaceWith, build);
+        Map<Integer, Integer> currentVictoryPoints = victoryPointsOverTimeMap.remove(userToReplace);
+        victoryPointsOverTimeMap.put(userToReplaceWith, currentVictoryPoints);
+        if (Objects.equals(robberMover, userToReplace)) robberMover = userToReplaceWith;
         for (int i = 0; i < startUpPlayerOrder.size(); i++) {
             Actor user = startUpPlayerOrder.get(i);
             if (Objects.equals(user, userToReplace)) {

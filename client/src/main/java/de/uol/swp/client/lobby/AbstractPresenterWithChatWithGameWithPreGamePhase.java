@@ -141,6 +141,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         });
         sceneService.closeUserTradeWindow(lobbyName);
         sceneService.closeAcceptTradeWindow(lobbyName);
+        sceneService.closeRobberTaxWindow(lobbyName);
     }
 
     /**
@@ -273,7 +274,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
-                lobbyMembers.addAll(inGameUserList);
+                lobbyMembers.addAll(userLobbyList);
                 return;
             }
             if (lobbyMembers == null) {
@@ -541,7 +542,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
-        inGameUserList = msg.getPlayerList();
+        updateUsersList(msg.getPlayerList());
         actorPlayerMap = msg.getActorPlayerMap();
         userColoursMap = msg.getActorColourMap();
         gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));

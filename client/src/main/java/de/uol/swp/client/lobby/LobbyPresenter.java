@@ -52,6 +52,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int MIN_WIDTH_PRE_GAME = 695;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
+    private boolean leftGame = false;
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
     private final boolean joinLeaveMsgsOn;
@@ -168,7 +169,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         //Result is the button the user has clicked on
         if (result.isPresent() && result.get() == lConfirm) {
             closeWindow(false);
-            lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
+            if (!leftGame) lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
+            leftGame = true;
         }
         soundService.button();
     }
@@ -251,6 +253,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         // onCloseRequest already set by SceneManager, so do not overwrite
         this.window.setOnHiding(windowEvent -> {
             closeWindow(false);
+            if (!leftGame) lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
+            leftGame = true;
             clearEventBus();
         });
         lobbyService.retrieveAllLobbyMembers(lobbyName);

@@ -233,10 +233,9 @@ public class GameService extends AbstractService {
             }
             VictoryPointOverTimeMap victoryPointsOverTimeMap = game.getVictoryPointsOverTimeMap();
             Map<Integer, Integer> integerIntegerMap = victoryPointsOverTimeMap.get(player);
-            int round = game.getRound();
             Player player1 = game.getPlayer(player);
             int victoryPoints = game.calculateVictoryPoints(player1);
-            integerIntegerMap.put(round, victoryPoints);
+            integerIntegerMap.put(game.getRound(), victoryPoints);
         }
         ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
         lobbyService.sendToAllInLobby(originLobby, msg);
@@ -1408,30 +1407,52 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onReplaceUserWithAIRequest(ReplaceUserWithAIRequest req) {
-        LOG.debug("Received ReplaceUserWithAiRequest");
         LobbyName originLobby = req.getOriginLobby();
+        LOG.debug("Received ReplaceUserWithAiRequest for Lobby {}", originLobby);
         Game game = gameManagement.getGame(originLobby);
-        if (game == null) return;
-        Actor activePlayer = game.getActivePlayer();
-        AIDTO userToReplaceWith = new AIDTO(AI.Difficulty.EASY);
-        game.replaceUser(req.getUserToReplace(), userToReplaceWith);
+        Actor userToReplace = req.getUserToReplace();
         Optional<ILobby> lobby = lobbyManagement.getLobby(originLobby);
-        if (lobby.isPresent()) {
-            lobby.get().replaceUser(req.getUserToReplace(), userToReplaceWith, req.getOldColour());
-            ServerMessage message = new UserJoinedLobbyMessage(originLobby, userToReplaceWith);
-            lobbyService.sendToAllInLobby(originLobby, message);
-            if (Objects.equals(req.getUserToReplace(), activePlayer)) {
-                if (!game.isDiceRolledAlready()) onRollDiceRequest(new RollDiceRequest(userToReplaceWith, originLobby));
-                if (game.getTaxPayers().contains((User) req.getUserToReplace())) {
-                    gameAI.taxPayAI(game, userToReplaceWith);
-                    onRobberTaxChosenRequest(
-                            new RobberTaxChosenRequest(new ResourceList(), (User) req.getUserToReplace(), originLobby));
-                }
-                gameAI.turnAI(game, userToReplaceWith);
-            }
-            lobbyService.sendToAllInLobby(originLobby, new ColourChangedMessage(originLobby, userToReplaceWith,
-                                                                                lobby.get().getUserColourMap()));
+        if (lobby.isEmpty() || game == null || !game.getPlayerList().contains(userToReplace)) return;
+        Actor activePlayer = game.getActivePlayer();
+        AIDTO replacement = new AIDTO(AI.Difficulty.EASY);
+
+        try {
+            lobby.get().replaceUser(userToReplace, replacement, req.getOldColour());
+        } catch (IllegalArgumentException e) {
+            lobbyManagement.dropLobby(originLobby);
+            LOG.debug("Sending LobbyDeletedMessage");
+            sendToAll(new LobbyDeletedMessage(originLobby));
+            return;
         }
+        game.replaceUser(userToReplace, replacement);
+        ServerMessage message = new UserJoinedLobbyMessage(originLobby, replacement);
+        LOG.debug("Sending UserJoinedLobbyMessage for Lobby {}", originLobby);
+        lobbyService.sendToAllInLobby(originLobby, message);
+
+        if (game.getTaxPayers().contains(userToReplace)) {
+            gameAI.taxPayAI(game, replacement);
+            game.getTaxPayers().remove(userToReplace);
+            if (game.getTaxPayers().isEmpty()) {
+                LOG.debug("Sending RobberAllTaxPaidMessage for Lobby {}", originLobby);
+                lobbyService.sendToAllInLobby(originLobby,
+                                              new RobberAllTaxPaidMessage(originLobby, game.getActivePlayer()));
+            }
+        }
+
+        if (Objects.equals(userToReplace, activePlayer)) {
+            if (!game.isDiceRolledAlready()) onRollDiceRequest(new RollDiceRequest(replacement, originLobby));
+            if (replacement.equals(game.getRobberMover())) gameAI.robberMovementAI(replacement, originLobby);
+            gameAI.turnAI(game, replacement);
+        }
+
+        if (activePlayer instanceof Dummy) turnEndDummy(game, (Dummy) activePlayer);
+        else if (activePlayer instanceof AI) turnEndAI(game, (AI) activePlayer);
+        LOG.debug("Sending ColourChangedMessage for Lobby {}", originLobby);
+        lobbyService.sendToAllInLobby(originLobby, new ColourChangedMessage(originLobby, replacement,
+                                                                            lobby.get().getUserColourMap()));
+        ServerMessage msg = new RefreshCardAmountMessage(originLobby, replacement, game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", originLobby);
+        lobbyService.sendToAllInLobby(originLobby, msg);
     }
 
     /**
@@ -1524,7 +1545,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
         LOG.debug("Received RobberNewPositionChosenRequest for Lobby {}", msg.getLobby());
-        IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
+        Game game = gameManagement.getGame(msg.getLobby());
+        IGameMapManagement map = game.getMap();
         int newRobberPositionY = msg.getPosition().getY();
         int newRobberPositionX = msg.getPosition().getX();
         int oldRobberPositionY = map.getRobberPosition().getY();
@@ -1543,19 +1565,20 @@ public class GameService extends AbstractService {
         }
 
         map.moveRobber(msg.getPosition());
+        game.setRobberMover(null);
         LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
         Set<Player> players = new HashSet<>(map.getPlayersAroundHex(msg.getPosition()));
         ActorSet victims = new ActorSet();
-        for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getActorFromPlayer(p));
+        for (Player p : players) victims.add(game.getActorFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
             ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
             rcvm.initWithMessage(msg);
             post(rcvm);
         } else if (players.size() == 1) {
-            robRandomResource(gameManagement.getGame(msg.getLobby()), msg.getPlayer(), victims.get(0));
+            robRandomResource(game, msg.getPlayer(), victims.get(0));
         }
     }
 
@@ -1574,7 +1597,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onRobberTaxChosenRequest(RobberTaxChosenRequest req) {
         LOG.debug("Received RobberTaxChosenRequest for Lobby {}", req.getLobby());
-        Inventory i = gameManagement.getGame(req.getLobby()).getInventory(req.getPlayer());
+        Game game = gameManagement.getGame(req.getLobby());
+        Inventory i = game.getInventory(req.getPlayer());
         for (IResource r : req.getResources()) {
             try {
                 i.decrease(r.getType(), r.getAmount());
@@ -1587,11 +1611,9 @@ public class GameService extends AbstractService {
             }
         }
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getLobby());
-        ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(),
-                                                         gameManagement.getGame(req.getLobby()).getCardAmounts());
+        ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(), game.getCardAmounts());
         lobbyService.sendToAllInLobby(req.getLobby(), msg);
 
-        Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
         if (game.getTaxPayers().isEmpty()) lobbyService
                 .sendToAllInLobby(req.getLobby(), new RobberAllTaxPaidMessage(req.getLobby(), game.getActivePlayer()));
@@ -1657,6 +1679,7 @@ public class GameService extends AbstractService {
             } else if (req.getActor() instanceof AI) {
                 gameAI.robberMovementAI((AI) req.getActor(), req.getOriginLobby());
             } else {
+                game.setRobberMover(req.getActor());
                 robberMovementPlayer(req, (User) req.getActor());
             }
         } else {
