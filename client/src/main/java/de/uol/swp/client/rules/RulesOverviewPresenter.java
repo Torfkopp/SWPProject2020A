@@ -30,7 +30,7 @@ import java.util.Map;
 public class RulesOverviewPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RulesOverviewView.fxml";
-    public static final int MIN_HEIGHT = 550;
+    public static final int MIN_HEIGHT = 620;
     public static final int MIN_WIDTH = 700;
 
     private static final int MIN_LONG_TEXT_HEIGHT = 700;
