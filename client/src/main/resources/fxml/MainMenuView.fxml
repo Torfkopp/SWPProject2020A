@@ -55,7 +55,7 @@
                 <MenuItem onAction="#onDeleteButtonPressed" text="%mainmenu.settings.buttons.deleteuser"/>
                 <MenuItem onAction="#onLogoutButtonPressed" text="%mainmenu.settings.buttons.logout"/>
                 <MenuItem onAction="#onChangePropertiesButtonPressed"
-                          text="%mainmenu.settings.buttons.changeproperties"/>
+                          text="%mainmenu.settings.buttons.changesettings"/>
             </Menu>
             <Menu text="%lobby.menu.rules">
                 <MenuItem onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>

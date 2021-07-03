@@ -306,7 +306,7 @@ class SceneManagerTest {
             mockedHelper.when(() -> PresenterAndStageHelper
                     .showSceneOnPrimaryStage(isA(Stage.class), isA(Scene.class), isA(String.class), isA(Integer.class),
                                              isA(Integer.class))).then(invocation -> null);
-            String title = ResourceManager.get("changeproperties.window.title");
+            String title = ResourceManager.get("changesettings.window.title");
             int minHeight = ChangeSettingsPresenter.MIN_HEIGHT;
             int minWidth = ChangeSettingsPresenter.MIN_WIDTH;
 
@@ -460,6 +460,32 @@ class SceneManagerTest {
                     .makeAndShowStage(eq(primary), eq(fxml), eq(title), eq(minHeight), eq(minWidth), eq(10.0), eq(10.0),
                                       eq(defaultLobby), isA(LobbyStageMap.class), isA(EventHandler.class), eq(false),
                                       eq(true), eq(mockLatch)));
+        }
+    }
+
+    @Test
+    void showLogOldSessionOutScreen() {
+        try (MockedStatic<PresenterAndStageHelper> mockedHelper = mockStatic(PresenterAndStageHelper.class)) {
+            mockedHelper.when(() -> PresenterAndStageHelper.initPresenter(isA(String.class)))
+                        .thenReturn(new Scene(new Pane()));
+            mockedHelper.when(() -> PresenterAndStageHelper
+                    .showAndGetConfirmation(isA(String.class), isA(String.class), isA(String.class), isA(String.class),
+                                            isA(String.class), isA(Alert.AlertType.class), isA(Runnable.class)))
+                        .then(invocation -> null);
+            String title = ResourceManager.get("confirmation.title");
+            String expectedContent = ResourceManager.get("logoldsessionout.error");
+            String header = ResourceManager.get("confirmation.header");
+            String confirm = ResourceManager.get("button.confirm");
+            String cancel = ResourceManager.get("button.cancel");
+
+            SceneManager sceneManager = new SceneManager(soundService, eventBus, primary, tradeService);
+
+            sceneManager.showLogOldSessionOutScreen(mockUser);
+
+            verify(soundService).popup();
+            mockedHelper.verify(() -> PresenterAndStageHelper
+                    .showAndGetConfirmation(eq(title), eq(expectedContent), eq(header), eq(confirm), eq(cancel),
+                                            eq(Alert.AlertType.CONFIRMATION), isA(Runnable.class)));
         }
     }
 

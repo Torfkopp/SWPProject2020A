@@ -206,6 +206,8 @@ public class Game {
             for (IIntersection i : map.getIntersectionsFromHex(mapPoint)) {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
+                // NotEnoughResourcesExceptions can be ignored here because amount gets
+                // defined above as +1 or +2, which won't take the Inventory into the negative
                 if (i.getOwner() != null) {
                     getInventory(i.getOwner()).increase(hex.getResource(), amount);
                 }
@@ -224,6 +226,17 @@ public class Game {
      */
     public Actor getActivePlayer() {
         return activePlayer;
+    }
+
+    /**
+     * Returns the user corresponding with the given player
+     *
+     * @param player The player whose User is required
+     *
+     * @return The user needed
+     */
+    public Actor getActorFromPlayer(Player player) {
+        return players.getActorFromPlayer(player);
     }
 
     /**
@@ -633,17 +646,6 @@ public class Game {
      */
     public ActorColourMap getUserColoursMap() {
         return lobby.getUserColourMap();
-    }
-
-    /**
-     * Returns the user corresponding with the given player
-     *
-     * @param player The player whose User is required
-     *
-     * @return The user needed
-     */
-    public Actor getActorFromPlayer(Player player) {
-        return players.getActorFromPlayer(player);
     }
 
     /**
