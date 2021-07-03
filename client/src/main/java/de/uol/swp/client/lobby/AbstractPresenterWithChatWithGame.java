@@ -162,7 +162,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ActorSet inGameUserList;
     protected boolean drawHitboxGrid;
     protected String renderingStyle;
-    private DevelopmentCardList developmentCardResourceList;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
