@@ -13,11 +13,11 @@ import static org.mockito.Mockito.*;
 
 class AsyncTradeServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final LobbyName defaultLobby = mock(LobbyName.class);
     private final Actor otherUser = mock(Actor.class);
     private final TradeService syncTradeService = mock(TradeService.class);
-    AsyncTradeService tradeService;
+    private AsyncTradeService tradeService;
 
     @BeforeEach
     protected void setUp() {
@@ -40,7 +40,7 @@ class AsyncTradeServiceTest {
 
         tradeService.acceptUserTrade(defaultLobby, otherUser, offered, demanded);
 
-        verify(syncTradeService, after(DURATION)).acceptUserTrade(defaultLobby, otherUser, offered, demanded);
+        verify(syncTradeService, timeout(DURATION)).acceptUserTrade(defaultLobby, otherUser, offered, demanded);
     }
 
     @Test
@@ -49,7 +49,7 @@ class AsyncTradeServiceTest {
 
         tradeService.buyDevelopmentCard(defaultLobby);
 
-        verify(syncTradeService, after(DURATION)).buyDevelopmentCard(defaultLobby);
+        verify(syncTradeService, timeout(DURATION)).buyDevelopmentCard(defaultLobby);
     }
 
     @Test
@@ -58,7 +58,7 @@ class AsyncTradeServiceTest {
 
         tradeService.cancelTrade(defaultLobby, otherUser);
 
-        verify(syncTradeService, after(DURATION)).cancelTrade(defaultLobby, otherUser);
+        verify(syncTradeService, timeout(DURATION)).cancelTrade(defaultLobby, otherUser);
     }
 
     @Test
@@ -70,7 +70,7 @@ class AsyncTradeServiceTest {
 
         tradeService.executeTradeWithBank(defaultLobby, giveResource, loseResource);
 
-        verify(syncTradeService, after(DURATION)).executeTradeWithBank(defaultLobby, giveResource, loseResource);
+        verify(syncTradeService, timeout(DURATION)).executeTradeWithBank(defaultLobby, giveResource, loseResource);
     }
 
     @Test
@@ -83,7 +83,7 @@ class AsyncTradeServiceTest {
 
         tradeService.offerTrade(defaultLobby, otherUser, offered, demanded, false);
 
-        verify(syncTradeService, after(DURATION)).offerTrade(defaultLobby, otherUser, offered, demanded, false);
+        verify(syncTradeService, timeout(DURATION)).offerTrade(defaultLobby, otherUser, offered, demanded, false);
     }
 
     @Test
@@ -92,7 +92,7 @@ class AsyncTradeServiceTest {
 
         tradeService.resetOfferTradeButton(defaultLobby, otherUser);
 
-        verify(syncTradeService, after(DURATION)).resetOfferTradeButton(defaultLobby, otherUser);
+        verify(syncTradeService, timeout(DURATION)).resetOfferTradeButton(defaultLobby, otherUser);
     }
 
     @Test
@@ -101,7 +101,7 @@ class AsyncTradeServiceTest {
 
         tradeService.tradeWithBank(defaultLobby);
 
-        verify(syncTradeService, after(DURATION)).tradeWithBank(defaultLobby);
+        verify(syncTradeService, timeout(DURATION)).tradeWithBank(defaultLobby);
     }
 
     @Test
@@ -110,6 +110,6 @@ class AsyncTradeServiceTest {
 
         tradeService.tradeWithUser(defaultLobby, otherUser, false);
 
-        verify(syncTradeService, after(DURATION)).tradeWithUser(defaultLobby, otherUser, false);
+        verify(syncTradeService, timeout(DURATION)).tradeWithUser(defaultLobby, otherUser, false);
     }
 }

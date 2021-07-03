@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.exception.NotEnoughResourcesException;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
@@ -17,11 +18,13 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -39,6 +42,7 @@ import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.r
  */
 public class GameAI {
 
+    private static final Logger LOG = LogManager.getLogger(GameAI.class);
     private final GameService gameService;
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
@@ -140,10 +144,10 @@ public class GameAI {
                 }
         }
         mapPoint = MapPoint.HexMapPoint(y, x);
-        GameService.LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
+        LOG.debug("{} moves the robber to position: {}|{}", ai, y, x);
         map.moveRobber(mapPoint);
-        GameService.LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, ai, mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, msg);
 
         //Pick victim to steal random card from
@@ -183,12 +187,14 @@ public class GameAI {
         int i = inv.getResourceAmount() / 2;
         writeChatMessageAI(ai, game.getLobby().getName(), AI.WriteType.TAX);
 
-        GameService.LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
+        LOG.debug("{} has to give up {} of their {} cards", ai, i, inv.getResourceAmount());
         switch (ai.getDifficulty()) {
             case EASY:
                 while (i > 0) {
                     for (ResourceType resourceType : ResourceType.values()) {
                         if (inv.get(resourceType) > 0) {
+                            // NotEnoughResourcesException can be ignored because the if clause
+                            // guarantees enough resources
                             inv.increase(resourceType, -1);
                             i--;
                             if (i == 0) break;
@@ -201,7 +207,14 @@ public class GameAI {
                 while (i > 0) {
                     for (IResource r : inv.getResources())
                         if (r.getAmount() > inv.getResources().getAmount(highest)) highest = r.getType();
-                    inv.decrease(highest);
+                    try {
+                        inv.decrease(highest);
+                    } catch (NotEnoughResourcesException e) {
+                        // entirely empty inventory or similar issues might cause
+                        // a decrease by -1 or similar
+                        LOG.error(e.getMessage());
+                        continue;
+                    }
                     i--;
                 }
         }
@@ -366,8 +379,11 @@ public class GameAI {
             if (settlements.containsValue(i)) for (MapPoint mp : settlements.keySet())
                 if (settlements.get(mp) == i) {
                     map.upgradeSettlement(player, mp);
+                    // NotEnoughResourcesExceptions can be ignored because of the
+                    // if clause several lines higher which guarantees enough GRAIN and ORE
                     inv.decrease(GRAIN, 2);
                     inv.decrease(ORE, 3);
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
                     return true;
                 }
@@ -472,8 +488,11 @@ public class GameAI {
             mapPoint = MapPoint.EdgeMapPoint(path.get(i), path.get(i + 1));
             if (game.getMap().roadPlaceable(game.getPlayer(ai), mapPoint)) {
                 game.getMap().placeRoad(game.getPlayer(ai), mapPoint);
+                // NotEnoughResourcesExceptions can be ignored because of the if clause
+                // which guarantees enough resources
                 inv.decrease(BRICK);
                 inv.decrease(LUMBER);
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, ROAD));
             }
         }
@@ -494,7 +513,7 @@ public class GameAI {
      */
     private boolean buildSettlement(Game game, AI ai) {
         Inventory inv = game.getInventory(ai);
-        if (!(inv.get(LUMBER) >= 1 && inv.get(BRICK) >= 1 && inv.get(GRAIN) >= 1 && inv.get(WOOL) >= 1)) return false;
+        if (inv.get(LUMBER) < 1 || inv.get(BRICK) < 1 || inv.get(GRAIN) < 1 || inv.get(WOOL) < 1) return false;
         IGameMapManagement map = game.getMap();
         List<MapPoint> intersections = new ArrayList<>();
         LobbyName lobbyName = game.getLobby().getName();
@@ -521,6 +540,12 @@ public class GameAI {
                     }
                 if (aiBuildPriority.get(game).get(mp) == i) {
                     try {
+                        // NotEnoughResourcesExceptions can be ignored because of the if clause
+                        // at the beginning which guarantees enough resources
+                        inv.decrease(BRICK);
+                        inv.decrease(LUMBER);
+                        inv.decrease(GRAIN);
+                        inv.decrease(WOOL);
                         map.placeSettlement(player, mp);
                     } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
                         GameMapManagement.PlayerWithLengthOfLongestRoad a = map.findLongestRoad();
@@ -531,6 +556,7 @@ public class GameAI {
                             game.setPlayerWithLongestRoad(null);
                             game.setLongestRoadLength(0);
                         }
+                        LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                         lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName,
                                                                                                   game.getUniqueCardsList()));
                     }
@@ -538,10 +564,7 @@ public class GameAI {
                         harbours.putIfAbsent(ai, new ArrayList<>());
                         harbours.get(ai).add(map.getHarbourResource(mp));
                     }
-                    inv.decrease(BRICK);
-                    inv.decrease(LUMBER);
-                    inv.decrease(GRAIN);
-                    inv.decrease(WOOL);
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService
                             .sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
                     return true;
@@ -712,30 +735,56 @@ public class GameAI {
         Inventory inv = game.getInventory(ai);
         LobbyName lobbyName = game.getLobby().getName();
         switch (type) {
+            // None of these guarantee the Card exists, so try/catch for NotEnoughResourcesExceptions
             case KNIGHT_CARD:
-                inv.decrease(DevelopmentCardType.KNIGHT_CARD);
+                try {
+                    inv.decrease(DevelopmentCardType.KNIGHT_CARD);
+                } catch (NotEnoughResourcesException e) {
+                    LOG.error(e.getMessage());
+                    break;
+                }
                 inv.increaseKnights();
                 gameService.checkLargestArmy(lobbyName, ai);
                 gameService.updateVictoryPoints(lobbyName);
                 robberMovementAI(ai, lobbyName);
                 break;
             case ROAD_BUILDING_CARD:
-                inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
-                inv.increase(BRICK, 2);
-                inv.increase(LUMBER, 2);
+                try {
+                    inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+                    inv.increase(BRICK, 2);
+                    inv.increase(LUMBER, 2);
+                } catch (NotEnoughResourcesException e) {
+                    LOG.error(e.getMessage());
+                    break;
+                }
                 break;
             case YEAR_OF_PLENTY_CARD:
-                inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
+                try {
+                    inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
+                } catch (NotEnoughResourcesException e) {
+                    LOG.error(e.getMessage());
+                    break;
+                }
                 inv.increase(res1);
                 inv.increase(res2);
                 break;
             case MONOPOLY_CARD:
-                inv.decrease(DevelopmentCardType.MONOPOLY_CARD);
+                try {
+                    inv.decrease(DevelopmentCardType.MONOPOLY_CARD);
+                } catch (NotEnoughResourcesException e) {
+                    LOG.error(e.getMessage());
+                    break;
+                }
                 Inventory[] inventories = game.getAllInventories();
                 for (Inventory i : inventories)
                     if (i.get(res1) > 0) {
-                        inv.increase(res1, i.get(res1));
-                        i.decrease(res1, i.get(res1));
+                        try {
+                            inv.increase(res1, i.get(res1));
+                            i.decrease(res1, i.get(res1));
+                        } catch (NotEnoughResourcesException e) {
+                            LOG.error(e.getMessage());
+                            return;
+                        }
                     }
                 writeChatMessageAI(ai, lobbyName, AI.WriteType.MONOPOLY);
                 break;
@@ -770,6 +819,7 @@ public class GameAI {
             System.err.println(mp.getY() + " " + mp.getX());
             built = map.placeFoundingSettlement(player, mp);
         }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
 
         List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
@@ -782,6 +832,7 @@ public class GameAI {
             built = map.placeRoad(player, edge);
         }
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName,
                                       new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge), ROAD));
     }
@@ -819,6 +870,7 @@ public class GameAI {
                 mapPoint = mp;
                 break;
             }
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, SETTLEMENT));
 
         //Build road in the direction of the next best rated point
@@ -836,6 +888,7 @@ public class GameAI {
 
         map.placeRoad(player, road);
 
+        LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, road, ROAD));
     }
 
@@ -877,9 +930,12 @@ public class GameAI {
         //Build City for Rock 'n' Roll
         while (inv.get(GRAIN) >= 2 && inv.get(ORE) >= 3 && !cities.isEmpty()) {
             mp = cities.remove(Util.randomInt(cities.size()));
-            map.upgradeSettlement(player, mp);
+            // exception can be ignored because the while loop condition guarantees
+            // at least 2 GRAIN and 3 ORE
             inv.decrease(GRAIN, 2);
             inv.decrease(ORE, 3);
+            map.upgradeSettlement(player, mp);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, CITY));
         }
 
@@ -888,6 +944,12 @@ public class GameAI {
                 .isEmpty()) {
             mp = settlements.remove(Util.randomInt(settlements.size()));
             try {
+                // NotEnoughResourcesExceptions can be ignored because the while loop condition guarantees
+                // at least +1 of each resource
+                inv.decrease(BRICK);
+                inv.decrease(LUMBER);
+                inv.decrease(GRAIN);
+                inv.decrease(WOOL);
                 map.placeSettlement(player, mp);
             } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
                 GameMapManagement.PlayerWithLengthOfLongestRoad a = map.findLongestRoad();
@@ -898,13 +960,11 @@ public class GameAI {
                     game.setPlayerWithLongestRoad(null);
                     game.setLongestRoadLength(0);
                 }
+                LOG.debug("Sending UpdateUniqueCardsListMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
             }
-            inv.decrease(BRICK);
-            inv.decrease(LUMBER);
-            inv.decrease(GRAIN);
-            inv.decrease(WOOL);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
         }
 
@@ -913,9 +973,12 @@ public class GameAI {
         while (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && !roads.isEmpty()) {
             IEdge edge = roads.remove(Util.randomInt(roads.size()));
             map.placeRoad(player, edge);
+            // NotEnoughResourcesExceptions can be ignored because the while loop condition guarantees
+            // at least +1 of each resource
             inv.decrease(BRICK);
             inv.decrease(LUMBER);
             mp = map.getEdgeMapPoint(edge);
+            LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
         }
 
@@ -1014,13 +1077,17 @@ public class GameAI {
             if (roads.size() > 1) {
                 IEdge edge = roads.remove(Util.randomInt(roads.size()));
                 map.placeRoad(player, edge);
+                // exception can be ignored because the if condition above guarantees
+                // at least 1 Road Building Card
                 inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+                LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                 lobbyService.sendToAllInLobby(lobbyName,
                                               new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge),
                                                                             ROAD));
                 if (roads.size() > 2) {
                     edge = roads.remove(Util.randomInt(roads.size()));
                     game.getMap().placeRoad(player, roads.remove(Util.randomInt(roads.size())));
+                    LOG.debug("Sending BuildingSuccessfulMessage for Lobby {}", lobbyName);
                     lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai,
                                                                                            map.getEdgeMapPoint(edge),
                                                                                            ROAD));
@@ -1063,15 +1130,24 @@ public class GameAI {
         tradeGet = harbours.tradeGet(ai, game.getRound());
         //Use harbour
         if (tradeGet != null) {
-            inv.decrease(tradeGive, 2);
-            inv.increase(tradeGet);
+            try {
+                inv.decrease(tradeGive, 2);
+                inv.increase(tradeGet);
+            } catch (NotEnoughResourcesException e) {
+                LOG.error(e.getMessage());
+                return;
+            }
             return;
         }
         //Use "any" harbour as last resort
         if (harbours.get(ai).contains(IHarbourHex.HarbourResource.ANY)) {
             tradeGet = game.getRound() > 6 ? ORE : inv.get(BRICK) >= inv.get(LUMBER) ? LUMBER : BRICK;
-            inv.decrease(tradeGive, 3);
-            inv.increase(tradeGet);
+            try {
+                inv.decrease(tradeGive, 3);
+                inv.increase(tradeGet);
+            } catch (NotEnoughResourcesException e) {
+                LOG.error(e.getMessage());
+            }
         }
     }
 }

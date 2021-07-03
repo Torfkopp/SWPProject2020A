@@ -3,6 +3,7 @@ package de.uol.swp.client.scene;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.auth.event.RetryLoginEvent;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.event.RobberTaxUpdateEvent;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
@@ -16,9 +17,7 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -172,6 +171,19 @@ class SceneServiceTest {
     }
 
     @Test
+    void onAlreadyLoggedInResponse() {
+        User user = mock(User.class);
+        AlreadyLoggedInResponse response = mock(AlreadyLoggedInResponse.class);
+        doReturn(user).when(response).getLoggedInUser();
+        doNothing().when(sceneManager).showLogOldSessionOutScreen(isA(User.class));
+
+        eventBus.post(response);
+
+        verify(response, times(2)).getLoggedInUser();
+        verify(sceneManager).showLogOldSessionOutScreen(user);
+    }
+
+    @Test
     void onChangeAccountDetailsResponse() {
         User user = mock(User.class);
         ChangeAccountDetailsSuccessfulResponse response = mock(ChangeAccountDetailsSuccessfulResponse.class);
@@ -206,6 +218,16 @@ class SceneServiceTest {
         eventBus.post(response);
 
         verify(sceneManager).showMainScreen(user);
+    }
+
+    @Test
+    void onNukedUsersSessionsResponse() throws InterruptedException {
+        NukedUsersSessionsResponse response = mock(NukedUsersSessionsResponse.class);
+        eventBus.post(response);
+        boolean value = lock.await(500, TimeUnit.MILLISECONDS);
+
+        assertTrue(value);
+        assertTrue(event instanceof RetryLoginEvent);
     }
 
     @Test

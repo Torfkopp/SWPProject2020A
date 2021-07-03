@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,7 +20,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
-import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -140,7 +140,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInventoryForTradeWithUserResponse(InventoryForTradeWithUserResponse rsp) {
-        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
         counterOffer = rsp.isCounterOffer();
@@ -199,6 +199,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                     counterOffer);
             sceneService.closeAcceptTradeWindow(lobbyName);
+            LOG.debug("Sending PauseTimerRequest for Lobby {}", lobbyName);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -216,8 +217,8 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", rsp.getLobbyName());
         if (rsp.isTradeRejectedByActivePlayer()) {
             closeWindow();
             return;
@@ -239,8 +240,8 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", rsp.getLobbyName());
         soundService.coins();
         closeWindow();
     }
@@ -264,10 +265,9 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
+        if (lobbyName != null) return;
         LOG.debug("Received TradeWithUserUpdateEvent for Lobby {}", event.getLobbyName());
-        if (lobbyName == null) lobbyName = event.getLobbyName();
-        Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> closeWindow());
+        lobbyName = event.getLobbyName();
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN), // CTRL/META + O

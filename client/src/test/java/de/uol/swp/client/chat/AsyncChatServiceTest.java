@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncChatServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final LobbyName lobbyName = mock(LobbyName.class);
     private final ChatService syncChatService = mock(ChatService.class);
     private AsyncChatService chatService;
@@ -33,7 +33,7 @@ class AsyncChatServiceTest {
 
         chatService.askLatestMessages(1);
 
-        verify(syncChatService, after(DURATION)).askLatestMessages(1);
+        verify(syncChatService, timeout(DURATION)).askLatestMessages(1);
     }
 
     @Test
@@ -42,7 +42,7 @@ class AsyncChatServiceTest {
 
         chatService.deleteMessage(1);
 
-        verify(syncChatService, after(DURATION)).deleteMessage(1);
+        verify(syncChatService, timeout(DURATION)).deleteMessage(1);
     }
 
     @Test
@@ -51,7 +51,7 @@ class AsyncChatServiceTest {
 
         chatService.editMessage(1, "test");
 
-        verify(syncChatService, after(DURATION)).editMessage(1, "test");
+        verify(syncChatService, timeout(DURATION)).editMessage(1, "test");
     }
 
     @Test
@@ -60,7 +60,7 @@ class AsyncChatServiceTest {
 
         chatService.newMessage("test message");
 
-        verify(syncChatService, after(DURATION)).newMessage("test message");
+        verify(syncChatService, timeout(DURATION)).newMessage("test message");
     }
 
     @Test
@@ -69,7 +69,7 @@ class AsyncChatServiceTest {
 
         chatService.askLatestMessages(1, lobbyName);
 
-        verify(syncChatService, after(DURATION)).askLatestMessages(1, lobbyName);
+        verify(syncChatService, timeout(DURATION)).askLatestMessages(1, lobbyName);
     }
 
     @Test
@@ -78,7 +78,7 @@ class AsyncChatServiceTest {
 
         chatService.deleteMessage(1, lobbyName);
 
-        verify(syncChatService, after(DURATION)).deleteMessage(1, lobbyName);
+        verify(syncChatService, timeout(DURATION)).deleteMessage(1, lobbyName);
     }
 
     @Test
@@ -87,7 +87,7 @@ class AsyncChatServiceTest {
 
         chatService.editMessage(1, "test", lobbyName);
 
-        verify(syncChatService, after(DURATION)).editMessage(1, "test", lobbyName);
+        verify(syncChatService, timeout(DURATION)).editMessage(1, "test", lobbyName);
     }
 
     @Test
@@ -96,6 +96,6 @@ class AsyncChatServiceTest {
 
         chatService.newMessage("test message", lobbyName);
 
-        verify(syncChatService, after(DURATION)).newMessage("test message", lobbyName);
+        verify(syncChatService, timeout(DURATION)).newMessage("test message", lobbyName);
     }
 }

@@ -13,6 +13,7 @@ import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.robber.RobbingMessage;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,7 +88,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(this.lobbyName)) {
+        if (rsp.getLobbyName() != null && Util.equals(this.lobbyName, rsp.getLobbyName())) {
             LOG.debug("Received AskLatestChatMessageResponse for Lobby {}", rsp.getLobbyName());
             updateChatMessageList(rsp.getChatHistory());
         } else if (rsp.getLobbyName() == null && this.lobbyName == null) {
@@ -113,7 +114,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (chatMessages == null) return;
+        if (msg.isLobbyChatMessage() && Util.equals(this.lobbyName, msg.getLobbyName())) {
             LOG.debug("Received CreatedChatMessageMessage for Lobby {}", msg.getLobbyName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
@@ -166,7 +168,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (msg.isLobbyChatMessage() && Util.equals(this.lobbyName, msg.getLobbyName())) {
             LOG.debug("Received DeletedChatMessageMessage for Lobby {}", msg.getLobbyName());
             dropChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
@@ -226,7 +228,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (msg.isLobbyChatMessage() && Util.equals(this.lobbyName, msg.getLobbyName())) {
             LOG.debug("Received EditedChatMessageMessage for Lobby {}", msg.getLobbyName());
             editChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
@@ -258,37 +260,14 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Handles new incoming SystemMessageForPlayingCardsMessage
+     * Handles new incoming RobbingMessage
      * <p>
-     * If a SystemMessageForPlayingCardsMessage is posted onto the EventBus, this method
-     * places the incoming SystemMessageForPlayingCardsMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received SystemMessageForPlayingCardsMessage for Lobby
-     * {@code <lobbyName>}" is displayed in the log.
-     *
-     * @param msg The SystemMessageForPlayingCardsMessage found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageMessage
-     * @since 2021-03-23
-     */
-    @Subscribe
-    protected void onSystemMessageForPlayingCardsMessage(SystemMessageMessage msg) {
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby {}", msg.getName());
-            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
-        }
-    }
-
-    /**
-     * Handles new incoming SystemMessageForRobbingMessage
-     * <p>
-     * If a SystemMessageForRobbingMessage is posted onto the EventBus, this method
-     * places the incoming SystemMessageForRobbingMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the massage "Received SystemMessageForRobbingMessage
+     * If a RobbingMessage is posted onto the EventBus, this method places the
+     * incoming RobbingMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the massage "Received RobbingMessage
      * for Lobby {@code <lobbyName>}" is displayed in the log.
      *
-     * @param msg The SystemMessageForRobbingMessage foung on the EventBus
+     * @param msg The RobbingMessage found on the EventBus
      *
      * @author Mario Fokken
      * @author Timo Gerken
@@ -297,30 +276,52 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageForRobbingMessage(RobbingMessage msg) {
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
-            if (msg.getVictim() == null) {
-                if (msg.getActor().equals(userService.getLoggedInUser())) {
-                    String title = ResourceManager.get("error.title");
-                    String headerText = ResourceManager.get("error.header");
-                    String contentText = ResourceManager.get("game.robber.error");
-                    String confirmText = ResourceManager.get("button.confirm");
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle(title);
-                        alert.setHeaderText(headerText);
-                        alert.setContentText(contentText);
-                        ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
-                        alert.getButtonTypes().setAll(confirm);
-                        alert.getDialogPane().getStylesheets().add(styleSheet);
-                        alert.showAndWait();
-                        soundService.button();
-                    });
-                }
-            } else {
-                Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        if (!Util.equals(this.lobbyName, msg.getName())) return;
+        LOG.debug("Received RobbingMessage for Lobby {}", msg.getName());
+        if (msg.getVictim() == null) {
+            if (msg.getActor().equals(userService.getLoggedInUser())) {
+                String title = ResourceManager.get("error.title");
+                String headerText = ResourceManager.get("error.header");
+                String contentText = ResourceManager.get("game.robber.error");
+                String confirmText = ResourceManager.get("button.confirm");
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(title);
+                    alert.setHeaderText(headerText);
+                    alert.setContentText(contentText);
+                    ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+                    alert.getButtonTypes().setAll(confirm);
+                    alert.getDialogPane().getStylesheets().add(styleSheet);
+                    alert.showAndWait();
+                    soundService.button();
+                });
             }
+        } else {
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
+    }
+
+    /**
+     * Handles new incoming SystemMessageMessage
+     * <p>
+     * If a SystemMessageMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageMessage for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.message.SystemMessageMessage
+     * @since 2021-03-23
+     */
+    @Subscribe
+    protected void onSystemMessageMessage(SystemMessageMessage msg) {
+        if (chatMessages == null) return;
+        if (Util.equals(this.lobbyName, msg.getName())) return;
+        LOG.debug("Received SystemMessageMessage for Lobby {}", msg.getName());
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
     /**
@@ -338,7 +339,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
-        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
+        if (chatMessages == null) return;
+        if (rsp.isLobbyChatMessage() && Util.equals(this.lobbyName, rsp.getLobbyName())) {
             LOG.debug("Received SystemMessageResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) {
