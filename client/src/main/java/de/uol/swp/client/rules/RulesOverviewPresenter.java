@@ -104,6 +104,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onResetRulesOverviewEvent(ResetRulesOverviewEvent event) {
+        LOG.debug("Received ResetRulesOverviewEvent");
         Platform.runLater(() -> rulesTabPane.getSelectionModel().select(basicsTab));
     }
 

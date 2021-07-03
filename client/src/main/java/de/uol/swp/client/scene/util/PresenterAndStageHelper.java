@@ -1,8 +1,6 @@
 package de.uol.swp.client.scene.util;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 import com.jfoenix.utils.JFXUtilities;
 import de.uol.swp.client.scene.SceneManager;
 import de.uol.swp.client.sound.ISoundService;
@@ -22,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -35,12 +34,8 @@ public class PresenterAndStageHelper {
 
     private static final Logger LOG = LogManager.getLogger(PresenterAndStageHelper.class);
 
-    @Inject
     private static Injector injector;
-    @Inject
-    @Named("styleSheet")
     private static String styleSheet;
-    @Inject
     private static ISoundService soundService;
 
     /**
@@ -69,6 +64,24 @@ public class PresenterAndStageHelper {
         } catch (IOException e) {
             throw new RuntimeException("Could not load View!" + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Static initialiser method to provide the PresenterAndStageHelper class
+     * with an ISoundService, an Injector for FXMLLoader instances, and the
+     * Stylesheet as a String
+     *
+     * @param soundService The SoundService to use
+     * @param injector     The Injector to provide the FXMLLoader instances
+     * @param styleSheet   The Stylesheet to use for all styling
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-02
+     */
+    public static void initialise(ISoundService soundService, Injector injector, String styleSheet) {
+        PresenterAndStageHelper.injector = injector;
+        PresenterAndStageHelper.styleSheet = styleSheet;
+        PresenterAndStageHelper.soundService = soundService;
     }
 
     /**
@@ -205,6 +218,34 @@ public class PresenterAndStageHelper {
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
             soundService.button();
+        });
+    }
+
+    /**
+     * Utility method to display an Alert dialogue window.
+     * Returns true if OK is pressed and false if Cancel is pressed.
+     *
+     * @param title       The title of the Alert window
+     * @param contentText The content of the Alert window
+     * @param headerText  The text to be displayed in the header portion of the Alert window
+     * @param confirmText The text of the "Confirm" button
+     * @param alertType   What AlertType the Alert window should be
+     */
+    public static void showAndGetConfirmation(String title, String contentText, String headerText, String confirmText,
+                                              String cancelText, Alert.AlertType alertType, Runnable AIDS) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(alertType, contentText);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(confirm, cancel);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
+            Optional<ButtonType> result = alert.showAndWait();
+            soundService.button();
+            if (result.isPresent() && result.get() == confirm) {
+                AIDS.run();
+            }
         });
     }
 

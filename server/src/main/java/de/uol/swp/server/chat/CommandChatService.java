@@ -65,10 +65,12 @@ public class CommandChatService extends AbstractService {
      */
     public void newGameOrDevCommand(NewChatMessageRequest req) {
         if (req.getContent().length() > 4 && gameCommands.contains(req.getContent().substring(0, 5))) {
+            LOG.debug("Sending NewChatCommandMessage");
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
         } else {
             ExceptionMessage msg = new ExceptionMessage("This server doesn't allow the use of commands!");
             msg.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage [{}]", msg.getException());
             post(msg);
         }
     }

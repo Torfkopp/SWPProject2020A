@@ -21,6 +21,7 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
@@ -245,7 +246,7 @@ public class SceneManager {
      * @since 2021-06-24
      */
     void showChangeSettingsScreen(User loggedInUser) {
-        showSceneOnPrimaryStage(primaryStage, changeSettingsScene, ResourceManager.get("changeproperties.window.title"),
+        showSceneOnPrimaryStage(primaryStage, changeSettingsScene, ResourceManager.get("changesettings.window.title"),
                                 ChangeSettingsPresenter.MIN_WIDTH, ChangeSettingsPresenter.MIN_HEIGHT);
         primaryStage.setOnCloseRequest(windowEvent -> showMainScreen(loggedInUser));
     }
@@ -333,6 +334,29 @@ public class SceneManager {
     }
 
     /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-29
+     */
+    void showLogOldSessionOutScreen(User user) {
+        soundService.popup();
+        Runnable AIDS = () -> {
+            LOG.debug("Sending NukeUsersSessionsRequest");
+            ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
+        };
+        showAndGetConfirmation(ResourceManager.get("confirmation.title"), ResourceManager.get("logoldsessionout.error"),
+                               ResourceManager.get("confirmation.header"), ResourceManager.get("button.confirm"),
+                               ResourceManager.get("button.cancel"), Alert.AlertType.CONFIRMATION, AIDS);
+    }
+
+    /**
      * Displays the Login screen on the primary Stage
      *
      * @author Phillip-André Suhr
@@ -402,7 +426,10 @@ public class SceneManager {
         rulesOverviewIsOpen = true;
         EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
             rulesOverviewIsOpen = false;
-            ThreadManager.runNow(() -> eventBus.post(new ResetRulesOverviewEvent()));
+            ThreadManager.runNow(() -> {
+                LOG.debug("Sending ResetRulesOverviewEvent");
+                eventBus.post(new ResetRulesOverviewEvent());
+            });
         };
         showStageFromScene(primaryStage, ResourceManager.get("rules.window.title"), RulesOverviewPresenter.MIN_HEIGHT,
                            RulesOverviewPresenter.MIN_WIDTH, rulesScene, onCloseRequestHandler);
@@ -459,6 +486,7 @@ public class SceneManager {
         if (changeAccountScene == null) changeAccountScene = initPresenter(ChangeAccountDetailsPresenter.fxml);
         if (changeSettingsScene == null) changeSettingsScene = initPresenter(ChangeSettingsPresenter.fxml);
         if (changeGameSettingsScene == null) changeGameSettingsScene = initPresenter(ChangeGameSettingsPresenter.fxml);
+        LOG.debug("Sending SetAcceleratorsEvent");
         eventBus.post(new SetAcceleratorsEvent());
     }
 }
