@@ -426,7 +426,10 @@ public class SceneManager {
         rulesOverviewIsOpen = true;
         EventHandler<WindowEvent> onCloseRequestHandler = windowEvent -> {
             rulesOverviewIsOpen = false;
-            ThreadManager.runNow(() -> eventBus.post(new ResetRulesOverviewEvent()));
+            ThreadManager.runNow(() -> {
+                LOG.debug("Sending ResetRulesOverviewEvent");
+                eventBus.post(new ResetRulesOverviewEvent());
+            });
         };
         showStageFromScene(primaryStage, ResourceManager.get("rules.window.title"), RulesOverviewPresenter.MIN_HEIGHT,
                            RulesOverviewPresenter.MIN_WIDTH, rulesScene, onCloseRequestHandler);
@@ -483,6 +486,7 @@ public class SceneManager {
         if (changeAccountScene == null) changeAccountScene = initPresenter(ChangeAccountDetailsPresenter.fxml);
         if (changeSettingsScene == null) changeSettingsScene = initPresenter(ChangeSettingsPresenter.fxml);
         if (changeGameSettingsScene == null) changeGameSettingsScene = initPresenter(ChangeGameSettingsPresenter.fxml);
+        LOG.debug("Sending SetAcceleratorsEvent");
         eventBus.post(new SetAcceleratorsEvent());
     }
 }

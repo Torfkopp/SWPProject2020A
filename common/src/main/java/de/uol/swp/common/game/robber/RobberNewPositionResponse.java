@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.robber;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 
@@ -14,6 +15,7 @@ import de.uol.swp.common.user.User;
  */
 public class RobberNewPositionResponse extends AbstractResponseMessage {
 
+    private final LobbyName lobbyName;
     private final User player;
 
     /**
@@ -21,7 +23,32 @@ public class RobberNewPositionResponse extends AbstractResponseMessage {
      *
      * @param player The player to choose the robber's new position
      */
-    public RobberNewPositionResponse(User player) {
+    public RobberNewPositionResponse(LobbyName lobbyName, User player) {
+        this.lobbyName = lobbyName;
         this.player = player;
+    }
+
+    /**
+     * Gets the Name of the Lobby in which the Robber has to be moved
+     *
+     * @return The Name of the Lobby in which the Robber has to be moved
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public LobbyName getLobbyName() {
+        return lobbyName;
+    }
+
+    /**
+     * Gets the User who has to move the Robber
+     *
+     * @return The User who has to move the Robber
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public User getPlayer() {
+        return player;
     }
 }
