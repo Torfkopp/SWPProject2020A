@@ -67,11 +67,11 @@ public class SessionService extends AbstractService {
         LOG.debug("Received ForwardToUserInternalRequest");
         Optional<Session> session = sessionManagement.getSession(event.getTargetUser());
         if (event.getTargetUser() instanceof Computer)
-            LOG.debug("Ignoring the ForwardToUserInternalRequest because its sent to a computer");
+            LOG.debug("Ignoring ForwardToUserInternalRequest because it was sent to a Computer");
         else if (session.isEmpty()) LOG.error(new RuntimeException("UserSession not found"));
         else{
             LOG.debug("Sending FetchUserContextInternalRequest");
             post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
-        }}
+        }
     }
 }
