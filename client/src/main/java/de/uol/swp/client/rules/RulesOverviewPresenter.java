@@ -30,8 +30,8 @@ import java.util.Map;
 public class RulesOverviewPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RulesOverviewView.fxml";
-    public static final int MIN_HEIGHT = 550;
-    public static final int MIN_WIDTH = 625;
+    public static final int MIN_HEIGHT = 620;
+    public static final int MIN_WIDTH = 700;
 
     private static final int MIN_LONG_TEXT_HEIGHT = 700;
     private static final int MIN_BANK_TAB_WIDTH = 650;
@@ -57,6 +57,8 @@ public class RulesOverviewPresenter extends AbstractPresenter {
     private Tab developmentCardTab;
     @FXML
     private Tab founderPhaseTab;
+    @FXML
+    private Tab shortcutsTab;
     @FXML
     private Tab robberTab;
     @FXML
@@ -118,6 +120,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
      *     <li> CTRL/META + R = Select Robber tab
      *     <li> CTRL/META + D = Select DevelopmentCard tab
      *     <li> CTRL/META + F = Select Founding Phase tab
+     *     <li> CTRL/META + F = Select Shortcuts tab
      *     <li> ESC           = Close window
      *
      * @param event The SetAcceleratorEvent found on the EventBus
@@ -144,6 +147,8 @@ public class RulesOverviewPresenter extends AbstractPresenter {
                          () -> rulesTabPane.getSelectionModel().select(developmentCardTab));
         accelerators.put(new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN), // CTRL/META + F
                          () -> rulesTabPane.getSelectionModel().select(founderPhaseTab));
+        accelerators.put(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN), // CTRL/META + S
+                         () -> rulesTabPane.getSelectionModel().select(shortcutsTab));
         accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), // ESC to close window
                          () -> {
                              Window window = rulesTabPane.getScene().getWindow();

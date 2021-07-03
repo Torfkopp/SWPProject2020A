@@ -306,4 +306,17 @@
             </padding>
         </VBox>
     </Tab>
+    <Tab fx:id="shortcutsTab" text="%rules.tabs.shortcuts">
+        <VBox spacing="15.0">
+            <Label text="%rules.shortcuts.mainmenu" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.shortcuts.game" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.shortcuts.tradewithbank" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.shortcuts.tradewithuser" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.shortcuts.registration" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.shortcuts.accountdetails" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <padding>
+                <Insets topRightBottomLeft="15.0"/>
+            </padding>
+        </VBox>
+    </Tab>
 </TabPane>
