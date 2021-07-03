@@ -18,7 +18,7 @@ class MySQLBasedUserStoreTest {
     private static int nextID;
 
     { // do not make static (will cause tests to fail)
-        UserStore store = new MySQLBasedUserStore();
+        IUserStore store = new MySQLBasedUserStore();
         MySQLBasedUserStoreTest.nextID = store.getNextUserID();
         MySQLBasedUserStoreTest.users = new ArrayList<>();
         for (int i = nextID; i < NO_USERS + nextID; i++) {
@@ -35,19 +35,19 @@ class MySQLBasedUserStoreTest {
 
     @AfterEach
     protected void cleanDatabase() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.removeUser(u.getUsername()));
     }
 
     @BeforeEach
     protected void fillDatabase() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
     }
 
-    protected UserStore getDefaultStore() {
+    protected IUserStore getDefaultStore() {
         return new MySQLBasedUserStore();
     }
 
@@ -58,7 +58,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void changePasswordWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -79,7 +79,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void changePasswordWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -101,7 +101,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void createEmptyUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         assertThrows(IllegalArgumentException.class, () -> store.createUser("", "", ""));
     }
@@ -109,7 +109,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void dropUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
         Optional<User> userFound = store.findUser(userToRemove.getID());
         assertTrue(userFound.isPresent());
@@ -124,7 +124,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void dropUserByUsername() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
         store.removeUser(userToRemove.getUsername());
@@ -137,7 +137,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(2);
 
         Optional<User> userFound = store.findUser(userToFind.getID());
@@ -152,7 +152,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserByName() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername());
@@ -168,7 +168,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserByNameAndPassword() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
@@ -184,7 +184,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserByNameAndPassword_EmptyUser_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         Optional<User> userFound = store.findUser(null, "");
 
@@ -194,7 +194,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserByNameAndPassword_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
@@ -205,7 +205,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void findUserByName_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
@@ -216,7 +216,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void getAllUsers() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
@@ -239,7 +239,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void overwriteUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
 
         assertThrows(IllegalArgumentException.class, () -> store
@@ -249,7 +249,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void updateEmailWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());
@@ -270,7 +270,7 @@ class MySQLBasedUserStoreTest {
     @Test
     @EnabledIf("isLocal")
     void updateEmailWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());

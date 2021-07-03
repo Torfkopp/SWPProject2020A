@@ -3,7 +3,7 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import de.uol.swp.common.user.User;
-import de.uol.swp.server.usermanagement.store.UserStore;
+import de.uol.swp.server.usermanagement.store.IUserStore;
 
 import java.util.*;
 
@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class UserManagement implements IUserManagement {
 
-    private final UserStore userStore;
+    private final IUserStore userStore;
     private final SortedMap<Integer, User> loggedInUsers = new TreeMap<>();
 
     /**
@@ -24,10 +24,10 @@ public class UserManagement implements IUserManagement {
      *
      * @param userStore Object of the UserStore to be used
      *
-     * @see de.uol.swp.server.usermanagement.store.UserStore
+     * @see de.uol.swp.server.usermanagement.store.IUserStore
      */
     @Inject
-    public UserManagement(UserStore userStore) {
+    public UserManagement(IUserStore userStore) {
         this.userStore = userStore;
     }
 

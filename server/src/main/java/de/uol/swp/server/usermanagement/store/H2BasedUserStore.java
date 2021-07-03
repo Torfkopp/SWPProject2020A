@@ -3,6 +3,8 @@ package de.uol.swp.server.usermanagement.store;
 import com.google.common.base.Strings;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,11 +22,12 @@ import java.util.Optional;
  * @author Aldin Dervisi
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see de.uol.swp.server.usermanagement.store.UserStore
+ * @see IUserStore
  * @since 2021-01-20
  */
-public class H2BasedUserStore implements UserStore {
+public class H2BasedUserStore implements IUserStore {
 
+    private static final Logger LOG = LogManager.getLogger(H2BasedUserStore.class);
     private static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
     private static final String USER = "H2";
     private static final String PASS = "123456";
@@ -32,10 +35,6 @@ public class H2BasedUserStore implements UserStore {
     private PreparedStatement pstmt = null;
     private int nextID;
 
-    /**
-     * This method registers the user with its specific and unique username,
-     * password and e-mail and saves it in the H2 Database.
-     */
     @Override
     public User createUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
@@ -53,7 +52,7 @@ public class H2BasedUserStore implements UserStore {
                 pstmt.setString(3, password);
                 pstmt.executeUpdate();
             } catch (SQLException e) {
-                System.err.println(e.getMessage());
+                LOG.fatal(e.getMessage());
             } finally {
                 closeConnection(conn, pstmt);
             }
@@ -65,15 +64,6 @@ public class H2BasedUserStore implements UserStore {
         }
     }
 
-    /**
-     * This method finds and returns the specific user
-     * identified by the provided ID from the database
-     * without the password.
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
-     */
     @Override
     public Optional<User> findUser(int id) {
         createTable();
@@ -97,17 +87,13 @@ public class H2BasedUserStore implements UserStore {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method finds and returns the specific user
-     * from the database without the password.
-     */
     @Override
     public Optional<User> findUser(String username) {
         createTable();
@@ -131,18 +117,13 @@ public class H2BasedUserStore implements UserStore {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method searches for a user that matches both
-     * the provided username and password and returns a
-     * UserDTO for the matching result.
-     */
     @Override
     public Optional<User> findUser(String username, String password) {
         createTable();
@@ -166,18 +147,13 @@ public class H2BasedUserStore implements UserStore {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method dumps the whole database and puts
-     * the data from each row into a UserDTO which then
-     * gets put into a list.
-     */
     @Override
     public List<User> getAllUsers() {
         createTable();
@@ -185,8 +161,7 @@ public class H2BasedUserStore implements UserStore {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement("SELECT * FROM USERDB");
             ResultSet rs = pstmt.executeQuery();
 
@@ -201,7 +176,7 @@ public class H2BasedUserStore implements UserStore {
             }
             rs.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
@@ -223,9 +198,7 @@ public class H2BasedUserStore implements UserStore {
 
         String sequenceName = "";
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
+            conn = openConnection();
             pstmt = conn.prepareStatement("SELECT SEQUENCE_NAME FROM USERDB.INFORMATION_SCHEMA.SEQUENCES LIMIT 1");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) sequenceName = rs.getString(1);
@@ -238,64 +211,45 @@ public class H2BasedUserStore implements UserStore {
             while (rs.next()) nextID = rs.getInt(1) + 1;
             rs.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
         return nextID;
     }
 
-    /**
-     * This method removes the row matching the provided ID.
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
-     */
     @Override
     public void removeUser(int id) {
         createTable();
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
     }
 
-    /**
-     * This method removes the row matching the provided username.
-     */
     @Override
     public void removeUser(String username) {
         createTable();
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
     }
 
-    /**
-     * This method allows the user to change their unique username, password
-     * or e-mail.
-     * <p>
-     * The user will not be able to update his username or e-mail into already
-     * registered ones.
-     */
     @Override
     public User updateUser(int id, String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
@@ -304,12 +258,11 @@ public class H2BasedUserStore implements UserStore {
 
         createTable();
 
-        Optional<User> usr = findUser(username);
-        if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username already taken");
+        Optional<User> user = findUser(username);
+        if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement("UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -317,24 +270,15 @@ public class H2BasedUserStore implements UserStore {
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
-        Optional<User> usr2 = findUser(username);
-        if (usr2.isPresent()) return usr2.get().getWithoutPassword();
+        Optional<User> usr = findUser(username);
+        if (usr.isPresent()) return usr.get().getWithoutPassword();
         else throw new RuntimeException("Something went wrong when updating the user");
     }
 
-    /**
-     * This method allows the user to change their password or e-mail.
-     * The user will not be able to update their username through this method.
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @implNote This method will not change the username. Use {@code updateUser(int id, String username, String password, String eMail)} for that instead.
-     * @since 2021-02-23
-     */
     @Override
     public User updateUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
@@ -344,15 +288,14 @@ public class H2BasedUserStore implements UserStore {
         createTable();
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement("UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?");
             pstmt.setString(1, password);
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         } finally {
             closeConnection(conn, pstmt);
         }
@@ -375,12 +318,12 @@ public class H2BasedUserStore implements UserStore {
         try {
             if (pstmt != null) pstmt.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         }
         try {
             if (conn != null) conn.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOG.fatal(e.getMessage());
         }
     }
 

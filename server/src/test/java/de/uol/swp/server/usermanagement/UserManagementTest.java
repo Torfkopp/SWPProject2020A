@@ -2,8 +2,8 @@ package de.uol.swp.server.usermanagement;
 
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.server.usermanagement.store.IUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
-import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ class UserManagementTest {
     }
 
     protected IUserManagement getDefaultManagement() {
-        UserStore store = new MainMemoryBasedUserStore();
+        IUserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return new UserManagement(store);

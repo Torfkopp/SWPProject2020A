@@ -41,7 +41,7 @@ public class ServerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        final UserStore store;
+        final IUserStore store;
         //Default Properties
         java.util.Properties defaultProps = new Properties();
 
@@ -92,7 +92,7 @@ public class ServerModule extends AbstractModule {
         bind(IChatMessageStore.class).toInstance(chatMessageStore);
         bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
-        bind(UserStore.class).toInstance(store);
+        bind(IUserStore.class).toInstance(store);
 
         bindConstant().annotatedWith(Names.named("commandsAllowed")).to(commandsAllowed);
 

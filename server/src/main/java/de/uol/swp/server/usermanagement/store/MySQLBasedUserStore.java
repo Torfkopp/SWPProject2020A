@@ -3,6 +3,8 @@ package de.uol.swp.server.usermanagement.store;
 import com.google.common.base.Strings;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,26 +20,19 @@ import java.util.Optional;
  *
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see de.uol.swp.server.usermanagement.store.UserStore
+ * @see IUserStore
  * @since 2021-02-10
  */
-public class MySQLBasedUserStore implements UserStore {
+public class MySQLBasedUserStore implements IUserStore {
 
-    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";
-    static final String USER = "catan";
-    static final String PASS = "rNZcEqeiqMJpdr9M";
-    Connection conn = null;
-    PreparedStatement pstmt = null;
+    private static final Logger LOG = LogManager.getLogger(H2BasedUserStore.class);
+    private static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";
+    private static final String USER = "catan";
+    private static final String PASS = "rNZcEqeiqMJpdr9M";
+    private static Connection conn = null;
+    private PreparedStatement pstmt = null;
     private int nextID;
 
-    /**
-     * This method registers the user with its specific and unique username,
-     * password and e-mail and saves it in the database.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public User createUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
@@ -46,54 +41,30 @@ public class MySQLBasedUserStore implements UserStore {
 
         if (findUser(username).isEmpty()) {
             try {
-                Class.forName(JDBC_DRIVER);
-                conn = DriverManager.getConnection(DB_URL, USER, PASS);
-                conn.setAutoCommit(true);
-
-                String sql = "INSERT INTO userdb (username, mail, pass) VALUES (?, ?, ?)";
-                pstmt = conn.prepareStatement(sql);
+                conn = openConnection();
+                pstmt = conn.prepareStatement("INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)");
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
                 pstmt.setString(3, password);
                 pstmt.executeUpdate();
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException e) {
+                LOG.fatal(e.getMessage());
             } finally {
-                try {
-                    if (pstmt != null) pstmt.close();
-                } catch (SQLException ignored) {
-                }
-                try {
-                    if (conn != null) conn.close();
-                } catch (SQLException se) {
-                    se.printStackTrace();
-                }
+                closeConnection(conn, pstmt);
             }
             Optional<User> usr = findUser(username);
-            if (usr.isEmpty()) throw new RuntimeException("Something went wrong when creating the user");
-            return usr.get().getWithoutPassword();
+            if (usr.isPresent()) return usr.get().getWithoutPassword();
+            else throw new RuntimeException("Something went wrong when creating the user");
         } else {
             throw new IllegalArgumentException("Username must not be taken already");
         }
     }
 
-    /**
-     * This method finds and returns the user specified by the provided ID
-     * without a password comparison
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
-     */
     @Override
     public Optional<User> findUser(int id) {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM userdb WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
@@ -109,38 +80,19 @@ public class MySQLBasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method finds and returns the specific user
-     * from the database without a password comparison.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public Optional<User> findUser(String username) {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM userdb WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
@@ -156,39 +108,19 @@ public class MySQLBasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method searches for a user that matches both
-     * the provided username and password and returns a
-     * UserDTO for the matching result.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public Optional<User> findUser(String username, String password) {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM userdb WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
@@ -204,41 +136,21 @@ public class MySQLBasedUserStore implements UserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return Optional.empty();
     }
 
-    /**
-     * This method dumps the whole database and puts
-     * the data from each row into a UserDTO which then
-     * gets put into a list.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public List<User> getAllUsers() {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "SELECT * FROM userdb";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("SELECT * FROM USERDB");
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -251,18 +163,10 @@ public class MySQLBasedUserStore implements UserStore {
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return retUsers;
     }
@@ -279,102 +183,48 @@ public class MySQLBasedUserStore implements UserStore {
     @Override
     public int getNextUserID() {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
+            conn = openConnection();
             pstmt = conn.prepareStatement(
                     "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'catan_user_schema' AND TABLE_NAME = 'userdb'");
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) nextID = rs.getInt(1);
             rs.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         return nextID;
     }
 
-    /**
-     * This method removes the row matching the provided ID.
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
-     */
     @Override
     public void removeUser(int id) {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "DELETE FROM userdb WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
     }
 
-    /**
-     * This method removes the row matching the provided username.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public void removeUser(String username) {
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "DELETE FROM userdb WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
     }
 
-    /**
-     * This method allows the user to change his unique username, password or e-mail.
-     * The user will not be able to update his username or e-mail into already registered ones.
-     *
-     * @author Marvin Drees
-     * @since 2021-02-10
-     */
     @Override
     public User updateUser(int id, String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
@@ -385,29 +235,17 @@ public class MySQLBasedUserStore implements UserStore {
         if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "UPDATE userdb SET username = ?, pass = ?, mail = ? WHERE id = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         Optional<User> usr = findUser(username);
         if (usr.isPresent()) return usr.get().getWithoutPassword();
@@ -421,31 +259,57 @@ public class MySQLBasedUserStore implements UserStore {
         }
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "UPDATE userdb SET pass = ?, mail = ? WHERE username = ?";
-            pstmt = conn.prepareStatement(sql);
+            conn = openConnection();
+            pstmt = conn.prepareStatement("UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?");
             pstmt.setString(1, password);
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            closeConnection(conn, pstmt);
         }
         Optional<User> user = findUser(username);
         if (user.isEmpty()) throw new RuntimeException("Something went wrong when updating the user");
         else return user.get().getWithoutPassword();
+    }
+
+    /**
+     * Helper method to close a provided connection
+     * and SQL statement.
+     *
+     * @param conn  The connection to be closed
+     * @param pstmt The statement to be closed
+     *
+     * @author Marvin Drees
+     * @since 2021-07-02
+     */
+    private void closeConnection(Connection conn, PreparedStatement pstmt) {
+        try {
+            if (pstmt != null) pstmt.close();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
+        }
+        try {
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            LOG.fatal(e.getMessage());
+        }
+    }
+
+    /**
+     * Helper method to open a connection to the SQL database.
+     *
+     * @return The opened connection
+     *
+     * @throws SQLException Exception when something goes wrong opening the connection
+     * @author Marvin Drees
+     * @since 2021-07-02
+     */
+    private Connection openConnection() throws SQLException {
+        Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        conn.setAutoCommit(true);
+        return conn;
     }
 }
