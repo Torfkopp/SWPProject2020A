@@ -427,9 +427,8 @@ public class ServerHandler implements ServerHandlerDelegate {
             try {
                 client.writeAndFlush(msg);
             } catch (Exception e) {
-                // UwU what is thrown here?
-                // TODO: Handle exceptions for unreachable clients
-                e.printStackTrace();
+                // It is unknown which exception might be thrown if any
+                LOG.error(e.getMessage());
             }
         }
     }
