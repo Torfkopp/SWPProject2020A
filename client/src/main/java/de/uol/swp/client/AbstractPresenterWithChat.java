@@ -319,9 +319,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageMessage(SystemMessageMessage msg) {
         if (chatMessages == null) return;
-        if (Util.equals(this.lobbyName, msg.getName())) return;
-        LOG.debug("Received SystemMessageMessage for Lobby {}", msg.getName());
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        if (msg.getName() == null && this.lobbyName == null) {
+            LOG.debug("Received SystemMessageMessage");
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        } else if (msg.getName() != null && Util.equals(this.lobbyName, msg.getName())) {
+            LOG.debug("Received SystemMessageMessage for Lobby {}", msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
     }
 
     /**
