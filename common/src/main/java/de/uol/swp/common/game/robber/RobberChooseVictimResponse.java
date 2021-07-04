@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.robber;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.User;
@@ -16,6 +17,7 @@ import de.uol.swp.common.user.User;
  */
 public class RobberChooseVictimResponse extends AbstractResponseMessage {
 
+    private final LobbyName lobbyName;
     private final User player;
     private final ActorSet victims;
 
@@ -25,9 +27,22 @@ public class RobberChooseVictimResponse extends AbstractResponseMessage {
      * @param player  The player choosing the victims
      * @param victims The victims to choose from
      */
-    public RobberChooseVictimResponse(User player, ActorSet victims) {
+    public RobberChooseVictimResponse(LobbyName lobbyName, User player, ActorSet victims) {
+        this.lobbyName = lobbyName;
         this.player = player;
         this.victims = victims;
+    }
+
+    /**
+     * Gets the Lobby's name in which the User has to pick a victim
+     *
+     * @return The Name of the Lobby in which to choose victims
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public LobbyName getLobbyName() {
+        return lobbyName;
     }
 
     /**
