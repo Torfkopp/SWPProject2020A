@@ -149,6 +149,7 @@ public class ClientConnection {
      * @since 2021-03-18
      */
     public void resetClient() {
+        LOG.debug("Sending ClientDisconnectedFromServerEvent");
         eventBus.post(new ClientDisconnectedFromServerEvent());
     }
 
@@ -258,6 +259,7 @@ public class ClientConnection {
      */
     @Subscribe
     private void onExceptionMessage(ExceptionMessage message) {
+        LOG.debug("Received ExceptionMessage [{}]", message.getException());
         for (ConnectionListener l : connectionListener) {
             l.exceptionOccurred(message.getException());
         }
@@ -280,6 +282,7 @@ public class ClientConnection {
     @Subscribe
     private void onPingMessage(PingMessage msg) {
         LOG.trace("Server ping received.");
+        LOG.trace("Sending PongMessage");
         eventBus.post(new PongMessage());
     }
 

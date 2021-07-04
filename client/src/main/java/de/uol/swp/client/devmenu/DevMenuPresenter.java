@@ -87,6 +87,7 @@ public class DevMenuPresenter extends AbstractPresenter {
      */
     @FXML
     private void initialize() {
+        LOG.debug("Sending DevMenuClassesRequest");
         post(new DevMenuClassesRequest());
         if (classNameObservableList == null) classNameObservableList = FXCollections.observableArrayList();
         FilteredList<String> filteredClassNameList = new FilteredList<>(classNameObservableList, p -> true);

@@ -399,6 +399,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
+            LOG.debug("Sending PlayRoadBuildingCardAllowedRequest for Lobby {}", lobbyName);
             post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
@@ -498,6 +499,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             disableButtonStates();
             sceneService.openUserTradeWindow(lobbyName, user, false);
+            LOG.debug("Sending PauseTimerRequest for Lobby {}", lobbyName);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -719,8 +721,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuildingFailedResponse");
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received BuildingFailedResponse for Lobby {}", rsp.getLobbyName());
         switch (rsp.getReason()) {
             case ALREADY_BUILT_HERE:
                 gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.alreadybuildhere"));
@@ -757,10 +759,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
-        if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received BuildingSuccessfulMessage for Lobby {}", msg.getLobbyName());
         gameRendering.redraw();
         soundService.building();
-        LOG.debug("Received BuildingSuccessfulMessage");
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
             LOG.debug("---- First road successfully built");
@@ -814,7 +816,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 break;
         }
         final String finalAttr = attr;
-        if (Util.equals(msg.getActor(), userService.getLoggedInUser())) {
+        if (Util.equals(userService.getLoggedInUser(), msg.getActor())) {
             gameService.updateInventory(lobbyName);
             if (finalAttr != null) {
                 InGameSystemMessageDTO message = new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"));
@@ -879,8 +881,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        LOG.debug("Received DiceCastMessage");
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received DiceCastMessage for Lobby {}", msg.getLobbyName());
         LOG.debug("---- The dices show: {} and {}", msg.getDice1(), msg.getDice2());
         playedCard = false;
         dice1 = msg.getDice1();
@@ -940,9 +942,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        int getRound = msg.getCurrentRound();
-        if (!msg.getLobbyName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
+        int getRound = msg.getCurrentRound();
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         if (!startUpPhaseEnabled) {
@@ -976,8 +978,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPauseGameMessage(UpdatePauseStatusMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        LOG.debug("Received PauseGameMessage");
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received PauseGameMessage for Lobby {}", msg.getLobbyName());
 
         boolean statusChange = msg.getPausedMembers() == lobbyMembers.size();
         if (!gamePaused) {
@@ -1027,7 +1029,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPauseTimerMessage(PauseTimerMessage msg) {
-        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        if (!Util.equals(lobbyName, msg.getName())) LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
         timerPaused = true;
     }
 
@@ -1043,8 +1045,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received PlayCardFailureResponse");
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received PlayCardFailureResponse for Lobby {}", rsp.getLobbyName());
         if (!userService.getLoggedInUser().equals(rsp.getUser())) return;
         String title = ResourceManager.get("game.playcards.failure.title");
         String headerText = ResourceManager.get("game.playcards.failure.header");
@@ -1078,8 +1080,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPlayCardSuccessResponse(PlayCardSuccessResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received PlayCardSuccessResponse");
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received PlayCardSuccessResponse for Lobby {}", rsp.getLobbyName());
         playCard.setDisable(true);
         playedCard = true;
         if (helpActivated) setHelpText();
@@ -1101,6 +1103,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Sending PlayRoadBuildingCardAllowedResponse for Lobby {}", rsp.getLobbyName());
         Platform.runLater(() -> {
             notice.setText(ResourceManager.get("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
@@ -1127,8 +1131,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
-        LOG.debug("Received RefreshCardAmountMessage");
-        if (!lobbyName.equals(msg.getLobbyName())) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received RefreshCardAmountMessage for Lobby {}", msg.getLobbyName());
         cardAmountsList = msg.getCardAmountsList();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         if (helpActivated) setHelpText();
@@ -1150,7 +1154,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
-        if (!lobbyName.equals(event.getLobbyName())) return;
+        if (!Util.equals(lobbyName, event.getLobbyName())) return;
+        LOG.debug("Received ResetTradeWithBankButtonEvent for Lobby {}", event.getLobbyName());
         if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
     }
 
@@ -1165,11 +1170,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberAllTaxPayedMessage(RobberAllTaxPaidMessage msg) {
-        if (msg.getLobbyName().equals(lobbyName)) {
-            resetButtonStates(msg.getActor());
-            if (helpActivated) setHelpText();
-        }
-        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getActor());
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received RobberAllTaxPayedMessage for Lobby {}", msg.getLobbyName());
+        if (helpActivated) setHelpText();
+        resetButtonStates(msg.getActor());
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         endTurn.setDisable(true);
         tradeWithUserButton.setDisable(true);
@@ -1188,31 +1193,31 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
-        LOG.debug("Received RobberChooseVictimResponse");
-        if (userService.getLoggedInUser().equals(rsp.getPlayer())) {
-            String title = ResourceManager.get("game.robber.victim.title");
-            String headerText = ResourceManager.get("game.robber.victim.header");
-            String contentText = ResourceManager.get("game.robber.victim.content");
-            String confirmText = ResourceManager.get("button.confirm");
-            String cancelText = ResourceManager.get("button.cancel");
-            Platform.runLater(() -> {
-                ActorSet victims = rsp.getVictims();
-                ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
-                dialogue.setTitle(title);
-                dialogue.setHeaderText(headerText);
-                dialogue.setContentText(contentText);
-                DialogPane pane = new DialogPane();
-                pane.setContent(dialogue.getDialogPane().getContent());
-                ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
-                ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
-                dialogue.setDialogPane(pane);
-                dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-                dialogue.getDialogPane().getStylesheets().add(styleSheet);
-                Optional<Actor> rst = dialogue.showAndWait();
-                soundService.button();
-                rst.ifPresent(actor -> gameService.robberChooseVictim(lobbyName, actor));
-            });
-        }
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        else if (!userService.getLoggedInUser().equals(rsp.getPlayer())) return;
+        LOG.debug("Received RobberChooseVictimResponse for Lobby {}", rsp.getLobbyName());
+        String title = ResourceManager.get("game.robber.victim.title");
+        String headerText = ResourceManager.get("game.robber.victim.header");
+        String contentText = ResourceManager.get("game.robber.victim.content");
+        String confirmText = ResourceManager.get("button.confirm");
+        String cancelText = ResourceManager.get("button.cancel");
+        Platform.runLater(() -> {
+            ActorSet victims = rsp.getVictims();
+            ChoiceDialog<Actor> dialogue = new ChoiceDialog<>(victims.get(0), victims);
+            dialogue.setTitle(title);
+            dialogue.setHeaderText(headerText);
+            dialogue.setContentText(contentText);
+            DialogPane pane = new DialogPane();
+            pane.setContent(dialogue.getDialogPane().getContent());
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.setDialogPane(pane);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            dialogue.getDialogPane().getStylesheets().add(styleSheet);
+            Optional<Actor> rst = dialogue.showAndWait();
+            soundService.button();
+            rst.ifPresent(actor -> gameService.robberChooseVictim(lobbyName, actor));
+        });
     }
 
     /**
@@ -1225,7 +1230,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberMovementFailedResponse(RobberMovementFailedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
         if (!userService.getLoggedInUser().equals(rsp.getPlayer())) return;
         LOG.debug("Received RobberMovementFailedResponse for Lobby {}", rsp.getLobbyName());
         robberNewPosition = true;
@@ -1244,7 +1249,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
-        LOG.debug("Received RobberNewPositionResponse");
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received RobberNewPositionResponse for Lobby {}", rsp.getLobbyName());
         Platform.runLater(() -> notice.setText(ResourceManager.get("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
@@ -1262,12 +1268,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberPositionMessage(RobberPositionMessage msg) {
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
         LOG.debug("Received RobberPositionMessage for Lobby {}", msg.getLobbyName());
-        if (lobbyName.equals(msg.getLobbyName())) {
-            resetButtonStates(msg.getActor());
-            gameService.updateGameMap(msg.getLobbyName());
-            if (helpActivated) setHelpText();
-        }
+        resetButtonStates(msg.getActor());
+        gameService.updateGameMap(msg.getLobbyName());
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -1282,17 +1287,16 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberTaxMessage(RobberTaxMessage msg) {
-        LOG.debug("Received RobberTaxMessage");
-        if (msg.getLobbyName().equals(lobbyName)) {
-            disableButtonStates();
-            if (helpActivated) setHelpText();
-            if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
-                LOG.debug("Sending ShowRobberTaxViewEvent");
-                User user = userService.getLoggedInUser();
-                sceneService.openRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                 msg.getInventories().get(user).create());
-                post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
-            }
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received RobberTaxMessage for Lobby {}", msg.getLobbyName());
+        disableButtonStates();
+        if (helpActivated) setHelpText();
+        if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
+            User user = userService.getLoggedInUser();
+            sceneService.openRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
+                                             msg.getInventories().get(user).create());
+            LOG.debug("Sending PauseTimerRequest for Lobby {}", lobbyName);
+            post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -1310,7 +1314,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", rsp.getLobbyName());
         gameService.updateInventory(lobbyName);
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -1328,8 +1335,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        LOG.debug("Received TradeWithUserCancelResponse");
-        if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        if (!Util.equals(userService.getLoggedInUser(), rsp.getActivePlayer())) return;
+        LOG.debug("Received TradeWithUserCancelResponse for Lobby {}", rsp.getLobbyName());
         if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
         sceneService.closeAcceptTradeWindow(rsp.getLobbyName());
@@ -1349,8 +1357,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
-        LOG.debug("Received TradeWithUserOfferResponse");
-        if (!rsp.getLobbyName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received TradeWithUserOfferResponse for Lobby {}", rsp.getLobbyName());
         sceneService.openAcceptTradeWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
@@ -1368,7 +1376,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-05-02
      */
     @Subscribe
-    private void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+    private void onUnpauseTimerMessage(UnpauseTimerMessage msg) {
+        if (!Util.equals(lobbyName, msg.getName())) return;
         LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
         timerPaused = false;
     }
@@ -1376,7 +1385,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Handles a UpdateGameMapResponse
      * If a UpdateGameMapResponse is found on the bus this method is called.
-     * It updates the gamemap and redraws it.
+     * It updates the GameMap and redraws it.
      *
      * @param rsp The UpdateGameMapResponse found on the bus
      *
@@ -1386,8 +1395,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
-        if (!Util.equals(rsp.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received UpdateGameMapResponse");
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received UpdateGameMapResponse for Lobby {}", rsp.getLobbyName());
         if (rsp.getGameMapDTO() == null) return;
         if (gameRendering == null) return;
         gameMapDescription.setGameMap(rsp.getGameMapDTO());
@@ -1411,7 +1420,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
-        if (!rsp.getLobbyName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             resourceTableView.getItems().clear();
@@ -1438,7 +1447,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
-        if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received UpdateUniqueCardsListMessage for Lobby {}", msg.getLobbyName());
         uniqueCardList.set(0, msg.getUniqueCardsList().get(0));
         uniqueCardList.set(1, msg.getUniqueCardsList().get(1));
     }
@@ -1455,11 +1465,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateVictoryPointsMessage(UpdateVictoryPointsMessage msg) {
-        if (!msg.getLobbyName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
         LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
         int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
-        Platform.runLater(
-                () -> victoryPointsLabel.setText(ResourceManager.get("game.victorypoints.labels", victoryPoints)));
+        String victoryPointText = ResourceManager.get("game.victorypoints.labels", victoryPoints);
+        Platform.runLater(() -> victoryPointsLabel.setText(victoryPointText));
     }
 
     /**
