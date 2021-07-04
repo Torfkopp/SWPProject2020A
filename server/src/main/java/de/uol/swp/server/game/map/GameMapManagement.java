@@ -1,4 +1,4 @@
-package de.uol.swp.server.game;
+package de.uol.swp.server.game.map;
 
 import com.google.common.graph.*;
 import de.uol.swp.common.game.map.Player;
@@ -11,7 +11,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.specialisedUtil.ActorSet;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.Util;
-import de.uol.swp.server.game.map.IGameMapManagement;
+import de.uol.swp.server.game.Game;
 
 import java.util.*;
 import java.util.function.BiFunction;
