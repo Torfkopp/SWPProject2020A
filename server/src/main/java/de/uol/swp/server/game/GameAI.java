@@ -20,6 +20,7 @@ import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.util.Util;
+import de.uol.swp.server.game.map.GameMapManagement;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.specialisedUtil.ActorStartUpBuiltMap;

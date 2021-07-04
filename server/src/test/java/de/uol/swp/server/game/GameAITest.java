@@ -10,6 +10,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.*;
+import de.uol.swp.server.game.map.GameMapManagement;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.*;
 import de.uol.swp.server.sessionmanagement.SessionManagement;

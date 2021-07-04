@@ -45,6 +45,7 @@ import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.game.event.KickUserEvent;
+import de.uol.swp.server.game.map.GameMapManagement;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
