@@ -1445,7 +1445,9 @@ public class GameService extends AbstractService {
         game.setBuildingAllowed(true);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
-        boolean secondOfferOfRespondingUser = game.getActivePlayer().equals(req.getSession().get().getUser());
+        boolean secondOfferOfRespondingUser = false;
+        if (req.getSession().isPresent())
+            secondOfferOfRespondingUser = game.getActivePlayer().equals(req.getSession().get().getUser());
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby(),
                                                                           secondOfferOfRespondingUser);
         LOG.debug("Sending ForwardToUserInternalRequest containing ResetOfferTradeButtonResponse for Lobby {}",
