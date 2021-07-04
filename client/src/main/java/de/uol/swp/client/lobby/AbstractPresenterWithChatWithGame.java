@@ -378,13 +378,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             } else if (card.getType() == DevelopmentCardType.MONOPOLY_CARD) {
                 playMonopolyCard(ore, grain, brick, lumber, wool, choices);
             } else if (card.getType() == DevelopmentCardType.ROAD_BUILDING_CARD) {
+                LOG.debug("Sending PlayRoadBuildingCardAllowedRequest for Lobby {}", lobbyName);
                 post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
             } else if (card.getType() == DevelopmentCardType.YEAR_OF_PLENTY_CARD) {
                 playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
-            } else if (card.getType() == DevelopmentCardType.VICTORY_POINT_CARD) {
-                sceneService.showError(ResourceManager.get("game.error.playviccard"));
-            } else sceneService.showError(ResourceManager.get("game.error.nodevcard"));
-        }
+            } else sceneService.showError(ResourceManager.get("game.error.playviccard"));
+        } else sceneService.showError(ResourceManager.get("game.error.nodevcard"));
     }
 
     /**
