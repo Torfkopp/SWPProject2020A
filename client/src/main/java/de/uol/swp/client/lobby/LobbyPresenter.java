@@ -23,6 +23,8 @@ import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -31,9 +33,7 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manages the lobby's menu
@@ -52,6 +52,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int MIN_WIDTH_PRE_GAME = 695;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
+    private boolean leftGame = false;
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
     private final boolean joinLeaveMsgsOn;
@@ -144,15 +145,34 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Handles a click on the LeaveLobby button
      * <p>
      * Method called when the leaveLobby button is pressed.
-     * If the leaveLobby button is pressed this method requests
-     * the lobby service to leave the lobby.
+     * If the leaveLobby button is pressed this method requests the lobby service
+     * through a ConfirmationAlert that the user wants to leave the lobby.
+     * If the user presses Confirm while he is in a Lobby which is not in a Game, the User leaves the Lobby.
+     * If the user presses Confirm while he is in a Lobby that is in a Game, he leaves the lobby and gets replaced by an AI.
      *
      * @since 2020-12-14
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
         soundService.button();
-        closeWindow(false);
+        //Create new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(ResourceManager.get("lobby.leave.confirmation.window"));
+        alert.setHeaderText(ResourceManager.get("lobby.leave.confirmation.question"));
+        alert.getDialogPane().getStylesheets().add(styleSheet);
+        //Create the buttons
+        ButtonType lConfirm = new ButtonType(ResourceManager.get("button.confirm"));
+        ButtonType lCancel = new ButtonType(ResourceManager.get("button.cancel"));
+        //Show the dialogue and get the result
+        alert.getButtonTypes().setAll(lConfirm, lCancel);
+        Optional<ButtonType> result = alert.showAndWait();
+        //Result is the button the user has clicked on
+        if (result.isPresent() && result.get() == lConfirm) {
+            closeWindow(false);
+            if (!leftGame) lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
+            leftGame = true;
+        }
+        soundService.button();
     }
 
     /**
@@ -233,6 +253,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         // onCloseRequest already set by SceneManager, so do not overwrite
         this.window.setOnHiding(windowEvent -> {
             closeWindow(false);
+            if (!leftGame) lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
+            leftGame = true;
             clearEventBus();
         });
         lobbyService.retrieveAllLobbyMembers(lobbyName);
