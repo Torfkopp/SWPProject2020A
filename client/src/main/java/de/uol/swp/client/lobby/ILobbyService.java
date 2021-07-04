@@ -134,7 +134,7 @@ public interface ILobbyService {
     /**
      * This method request to replace the User who left a lobby with an AI
      *
-     * @param lobbyName The name of the lobby the user gets replace with the AI
+     * @param lobbyName The name of the lobby, where the user gets replaced with the AI
      * @param oldColour The Colour of the User who left the lobby
      *
      * @since 2021-06-10
