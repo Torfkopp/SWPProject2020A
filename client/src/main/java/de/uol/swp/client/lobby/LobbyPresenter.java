@@ -272,6 +272,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         Platform.runLater(() -> {
             tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
+            playCard.setText(ResourceManager.get("lobby.game.buttons.playcard.nonselected"));
             moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
             maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
@@ -506,5 +507,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade", name));
             }
         });
+        developmentCardTableView.getSelectionModel().selectedItemProperty()
+                                .addListener((observableValue, oldValue, newValue) -> {
+                                    if (newValue == null) {
+                                        return;
+                                    }
+                                    String name = newValue.getType().toString();
+                                    playCard.setText(ResourceManager.get("lobby.game.buttons.playcard", name));
+                                });
     }
 }

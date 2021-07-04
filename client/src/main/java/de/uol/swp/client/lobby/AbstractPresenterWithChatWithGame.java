@@ -346,13 +346,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Handles a click on the PlayCardButton
      * <p>
-     * Method called when the PlayCardButton is pushed
-     * It opens a dialogue to allow the player to choose
-     * which card is to be played.
+     * Method called when the PlayCardButton is pushed.
+     * It plays the selected DevelopmentCard (if allowed).
      *
-     * @author Eric Vuong
-     * @author Mario Fokken
-     * @since 2021-02-25
+     * @author Alwin Bossert
+     * @since 2021-07-02
      */
     @FXML
     protected void onPlayCardButtonPressed() {
@@ -361,48 +359,30 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             return;
         }
         soundService.button();
-        //Create a new alert
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(ResourceManager.get("game.playcards.alert.title"));
-        alert.setHeaderText(ResourceManager.get("game.playcards.alert.header"));
-        alert.setContentText(ResourceManager.get("game.playcards.alert.content"));
-        //Create the buttons
-        ButtonType btnKnight = new ButtonType(ResourceManager.get("game.resources.cards.knight"));
-        ButtonType btnMonopoly = new ButtonType(ResourceManager.get("game.resources.cards.monopoly"));
-        ButtonType btnRoadBuilding = new ButtonType(ResourceManager.get("game.resources.cards.roadbuilding"));
-        ButtonType btnYearOfPlenty = new ButtonType(ResourceManager.get("game.resources.cards.yearofplenty"));
-        ButtonType btnCancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
-        alert.getDialogPane().getStylesheets().add(styleSheet);
-        //Show the dialogue and get the result
-        Optional<ButtonType> result = alert.showAndWait();
-        soundService.button();
-        //Create Strings based on the languages name for the resources
+        IDevelopmentCard card = developmentCardTableView.getSelectionModel().getSelectedItem();
         String ore = ResourceManager.get("game.resources.ore");
         String grain = ResourceManager.get("game.resources.grain");
         String brick = ResourceManager.get("game.resources.brick");
         String lumber = ResourceManager.get("game.resources.lumber");
         String wool = ResourceManager.get("game.resources.wool");
-        //Make a list with aforementioned Strings
         List<String> choices = new ArrayList<>();
         choices.add(ore);
         choices.add(grain);
         choices.add(brick);
         choices.add(lumber);
         choices.add(wool);
-        //Result is the button the user has clicked on
-        if (result.isEmpty()) return;
-        if (result.get() == btnKnight) { //Play a Knight Card
-            gameService.playKnightCard(lobbyName);
-            disableButtonStates();
-        } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
-            playMonopolyCard(ore, grain, brick, lumber, wool, choices);
-        } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            LOG.debug("Sending PlayRoadBuildingCardAllowedRequest for Lobby {}", lobbyName);
-            post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
-        } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
-            playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
-        }
+        if (card != null) {
+            if (card.getType() == DevelopmentCardType.KNIGHT_CARD) {
+                gameService.playKnightCard(lobbyName);
+            } else if (card.getType() == DevelopmentCardType.MONOPOLY_CARD) {
+                playMonopolyCard(ore, grain, brick, lumber, wool, choices);
+            } else if (card.getType() == DevelopmentCardType.ROAD_BUILDING_CARD) {
+                LOG.debug("Sending PlayRoadBuildingCardAllowedRequest for Lobby {}", lobbyName);
+                post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
+            } else if (card.getType() == DevelopmentCardType.YEAR_OF_PLENTY_CARD) {
+                playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
+            } else sceneService.showError(ResourceManager.get("game.error.playviccard"));
+        } else sceneService.showError(ResourceManager.get("game.error.nodevcard"));
     }
 
     /**
