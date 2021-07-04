@@ -133,6 +133,26 @@ public class InventoryMap implements Serializable {
     }
 
     /**
+     * Replace a User who left a Lobby in Game with an AI
+     *
+     * @param userToBeReplaced  The user who left the lobby and should be replaced
+     * @param userToReplaceWith The AI that replaces the user who left the lobby
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    public void replace(Actor userToBeReplaced, Actor userToReplaceWith) throws IllegalArgumentException {
+        for (int i = 0; i < map.size(); i++) {
+            UserPlayerInventoryMapping entry = map.get(i);
+            if (Objects.equals(entry.getActor(), userToBeReplaced)) {
+                map.set(i, new UserPlayerInventoryMapping(userToReplaceWith, entry.getPlayer(), entry.getInventory()));
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unknown User");
+    }
+
+    /**
      * Gets the size of the map
      *
      * @return The size of the map

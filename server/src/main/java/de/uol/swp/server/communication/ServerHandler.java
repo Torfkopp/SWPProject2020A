@@ -113,7 +113,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2021-03-18
      */
     public void sendPingMessage(MessageContext ctx) {
-        LOG.debug("Send ping message to client {}", ctx);
+        LOG.trace("Send ping message to client {}", ctx);
         sendToClient(ctx, new PingMessage());
     }
 

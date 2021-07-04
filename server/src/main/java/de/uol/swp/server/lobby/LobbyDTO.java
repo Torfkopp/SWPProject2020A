@@ -124,6 +124,9 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
+    public ActorSet getActors() { return users; }
+
+    @Override
     public int getMaxPlayers() {
         return maxPlayers;
     }
@@ -188,9 +191,6 @@ public class LobbyDTO implements ILobby {
     public ActorColourMap getUserColourMap() {
         return userColours;
     }
-
-    @Override
-    public ActorSet getActors() { return users; }
 
     @Override
     public boolean hasPassword() {
@@ -264,13 +264,22 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public void setUserColour(Actor user, Colour colour) {
-        userColours.put(user, colour);
+    public void replaceUser(Actor userToReplace, Actor userToReplaceWith, Colour oldColour) {
+        leaveUser(userToReplace);
+        users.add(userToReplaceWith);
+        readyUsers.remove(userToReplace);
+        readyUsers.add(userToReplaceWith);
+        userColours.put(userToReplaceWith, oldColour);
     }
 
     @Override
     public void setHasPassword(boolean hasPassword) {
         this.hasPassword = hasPassword;
+    }
+
+    @Override
+    public void setUserColour(Actor user, Colour colour) {
+        userColours.put(user, colour);
     }
 
     @Override

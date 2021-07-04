@@ -159,7 +159,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected IGameService gameService;
     protected int maxTradeDiff;
     protected VictoryPointOverTimeMap victoryPointsOverTimeMap;
-    protected ActorSet inGameUserList;
     protected boolean drawHitboxGrid;
     protected String renderingStyle;
 

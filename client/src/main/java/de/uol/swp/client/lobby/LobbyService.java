@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.Colour;
+import de.uol.swp.common.game.request.ReplaceUserWithAIRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -158,5 +159,12 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending UserReadyRequest");
         Message userReadyRequest = new UserReadyRequest(lobbyName, userService.getLoggedInUser(), isReady);
         eventBus.post(userReadyRequest);
+    }
+
+    @Override
+    public void replaceUserWithAI(LobbyName lobbyName, Colour oldColour) {
+        LOG.debug("Sending ReplaceUserWithAiRequest");
+        Message request = new ReplaceUserWithAIRequest(lobbyName, userService.getLoggedInUser(), oldColour);
+        eventBus.post(request);
     }
 }
