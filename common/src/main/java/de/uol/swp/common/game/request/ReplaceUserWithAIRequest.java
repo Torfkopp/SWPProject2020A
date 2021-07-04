@@ -43,7 +43,7 @@ public class ReplaceUserWithAIRequest extends AbstractGameRequest {
     }
 
     /**
-     * Gets the User that is to replace with the AI
+     * Gets the User that is to be replaced with the AI
      *
      * @return The User that is to be replaced
      */
