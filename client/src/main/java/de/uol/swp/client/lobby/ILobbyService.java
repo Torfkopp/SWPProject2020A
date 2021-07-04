@@ -132,7 +132,7 @@ public interface ILobbyService {
     void removeFromAllLobbies();
 
     /**
-     * This method request to replace the User who left a lobby with an AI
+     * This method requests to replace the User who left a lobby with an AI
      *
      * @param lobbyName The name of the lobby, where the user gets replaced with the AI
      * @param oldColour The Colour of the User who left the lobby
