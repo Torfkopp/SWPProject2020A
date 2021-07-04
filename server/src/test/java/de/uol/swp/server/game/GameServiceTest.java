@@ -27,8 +27,8 @@ import de.uol.swp.server.lobby.*;
 import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import de.uol.swp.server.usermanagement.UserManagement;
+import de.uol.swp.server.usermanagement.store.IUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
-import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ public class GameServiceTest {
     private final UserDTO user2 = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
     private final UserDTO user3 = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
     private final EventBus bus = new EventBus();
-    private final UserStore userStore = new MainMemoryBasedUserStore();
+    private final IUserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
     private final SessionManagement sessionManagement = new SessionManagement();

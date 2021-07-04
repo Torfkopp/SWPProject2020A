@@ -17,7 +17,7 @@ class H2BasedUserStoreTest {
     private static List<User> users;
 
     { // do not make static (will cause tests to fail)
-        UserStore store = new H2BasedUserStore();
+        IUserStore store = new H2BasedUserStore();
         H2BasedUserStoreTest.nextID = store.getNextUserID();
         H2BasedUserStoreTest.users = new ArrayList<>();
         for (int i = nextID; i < NO_USERS + nextID; i++) {
@@ -28,19 +28,19 @@ class H2BasedUserStoreTest {
 
     @AfterEach
     protected void cleanDatabase() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.removeUser(u.getUsername()));
     }
 
     @BeforeEach
     protected void fillDatabase() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
     }
 
-    protected UserStore getDefaultStore() {
+    protected IUserStore getDefaultStore() {
         return new H2BasedUserStore();
     }
 
@@ -50,7 +50,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void changePasswordWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -70,7 +70,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void changePasswordWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -91,14 +91,14 @@ class H2BasedUserStoreTest {
 
     @Test
     void createEmptyUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         assertThrows(IllegalArgumentException.class, () -> store.createUser("", "", ""));
     }
 
     @Test
     void dropUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
         Optional<User> userFound = store.findUser(userToRemove.getID());
         assertTrue(userFound.isPresent());
@@ -112,7 +112,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void dropUserByUsername() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
         store.removeUser(userToRemove.getUsername());
@@ -124,7 +124,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(2);
 
         Optional<User> userFound = store.findUser(userToFind.getID());
@@ -138,7 +138,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserByName() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername());
@@ -153,7 +153,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
@@ -168,7 +168,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_EmptyUser_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         Optional<User> userFound = store.findUser(null, "");
 
@@ -177,7 +177,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
@@ -187,7 +187,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void findUserByName_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
@@ -197,7 +197,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void getAllUsers() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
@@ -215,7 +215,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void overwriteUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
 
         assertThrows(IllegalArgumentException.class, () -> store
@@ -224,7 +224,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void updateEmailWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());
@@ -244,7 +244,7 @@ class H2BasedUserStoreTest {
 
     @Test
     void updateEmailWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());
