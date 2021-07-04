@@ -23,9 +23,10 @@ import java.util.Optional;
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
  * @see de.uol.swp.server.usermanagement.store.IUserStore
+ * @see de.uol.swp.server.usermanagement.store.SqlConnector
  * @since 2021-01-20
  */
-public class H2BasedUserStore implements IUserStore {
+public class H2BasedUserStore extends SqlConnector implements IUserStore {
 
     private static final Logger LOG = LogManager.getLogger(H2BasedUserStore.class);
     private static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
@@ -45,7 +46,7 @@ public class H2BasedUserStore implements IUserStore {
 
         if (findUser(username).isEmpty()) {
             try {
-                conn = openConnection();
+                conn = openConnection(DB_URL, USER, PASS);
                 pstmt = conn.prepareStatement("INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)");
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
@@ -69,7 +70,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -99,7 +100,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -129,7 +130,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -161,7 +162,7 @@ public class H2BasedUserStore implements IUserStore {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB");
             ResultSet rs = pstmt.executeQuery();
 
@@ -198,7 +199,7 @@ public class H2BasedUserStore implements IUserStore {
 
         String sequenceName = "";
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT SEQUENCE_NAME FROM USERDB.INFORMATION_SCHEMA.SEQUENCES LIMIT 1");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) sequenceName = rs.getString(1);
@@ -223,7 +224,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -239,7 +240,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             pstmt.executeUpdate();
@@ -262,7 +263,7 @@ public class H2BasedUserStore implements IUserStore {
         if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -288,7 +289,7 @@ public class H2BasedUserStore implements IUserStore {
         createTable();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?");
             pstmt.setString(1, password);
             pstmt.setString(2, eMail);
@@ -305,29 +306,6 @@ public class H2BasedUserStore implements IUserStore {
     }
 
     /**
-     * Helper method to close a provided connection
-     * and SQL statement.
-     *
-     * @param conn  The connection to be closed
-     * @param pstmt The statement to be closed
-     *
-     * @author Marvin Drees
-     * @since 2021-07-02
-     */
-    private void closeConnection(Connection conn, PreparedStatement pstmt) {
-        try {
-            if (pstmt != null) pstmt.close();
-        } catch (SQLException e) {
-            LOG.fatal(e.getMessage());
-        }
-        try {
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            LOG.fatal(e.getMessage());
-        }
-    }
-
-    /**
      * This method creates the table containing the user information
      * <p>
      * IMPORTANT: This method is only needed for H2 as this database
@@ -336,7 +314,7 @@ public class H2BasedUserStore implements IUserStore {
      */
     private void createTable() {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
 
             //@formatter:off
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
@@ -355,20 +333,5 @@ public class H2BasedUserStore implements IUserStore {
         } finally {
             closeConnection(conn, pstmt);
         }
-    }
-
-    /**
-     * Helper method to open a connection to the SQL database.
-     *
-     * @return The opened connection
-     *
-     * @throws SQLException Exception when something goes wrong opening the connection
-     * @author Marvin Drees
-     * @since 2021-07-02
-     */
-    private Connection openConnection() throws SQLException {
-        Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        conn.setAutoCommit(true);
-        return conn;
     }
 }

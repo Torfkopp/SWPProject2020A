@@ -21,11 +21,12 @@ import java.util.Optional;
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
  * @see de.uol.swp.server.usermanagement.store.IUserStore
+ * @see de.uol.swp.server.usermanagement.store.SqlConnector
  * @since 2021-02-10
  */
-public class MySQLBasedUserStore implements IUserStore {
+public class MySQLBasedUserStore extends SqlConnector implements IUserStore {
 
-    private static final Logger LOG = LogManager.getLogger(H2BasedUserStore.class);
+    private static final Logger LOG = LogManager.getLogger(MySQLBasedUserStore.class);
     private static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";
     private static final String USER = "catan";
     private static final String PASS = "rNZcEqeiqMJpdr9M";
@@ -41,7 +42,7 @@ public class MySQLBasedUserStore implements IUserStore {
 
         if (findUser(username).isEmpty()) {
             try {
-                conn = openConnection();
+                conn = openConnection(DB_URL, USER, PASS);
                 pstmt = conn.prepareStatement("INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)");
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
@@ -63,7 +64,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public Optional<User> findUser(int id) {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -91,7 +92,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public Optional<User> findUser(String username) {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -119,7 +120,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public Optional<User> findUser(String username, String password) {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -149,7 +150,7 @@ public class MySQLBasedUserStore implements IUserStore {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("SELECT * FROM USERDB");
             ResultSet rs = pstmt.executeQuery();
 
@@ -183,7 +184,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public int getNextUserID() {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement(
                     "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'catan_user_schema' AND TABLE_NAME = 'userdb'");
             ResultSet rs = pstmt.executeQuery();
@@ -200,7 +201,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public void removeUser(int id) {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE id = ?");
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -214,7 +215,7 @@ public class MySQLBasedUserStore implements IUserStore {
     @Override
     public void removeUser(String username) {
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("DELETE FROM USERDB WHERE username = ?");
             pstmt.setString(1, username);
             pstmt.executeUpdate();
@@ -235,7 +236,7 @@ public class MySQLBasedUserStore implements IUserStore {
         if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -259,7 +260,7 @@ public class MySQLBasedUserStore implements IUserStore {
         }
 
         try {
-            conn = openConnection();
+            conn = openConnection(DB_URL, USER, PASS);
             pstmt = conn.prepareStatement("UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?");
             pstmt.setString(1, password);
             pstmt.setString(2, eMail);
@@ -273,43 +274,5 @@ public class MySQLBasedUserStore implements IUserStore {
         Optional<User> user = findUser(username);
         if (user.isEmpty()) throw new RuntimeException("Something went wrong when updating the user");
         else return user.get().getWithoutPassword();
-    }
-
-    /**
-     * Helper method to close a provided connection
-     * and SQL statement.
-     *
-     * @param conn  The connection to be closed
-     * @param pstmt The statement to be closed
-     *
-     * @author Marvin Drees
-     * @since 2021-07-02
-     */
-    private void closeConnection(Connection conn, PreparedStatement pstmt) {
-        try {
-            if (pstmt != null) pstmt.close();
-        } catch (SQLException e) {
-            LOG.fatal(e.getMessage());
-        }
-        try {
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            LOG.fatal(e.getMessage());
-        }
-    }
-
-    /**
-     * Helper method to open a connection to the SQL database.
-     *
-     * @return The opened connection
-     *
-     * @throws SQLException Exception when something goes wrong opening the connection
-     * @author Marvin Drees
-     * @since 2021-07-02
-     */
-    private Connection openConnection() throws SQLException {
-        Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        conn.setAutoCommit(true);
-        return conn;
     }
 }
