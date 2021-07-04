@@ -17,18 +17,17 @@ import java.io.Serializable;
  * @see io.netty.handler.codec.serialization.ObjectEncoder
  * @since 2019-08-13
  */
-public class MyObjectEncoder extends ObjectEncoder {
+public class NettyObjectEncoder extends ObjectEncoder {
 
-    private static final Logger LOG = LogManager.getLogger(MyObjectEncoder.class);
+    private static final Logger LOG = LogManager.getLogger(NettyObjectEncoder.class);
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
         LOG.trace("Trying to encode: {}", msg);
         try {
             super.encode(ctx, msg, out);
-        } catch (Exception e) {
-            LOG.error(e);
-            e.printStackTrace();
+        } catch (Exception e) { // This is always an IOException but the Netty devs didn't bother declaring that
+            LOG.error(e.getMessage());
             throw e;
         }
         LOG.trace("{} {}", msg, out);

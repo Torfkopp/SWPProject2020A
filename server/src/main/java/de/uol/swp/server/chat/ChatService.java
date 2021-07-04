@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -83,7 +84,7 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onAskLatestChatMessageRequest(AskLatestChatMessageRequest req) {
-        if (req.isFromLobby()) LOG.debug("Received AskLatestChatMessageRequest from Lobby {}", req.getOriginLobby());
+        if (req.isFromLobby()) LOG.debug("Received AskLatestChatMessageRequest for Lobby {}", req.getOriginLobby());
         else LOG.debug("Received AskLatestChatMessageRequest");
         ResponseMessage returnMessage;
         if (req.isFromLobby()) {
@@ -94,6 +95,8 @@ public class ChatService extends AbstractService {
             returnMessage = new AskLatestChatMessageResponse(latestMessages);
         }
         returnMessage.initWithMessage(req);
+        LOG.debug("Sending AskLatestChatMessageResponse{}",
+                  req.isFromLobby() ? " for Lobby " + req.getOriginLobby() : "");
         post(returnMessage);
     }
 
@@ -121,18 +124,21 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onDeleteChatMessageRequest(DeleteChatMessageRequest req) {
-        if (req.isFromLobby()) LOG.debug("Received DeleteChatMessageRequest from Lobby {}", req.getOriginLobby());
+        LobbyName originLobby = req.getOriginLobby();
+        if (req.isFromLobby()) LOG.debug("Received DeleteChatMessageRequest for Lobby {}", originLobby);
         else LOG.debug("Received DeleteChatMessageRequest");
         try {
-            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), req.getOriginLobby());
+            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), originLobby);
             if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(req.getRequestingUser())) return;
             if (req.isFromLobby()) {
-                chatManagement.dropChatMessage(req.getId(), req.getOriginLobby());
-                ServerMessage returnMessage = new DeletedChatMessageMessage(req.getId(), req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+                chatManagement.dropChatMessage(req.getId(), originLobby);
+                ServerMessage returnMessage = new DeletedChatMessageMessage(req.getId(), originLobby);
+                LOG.debug("Sending DeletedChatMessageMessage for Lobby {}", originLobby);
+                lobbyService.sendToAllInLobby(originLobby, returnMessage);
             } else {
                 chatManagement.dropChatMessage(req.getId());
                 ServerMessage returnMessage = new DeletedChatMessageMessage(req.getId());
+                LOG.debug("Sending DeletedChatMessageMessage");
                 sendToAll(returnMessage);
             }
         } catch (ChatManagementException e) {
@@ -164,19 +170,21 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest req) {
-        if (req.isFromLobby()) LOG.debug("Received EditChatMessageRequest from Lobby {}", req.getOriginLobby());
+        LobbyName originLobby = req.getOriginLobby();
+        if (req.isFromLobby()) LOG.debug("Received EditChatMessageRequest for Lobby {}", originLobby);
         else LOG.debug("Received EditChatMessageRequest");
         try {
-            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), req.getOriginLobby());
+            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), originLobby);
             if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(req.getRequestingUser())) return;
             if (req.isFromLobby()) {
-                ChatMessage chatMessage = chatManagement
-                        .updateChatMessage(req.getId(), req.getContent(), req.getOriginLobby());
-                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+                ChatMessage chatMessage = chatManagement.updateChatMessage(req.getId(), req.getContent(), originLobby);
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, originLobby);
+                LOG.debug("Sending EditedChatMessageMessage for Lobby {}", originLobby);
+                lobbyService.sendToAllInLobby(originLobby, returnMessage);
             } else {
                 ChatMessage chatMessage = chatManagement.updateChatMessage(req.getId(), req.getContent());
                 ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
+                LOG.debug("Sending EditedChatMessageMessage");
                 sendToAll(returnMessage);
             }
         } catch (ChatManagementException e) {
@@ -238,20 +246,24 @@ public class ChatService extends AbstractService {
                 commandChatService.newGameOrDevCommand(req);
                 return;
             }
+            LOG.debug("Sending NewChatCommandMessage");
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
             return;
         }
-        if (req.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby {}", req.getOriginLobby());
+        LobbyName originLobby = req.getOriginLobby();
+        if (req.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby {}", originLobby);
         else LOG.debug("Received NewChatMessageRequest");
         try {
             if (req.isFromLobby()) {
                 ChatMessage chatMessage = chatManagement
-                        .createChatMessage(req.getAuthor(), req.getContent(), req.getOriginLobby());
-                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+                        .createChatMessage(req.getAuthor(), req.getContent(), originLobby);
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, originLobby);
+                LOG.debug("Sending CreatedChatMessageMessage for Lobby {}", originLobby);
+                lobbyService.sendToAllInLobby(originLobby, returnMessage);
             } else {
                 ChatMessage chatMessage = chatManagement.createChatMessage(req.getAuthor(), req.getContent());
                 ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
+                LOG.debug("Sending CreatedChatMessageMessage");
                 sendToAll(returnMessage);
             }
         } catch (ChatManagementException e) {

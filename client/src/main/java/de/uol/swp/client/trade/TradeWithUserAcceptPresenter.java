@@ -11,6 +11,7 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -92,6 +93,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
                         sceneService.closeAcceptTradeWindow(lobbyName);
+                        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
                         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
                     }
                 }
@@ -124,7 +126,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
-        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", rsp.getLobbyName());
         String invalid = String.format(ResourceManager.get("game.trade.status.invalid"), rsp.getOfferingUser());
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
@@ -150,6 +153,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onMakeCounterOfferButtonPressed() {
         soundService.button();
         sceneService.openUserTradeWindow(lobbyName, offeringUser, true);
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -168,6 +172,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         sceneService.closeAcceptTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, offeringUser);
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -182,8 +187,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", rsp.getLobbyName());
         sceneService.closeAcceptTradeWindow(lobbyName);
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -206,10 +213,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeWithUserResponseUpdateEvent(TradeWithUserResponseUpdateEvent event) {
+        if (lobbyName != null) return;
         TradeWithUserOfferResponse rsp = event.getRsp();
         lobbyName = rsp.getLobbyName();
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby {}", lobbyName);
+        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby {}", rsp.getLobbyName());
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getDemandedResources();
         offeringResourceMap = rsp.getOfferedResources();

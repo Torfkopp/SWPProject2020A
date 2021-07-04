@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
+import de.uol.swp.common.exception.NotEnoughResourcesException;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -102,6 +103,57 @@ public class Inventory extends AbstractInventory {
     }
 
     /**
+     * Checks if 2 GRAIN and 3 ORE (cost of a City) are available in the inventory
+     *
+     * @return true if 2 GRAIN and 3 ORE are available, false otherwise
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public boolean hasCityResources() {
+        return get(ResourceType.GRAIN) >= 2 && get(ResourceType.ORE) >= 3;
+    }
+
+    /**
+     * Checks if 1 each of ORE, GRAIN, WOOL (cost of a Development Card) are
+     * available in the inventory.
+     *
+     * @return true if 1 ORE, 1 GRAIN, 1 WOOL are available, false otherwise
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public boolean hasDevCardResources() {
+        return get(ResourceType.ORE) >= 1 && get(ResourceType.GRAIN) >= 1 && get(ResourceType.WOOL) >= 1;
+    }
+
+    /**
+     * Checks if 1 BRICK and 1 LUMBER (cost of a Road) are available in the inventory
+     *
+     * @return true if 1 BRICK and 1 LUMBER are available
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public boolean hasRoadResources() {
+        return get(ResourceType.BRICK) >= 1 && get(ResourceType.LUMBER) >= 1;
+    }
+
+    /**
+     * Checks if 1 each of BRICK, GRAIN, LUMBER, WOOL (cost of a Settlement)
+     * are available in the inventory
+     *
+     * @return true if 1 BRICK, 1 GRAIN, 1 LUMBER, 1 WOOL are available
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public boolean hasSettlementResources() {
+        return get(ResourceType.BRICK) >= 1 && get(ResourceType.GRAIN) >= 1 && get(ResourceType.LUMBER) >= 1 && get(
+                ResourceType.WOOL) >= 1;
+    }
+
+    /**
      * Increase knights.
      *
      * @author Temmo Junkhoff
@@ -147,5 +199,56 @@ public class Inventory extends AbstractInventory {
         for (var x : developmentCards) {
             isPlayable.put(x.getType(), x.getAmount() >= 1);
         }
+    }
+
+    /**
+     * Removes 2 GRAIN and 3 ORE (the cost of a City)
+     *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public void removeCityResources() throws NotEnoughResourcesException {
+        decrease(ResourceType.GRAIN, 2);
+        decrease(ResourceType.ORE, 3);
+    }
+
+    /**
+     * Removes 1 each of ORE, GRAIN, WOOL (the cost of a Development Card)
+     *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public void removeDevCardResources() throws NotEnoughResourcesException {
+        decrease(ResourceType.ORE, 1);
+        decrease(ResourceType.GRAIN, 1);
+        decrease(ResourceType.WOOL, 1);
+    }
+
+    /**
+     * Removes 1 each of BRICK, LUMBER (the cost of a Road)
+     *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public void removeRoadResources() throws NotEnoughResourcesException {
+        decrease(ResourceType.BRICK, 1);
+        decrease(ResourceType.LUMBER, 1);
+    }
+
+    /**
+     * Removes 1 each of BRICK, GRAIN, LUMBER, WOOL (the cost of a Settlement)
+     *
+     * @throws de.uol.swp.common.exception.NotEnoughResourcesException If the removal would make the Resource amount negative
+     * @author Phillip-André Suhr
+     * @since 2021-07-01
+     */
+    public void removeSettlementResources() throws NotEnoughResourcesException {
+        decrease(ResourceType.BRICK, 1);
+        decrease(ResourceType.GRAIN, 1);
+        decrease(ResourceType.LUMBER, 1);
+        decrease(ResourceType.WOOL, 1);
     }
 }

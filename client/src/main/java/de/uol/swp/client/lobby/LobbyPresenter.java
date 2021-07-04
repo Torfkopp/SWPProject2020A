@@ -119,7 +119,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
         if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
-        LOG.debug("Received AllLobbyMembersResponse");
+        LOG.debug("Received AllLobbyMembersResponse for Lobby {}", rsp.getLobbyName());
         LOG.debug("---- Update of Lobby member list");
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
@@ -188,7 +188,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
-        if (lobbyName != null && !lobbyName.equals(event.getLobby().getName())) return;
+        if (lobbyName != null) return;
         LOG.debug("Received LobbyUpdateEvent for Lobby {}", event.getLobby().getName());
         if (lobbyName == null) {
             lobbyName = event.getLobby().getName();
@@ -290,7 +290,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onRulesMenuClicked() {
-        LOG.debug("Sending ShowRulesOverviewViewEvent");
         soundService.button();
         sceneService.openRulesWindow();
     }
@@ -311,8 +310,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onUpdateLobbyMessage(UpdateLobbyMessage msg) {
-        LOG.debug("Received AllowedAmountOfPlayersMessage");
-        if (!lobbyName.equals(msg.getName())) return;
+        if (!Util.equals(lobbyName, msg.getName())) return;
+        LOG.debug("Received UpdateLobbyMessage for Lobby {}", msg.getLobby().getName());
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
         if (!Util.equals(owner, msg.getLobby().getOwner())) {
             if (ownerTransferNotificationsOn) {
@@ -358,8 +357,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
-        if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received UserJoinedLobbyMessage for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, msg.getName())) return;
+        LOG.debug("Received UserJoinedLobbyMessage for Lobby {}", msg.getName());
         Actor user = msg.getActor();
         LOG.debug("---- User {} joined", user.getUsername());
         Platform.runLater(() -> {
@@ -398,12 +397,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
-        if (!msg.getName().equals(this.lobbyName)) return;
-        LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
+        if (!Util.equals(lobbyName, msg.getName())) return;
+        LOG.debug("Received UserLeftLobbyMessage for Lobby {}", msg.getName());
         Actor user = msg.getActor();
-        if (Util.equals(user, owner)) {
-            LOG.debug("---- Owner {} left", user.getUsername());
-        } else LOG.debug("---- User {} left", user.getUsername());
+        if (Util.equals(user, owner)) LOG.debug("---- Owner {} left", user.getUsername());
+        else LOG.debug("---- User {} left", user.getUsername());
         Platform.runLater(() -> {
             if (joinLeaveMsgsOn)
                 chatMessages.add(new SystemMessageDTO(new I18nWrapper("lobby.user.leave", user.getUsername())));
