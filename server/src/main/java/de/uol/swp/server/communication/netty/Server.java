@@ -1,7 +1,7 @@
 package de.uol.swp.server.communication.netty;
 
-import de.uol.swp.common.MyObjectDecoder;
-import de.uol.swp.common.MyObjectEncoder;
+import de.uol.swp.common.NettyObjectDecoder;
+import de.uol.swp.common.NettyObjectEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -77,8 +77,8 @@ public class Server {
                     // Encoder and decoder are both needed!
                     // Send and receive serialisable objects
                     LOG.trace("Adding Encoder and Decoder to pipeline");
-                    ch.pipeline().addLast(new MyObjectEncoder());
-                    ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                    ch.pipeline().addLast(new NettyObjectEncoder());
+                    ch.pipeline().addLast(new NettyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                     // Must be last in the pipeline, else they will not
                     // get encoded/decoded objects but ByteBuf
                     ch.pipeline().addLast(serverHandler);

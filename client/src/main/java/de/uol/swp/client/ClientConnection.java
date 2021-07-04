@@ -6,7 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
-import de.uol.swp.common.MyObjectDecoder;
+import de.uol.swp.common.NettyObjectDecoder;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.*;
 import io.netty.bootstrap.Bootstrap;
@@ -90,7 +90,7 @@ public class ClientConnection {
         try {
             group.shutdownGracefully().sync();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOG.fatal(e.getMessage());
         }
     }
 
@@ -200,7 +200,7 @@ public class ClientConnection {
                         // Add both Encoder and Decoder to send and receive serialisable objects
                         LOG.trace("Adding Encoder and Decoder to pipeline");
                         ch.pipeline().addLast(new ObjectEncoder());
-                        ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                        ch.pipeline().addLast(new NettyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                         // Add a ClientHandler
                         ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
                     }
@@ -299,10 +299,14 @@ public class ClientConnection {
     @Subscribe
     private void onRequestMessage(RequestMessage message) {
         if (channel != null) {
-            channel.writeAndFlush(message);
+            try {
+                channel.writeAndFlush(message);
+            } catch (Exception e) {
+                // It is unknown which exception might be thrown if any
+                LOG.error(e.getMessage());
+            }
         } else {
             LOG.warn("Several tries to send a message, but server is not connected.");
-            // TODO: may create stack trace?
         }
     }
 }

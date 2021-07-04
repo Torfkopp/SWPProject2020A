@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
  * @see io.netty.handler.codec.serialization.ObjectDecoder
  * @since 2019-08-13
  */
-public class MyObjectDecoder extends ObjectDecoder {
+public class NettyObjectDecoder extends ObjectDecoder {
 
-    private static final Logger LOG = LogManager.getLogger(MyObjectDecoder.class);
+    private static final Logger LOG = LogManager.getLogger(NettyObjectDecoder.class);
 
     /**
      * Constructor
@@ -28,7 +28,7 @@ public class MyObjectDecoder extends ObjectDecoder {
      *
      * @since 2019-08-13
      */
-    public MyObjectDecoder(ClassResolver classResolver) {
+    public NettyObjectDecoder(ClassResolver classResolver) {
         super(classResolver);
     }
 
@@ -40,7 +40,7 @@ public class MyObjectDecoder extends ObjectDecoder {
             decoded = super.decode(ctx, in);
             LOG.trace("{} {}", in, decoded);
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error(e.getMessage());
             throw e;
         }
         return decoded;
