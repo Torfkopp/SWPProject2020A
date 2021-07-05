@@ -100,7 +100,7 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
                 case "Deutsch":
                     preferences.put("lang", "de_DE");
                     break;
-                case "Deutsch - kein Unicode":
+                case "Deutsch (kein Unicode)":
                     preferences.put("lang", "de_DE_nounicode");
                     break;
                 case "Deutsch (Sie)":
