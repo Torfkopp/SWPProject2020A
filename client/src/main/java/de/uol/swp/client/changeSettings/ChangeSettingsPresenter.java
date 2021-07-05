@@ -50,9 +50,10 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
     @FXML
     private void initialize() {
         themeBox.getItems().setAll("Classic", "Cursed", "Dark", "Default");
-        languageBox.getItems()
-                   .addAll("Deutsch - Du", "Deutsch - Sie", "English", "Blind", "Blank", "Hearing-Impaired", "Improved",
-                           "lowercase", "UwU Engwish");
+        languageBox.getItems().addAll("English", "Deutsch", "Deutsch - kein Unicode", "Deutsch - Sie", " ", "⠃⠇⠊⠝⠙",
+                                      "HEARING-IMPAIRED", "Improved", "lowercase", "No Unicode", "Playing Cards",
+                                      "Psэuбф Cчяilliс", "uʍop ǝpᴉsd∩", "UwU", "UWU", "uwu", "Plattdütsk",
+                                      "PLATT FÖR OLLE LÜÜ");
         loginLogoutMsgBox.setSelected(Boolean.parseBoolean(preferences.get("login_logout_msgs_on", "")));
         createDeleteLobbyMsgBox.setSelected(Boolean.parseBoolean(preferences.get("lobby_create_delete_msgs_on", "")));
         joinLeaveLobbyMsgBox.setSelected(Boolean.parseBoolean(preferences.get("join_leave_msgs_on", "")));
@@ -92,22 +93,27 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
         if (theme != null) preferences.put("theme", theme.toLowerCase());
         if (language != null) {
             switch (language) {
-                case "Deutsch - Du":
+                case "English":
+                    preferences.put("lang", "en_GB");
+                    break;
+
+                case "Deutsch":
                     preferences.put("lang", "de_DE");
+                    break;
+                case "Deutsch - kein Unicode":
+                    preferences.put("lang", "de_DE_nounicode");
                     break;
                 case "Deutsch - Sie":
                     preferences.put("lang", "de_DE_sie");
                     break;
-                case "English":
-                    preferences.put("lang", "en_GB");
-                    break;
-                case "Blind":
-                    preferences.put("lang", "en_GB_blind");
-                    break;
-                case "Blank":
+
+                case " ":
                     preferences.put("lang", "en_GB_blank");
                     break;
-                case "Hearing-Impaired":
+                case "⠃⠇⠊⠝⠙":
+                    preferences.put("lang", "en_GB_blind");
+                    break;
+                case "HEARING-IMPAIRED":
                     preferences.put("lang", "en_GB_hearing_impaired");
                     break;
                 case "Improved":
@@ -116,9 +122,33 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
                 case "lowercase":
                     preferences.put("lang", "en_GB_lowercase");
                     break;
-                case "UwU Engwish":
+                case "No Unicode":
+                    preferences.put("lang", "en_GB_nounicode");
+                    break;
+                case "Playing Cards":
+                    preferences.put("lang", "en_GB_playing-cards");
+                    break;
+                case "Psэuбф Cчяilliс":
+                    preferences.put("lang", "en_GB_pseudo-cyrillic");
+                    break;
+                case "uʍop ǝpᴉsd∩":
+                    preferences.put("lang", "en_GB_upside-down");
+                    break;
+
+                case "UwU":
                     preferences.put("lang", "en_GB_UwU");
                     break;
+                case "UWU":
+                    preferences.put("lang", "en_GB_uwu-scweam");
+                    break;
+                case "uwu":
+                    preferences.put("lang", "en_GB_uwu-wowewcase");
+                    break;
+
+                case "Plattdütsk":
+                    preferences.put("Lang", "nds_DE");
+                case "PLATT FÖR OLLE LÜÜ":
+                    preferences.put("Lang", "nds_DE_for-olle-luu");
             }
         }
         preferences.putBoolean("login_logout_msgs_on", loginLogoutMsgBox.isSelected());
