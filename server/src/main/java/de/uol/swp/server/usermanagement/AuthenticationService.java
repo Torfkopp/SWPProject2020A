@@ -3,6 +3,7 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.sessions.Session;
@@ -159,12 +160,15 @@ public class AuthenticationService extends AbstractService {
             LOG.debug("Sending FetchUserContextInternalRequest containing KillOldClientResponse");
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
                                                      new KillOldClientResponse()));
+            LOG.debug("Sending RemoveFromLobbiesRequest");
+            post(new RemoveFromLobbiesRequest(userToLogOut));
             try {
                 sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
             } catch (SessionManagementException e) {
                 LOG.error(e);
             }
         }
+        LOG.debug("Sending UserLoggedOutMessage");
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
         ResponseMessage response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
