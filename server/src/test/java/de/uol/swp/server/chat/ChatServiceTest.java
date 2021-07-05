@@ -15,8 +15,8 @@ import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.sessionmanagement.SessionManagement;
+import de.uol.swp.server.usermanagement.store.IUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
-import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class ChatServiceTest {
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
-    private final UserStore userStore = new MainMemoryBasedUserStore();
+    private final IUserStore userStore = new MainMemoryBasedUserStore();
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
     private final SessionManagement sessionManagement = new SessionManagement();
     private final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);

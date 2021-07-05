@@ -132,6 +132,16 @@ public interface ILobbyService {
     void removeFromAllLobbies();
 
     /**
+     * This method requests to replace the User who left a lobby with an AI
+     *
+     * @param lobbyName The name of the lobby, where the user gets replaced with the AI
+     * @param oldColour The Colour of the User who left the lobby
+     *
+     * @since 2021-06-10
+     */
+    void replaceUserWithAI(LobbyName lobbyName, Colour oldColour);
+
+    /**
      * Posts a request to retrieve all lobby names
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread

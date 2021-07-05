@@ -198,6 +198,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
         Platform.runLater(() -> randomLobbyState.setVisible(false));
@@ -216,6 +217,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllOnlineUsersResponse(AllOnlineUsersResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllOnlineUsersResponse");
         updateUsersList(rsp.getUsers());
     }
@@ -290,6 +292,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
             sceneService.showError(ResourceManager.get("lobby.error.in.lobby"));
@@ -374,6 +377,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received CreateLobbyResponse");
         sceneService.openLobbyWindow(rsp.getLobby());
     }
@@ -479,6 +483,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received JoinLobbyResponse");
         sceneService.openLobbyWindow(rsp.getLobby());
     }
@@ -495,6 +500,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
@@ -520,9 +526,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyPassword = userService.hash(lobbyPasswordField.getText());
             }
             String finalLobbyPassword = lobbyPassword;
-            result.ifPresent(s -> post(
-                    new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(), userService.getLoggedInUser(),
-                                                                 finalLobbyPassword)));
+            result.ifPresent(s -> {
+                LOG.debug("Sending JoinLobbyWithPasswordConfirmationRequest");
+                post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
+                                                                  userService.getLoggedInUser(), finalLobbyPassword));
+            });
         });
     }
 
@@ -556,7 +564,31 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        if (userService.getLoggedInUser() == null) return;
+        LOG.debug("Received JoinRandomLobbyFailedResponse");
         Platform.runLater(() -> randomLobbyState.setVisible(true));
+    }
+
+    /**
+     * Handles a KillOldClientResponse found on the EventBus
+     * <p>
+     * If a new KillOldClientResponse object is found on the EventBus, this
+     * method removes the user from all lobbies and resets the users chat vars.
+     * After that it requests the SceneService to close all lobby windows and
+     * reset the old client to the login screen.
+     *
+     * @param rsp TheKillOldClientResponse object fount on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.common.user.response.KillOldClientResponse
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        resetChatVars();
+        sceneService.closeAllLobbyWindows();
+        sceneService.displayLoginScreen();
     }
 
     /**
@@ -713,7 +745,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
-        LOG.info("User deletion successful");
+        LOG.debug("Received UserDeletionSuccessfulResponse");
         String username = userService.getLoggedInUser().getUsername();
         sceneService.displayLoginScreen();
         logout();
@@ -748,6 +780,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
         if (userService.getLoggedInUser() == null) return;
+        if (chatMessages == null) return;
         LOG.debug("Received UserLoggedInMessage");
         LOG.debug("---- New user {} logged in", msg.getUsername());
         Platform.runLater(() -> {
@@ -775,6 +808,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         if (userService.getLoggedInUser() == null) return;
+        if (chatMessages == null) return;
         LOG.debug("Received UserLoggedOutMessage");
         String username = msg.getUsername();
         LOG.debug("---- User {} logged out", username);

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncUserServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final UserService syncUserService = mock(UserService.class);
     private final User user = mock(User.class);
     private AsyncUserService userService;
@@ -33,7 +33,7 @@ class AsyncUserServiceTest {
 
         userService.createUser(user);
 
-        verify(syncUserService, after(DURATION)).createUser(user);
+        verify(syncUserService, timeout(DURATION)).createUser(user);
     }
 
     @Test
@@ -43,7 +43,7 @@ class AsyncUserServiceTest {
 
         userService.dropUser(user, password);
 
-        verify(syncUserService, after(DURATION)).dropUser(user, password);
+        verify(syncUserService, timeout(DURATION)).dropUser(user, password);
     }
 
     @Test
@@ -52,7 +52,7 @@ class AsyncUserServiceTest {
 
         userService.getLoggedInUser();
 
-        verify(syncUserService, after(DURATION)).getLoggedInUser();
+        verify(syncUserService, timeout(DURATION)).getLoggedInUser();
     }
 
     @Test
@@ -63,7 +63,7 @@ class AsyncUserServiceTest {
 
         userService.login(name, password, false);
 
-        verify(syncUserService, after(DURATION)).login(name, password, false);
+        verify(syncUserService, timeout(DURATION)).login(name, password, false);
     }
 
     @Test
@@ -72,7 +72,7 @@ class AsyncUserServiceTest {
 
         userService.logout(false);
 
-        verify(syncUserService, after(DURATION)).logout(false);
+        verify(syncUserService, timeout(DURATION)).logout(false);
     }
 
     @Test
@@ -81,7 +81,7 @@ class AsyncUserServiceTest {
 
         userService.retrieveAllUsers();
 
-        verify(syncUserService, after(DURATION)).retrieveAllUsers();
+        verify(syncUserService, timeout(DURATION)).retrieveAllUsers();
     }
 
     @Test
@@ -90,7 +90,7 @@ class AsyncUserServiceTest {
 
         userService.setLoggedInUser(user);
 
-        verify(syncUserService, after(DURATION)).setLoggedInUser(user);
+        verify(syncUserService, timeout(DURATION)).setLoggedInUser(user);
     }
 
     @Test
@@ -103,6 +103,6 @@ class AsyncUserServiceTest {
 
         userService.updateAccountDetails(user, password, username, email);
 
-        verify(syncUserService, after(DURATION)).updateAccountDetails(user, password, username, email);
+        verify(syncUserService, timeout(DURATION)).updateAccountDetails(user, password, username, email);
     }
 }

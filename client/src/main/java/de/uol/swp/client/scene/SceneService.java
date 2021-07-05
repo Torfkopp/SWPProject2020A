@@ -3,6 +3,7 @@ package de.uol.swp.client.scene;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.client.auth.event.RetryLoginEvent;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.event.RobberTaxUpdateEvent;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
@@ -15,9 +16,7 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Actor;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +61,10 @@ public class SceneService implements ISceneService {
     @Override
     public void closeBankTradeWindow(LobbyName lobbyName, boolean wasCanceled) {
         sceneManager.closeTradeWindow(lobbyName);
-        if (wasCanceled) eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
+        if (wasCanceled) {
+            LOG.debug("Sending ResetTradeWithBankButtonEvent");
+            eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
+        }
     }
 
     @Override
@@ -130,12 +132,18 @@ public class SceneService implements ISceneService {
     }
 
     @Override
+    public void openChangeGameSettingsWindow() {
+        sceneManager.showChangeGameSettingsWindow();
+    }
+
+    @Override
     public void openLobbyWindow(ISimpleLobby lobby) {
         CountDownLatch latch = new CountDownLatch(1);
+        sceneManager.showLoadingLobbyWindow(lobby.getName());
         sceneManager.showLobbyWindow(lobby.getName(), latch);
         try {
             //noinspection ResultOfMethodCallIgnored
-            latch.await(300, TimeUnit.MILLISECONDS);
+            latch.await(2, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {}
         lobbyService.refreshLobbyPresenterFields(lobby);
     }
@@ -196,6 +204,26 @@ public class SceneService implements ISceneService {
     }
 
     /**
+     * Handles an old session
+     * <p>
+     * If an AlreadyLoggedInResponse object is found on the EventBus this method
+     * is called. If a client attempts to log in but the user is already
+     * logged in elsewhere this method tells the SceneManager to open a popup
+     * which prompts the user to log the old session out.
+     *
+     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
+        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
+        sceneManager.showLogOldSessionOutScreen(rsp.getLoggedInUser());
+    }
+
+    /**
      * Handles a successful account detail changing process
      * <p>
      * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
@@ -209,7 +237,7 @@ public class SceneService implements ISceneService {
      */
     @Subscribe
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
-        LOG.debug("Account Details change was successful.");
+        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
         sceneManager.showMainScreen(rsp.getUser());
     }
 
@@ -220,15 +248,15 @@ public class SceneService implements ISceneService {
      * is found on the EventBus. It shows an error indicating that the
      * connection timed out and closes the client.
      *
-     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
+     * @param event ClientDisconnectedFromServerEvent found on the EventBus
      *
      * @author Aldin Dervisi
      * @author Marvin Drees
      * @since 2021-03-25
      */
     @Subscribe
-    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
-        LOG.debug("Client disconnected from server");
+    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent event) {
+        LOG.debug("Received ClientDisconnectedFromServerEvent");
         sceneManager.showTimeoutErrorScreen();
         sceneManager.closeMainScreen();
     }
@@ -251,6 +279,26 @@ public class SceneService implements ISceneService {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
         sceneManager.showMainScreen(rsp.getUser());
+    }
+
+    /**
+     * Handles the NukedUsersSessionsResponse detected on the EventBus
+     * <p>
+     * If this method is called, it means all sessions belonging to a
+     * user have been nuked, therefore it posts a RetryLoginEvent
+     * on the EventBus to create a new session for the user.
+     *
+     * @param rsp The NukedUsersSessionsResponse detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukedUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
+        LOG.debug("Received NukedUsersSessionsResponse");
+        eventBus.post(new RetryLoginEvent());
     }
 
     /**
@@ -287,7 +335,7 @@ public class SceneService implements ISceneService {
      */
     @Subscribe
     private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
-        LOG.debug("Registration was successful.");
+        LOG.debug("Received RegistrationSuccessfulResponse");
         displayLoginScreen();
     }
 }

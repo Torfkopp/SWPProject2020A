@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class to handle execution of instructions on a non-JavaFX Application Thread
@@ -52,7 +53,12 @@ public class ThreadManager {
      * Shuts down the ExecutorService Threads orderly
      */
     public static void shutdown() {
-        executorService.shutdown();
-        threadForInOrderExecution.shutdown();
+        try {
+            executorService.awaitTermination(2, TimeUnit.SECONDS);
+            threadForInOrderExecution.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            executorService.shutdown();
+            threadForInOrderExecution.shutdown();
+        }
     }
 }

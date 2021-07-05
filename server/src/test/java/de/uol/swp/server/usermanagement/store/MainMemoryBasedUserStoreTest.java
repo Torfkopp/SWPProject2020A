@@ -15,7 +15,7 @@ class MainMemoryBasedUserStoreTest {
     private static int nextID;
 
     { // do not make static (will cause tests to fail)
-        UserStore store = new MainMemoryBasedUserStore();
+        IUserStore store = new MainMemoryBasedUserStore();
         MainMemoryBasedUserStoreTest.nextID = store.getNextUserID();
         MainMemoryBasedUserStoreTest.users = new ArrayList<>();
         for (int i = 0; i < NO_USERS + nextID; i++) {
@@ -24,8 +24,8 @@ class MainMemoryBasedUserStoreTest {
         Collections.sort(users);
     }
 
-    protected UserStore getDefaultStore() {
-        UserStore store = new MainMemoryBasedUserStore();
+    protected IUserStore getDefaultStore() {
+        IUserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return store;
@@ -37,7 +37,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void changePasswordWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -57,7 +57,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void changePasswordWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
@@ -78,14 +78,14 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void createEmptyUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         assertThrows(IllegalArgumentException.class, () -> store.createUser("", "", ""));
     }
 
     @Test
     void dropUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
         Optional<User> userFound = store.findUser(userToRemove.getID());
         assertTrue(userFound.isPresent());
@@ -99,7 +99,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void dropUserByUsername() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
         store.removeUser(userToRemove.getUsername());
@@ -111,7 +111,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserById() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(2);
 
         Optional<User> userFound = store.findUser(userToFind.getID());
@@ -126,7 +126,7 @@ class MainMemoryBasedUserStoreTest {
     @Test
     void findUserByName() {
         // arrange
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         // act
@@ -143,7 +143,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
@@ -158,7 +158,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_EmptyUser_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
 
         Optional<User> userFound = store.findUser(null, "");
 
@@ -167,7 +167,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
@@ -177,7 +177,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByName_NotFound() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
@@ -187,7 +187,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void getAllUsers() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         List<User> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
@@ -205,7 +205,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void overwriteUser() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
         store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
         store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
@@ -222,7 +222,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void updateEmailWithIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());
@@ -242,7 +242,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void updateEmailWithNoIdParameterUpdate() {
-        UserStore store = getDefaultStore();
+        IUserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());

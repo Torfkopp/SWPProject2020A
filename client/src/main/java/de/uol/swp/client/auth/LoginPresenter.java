@@ -2,7 +2,9 @@ package de.uol.swp.client.auth;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.auth.event.RetryLoginEvent;
 import de.uol.swp.client.scene.event.SetAcceleratorsEvent;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -85,6 +87,23 @@ public class LoginPresenter extends AbstractPresenter {
     private void onRegisterButtonPressed() {
         soundService.button();
         sceneService.displayRegistrationScreen();
+    }
+
+    /**
+     * Method called when RetryLoginEvent received
+     * <p>
+     * This method gets called when a RetryLoginEvent is detected on
+     * the eventbus. It behaves as if the login button is pressed.
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.client.auth.event.RetryLoginEvent
+     * @since 2021-03-04
+     */
+    @Subscribe
+    private void onRetryLoginEvent(RetryLoginEvent event) {
+        LOG.debug("Received RetryLoginEvent");
+        Platform.runLater(this::onLoginButtonPressed);
     }
 
     /**

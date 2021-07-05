@@ -77,15 +77,20 @@ public class UserService extends AbstractService {
                 returnMessage = new ChangeAccountDetailsSuccessfulResponse(user);
                 LOG.debug("Account Details were changed for {}", req.getUser().getUsername());
                 if (!req.getOldUsername().equals(req.getUser().getUsername())) {
+                    LOG.debug("Sending UserLoggedOutMessage for User {}", req.getOldUsername());
                     post(new UserLoggedOutMessage(req.getOldUsername()));
+                    LOG.debug("Sending UserLoggedInMessage for User {}", req.getUser().getUsername());
                     post(new UserLoggedInMessage(req.getUser().getUsername()));
                 }
+                LOG.debug("Sending ChangeAccountDetailsSuccessfulResponse for User {}", req.getUser().getUsername());
             } else {
                 returnMessage = new ChangeAccountDetailsExceptionMessage("Old Password was not correct");
+                LOG.debug("Sending ChangeAccountDetailsExceptionMessage");
             }
         } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new ChangeAccountDetailsExceptionMessage(e.getMessage());
+            LOG.debug("Sending ChangeAccountDetailsExceptionMessage");
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -116,14 +121,17 @@ public class UserService extends AbstractService {
             if (user.isPresent()) {
                 userManagement.dropUser(req.getUser());
                 returnMessage = new UserDeletionSuccessfulResponse();
+                LOG.debug("Sending UserDeletionSuccessfulResponse");
             } else {
                 returnMessage = new UserDeletionExceptionMessage(
                         "User deletion unsuccessful for user [" + req.getUser().getUsername() + "]");
+                LOG.debug("Sending UserDeletionExceptionMessage");
             }
         } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(
                     "Cannot delete user [" + req.getUser().getUsername() + "] " + e.getMessage());
+            LOG.debug("Sending UserDeletionExceptionMessage");
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -152,10 +160,12 @@ public class UserService extends AbstractService {
         try {
             userManagement.createUser(req.getUser());
             returnMessage = new RegistrationSuccessfulResponse();
+            LOG.debug("Sending RegistrationSuccessfulResponse");
         } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new RegistrationExceptionMessage(
                     "Cannot create user [" + req.getUser().getUsername() + "] " + e.getMessage());
+            LOG.debug("Sending RegistrationExceptionMessage");
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

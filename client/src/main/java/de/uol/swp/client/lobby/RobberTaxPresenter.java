@@ -171,8 +171,9 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.lobby.event.RobberTaxUpdateEvent
      */
     @Subscribe
-    private void onShowRobberTaxUpdateEvent(RobberTaxUpdateEvent event) {
-        LOG.debug("Received RobberTaxUpdateEvent");
+    private void onRobberTaxUpdateEvent(RobberTaxUpdateEvent event) {
+        if (lobbyName != null) return;
+        LOG.debug("Received RobberTaxUpdateEvent for Lobby {}", event.getLobbyName());
         lobbyName = event.getLobbyName();
         taxAmount = event.getTaxAmount();
         inventory = event.getInventory();
@@ -201,10 +202,10 @@ public class RobberTaxPresenter extends AbstractPresenter {
             return;
         }
         soundService.button();
-        LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
         sceneService.closeRobberTaxWindow(lobbyName);
+        LOG.debug("Sending UnpauseTimerRequest for Lobby {}", lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 

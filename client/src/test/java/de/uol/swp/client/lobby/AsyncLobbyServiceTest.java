@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncLobbyServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final LobbyName defaultLobby = mock(LobbyName.class);
     private final LobbyService syncLobbyService = mock(LobbyService.class);
     private AsyncLobbyService lobbyService;
@@ -38,7 +38,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.addAI(defaultLobby, ai);
 
-        verify(syncLobbyService, after(DURATION)).addAI(defaultLobby, ai);
+        verify(syncLobbyService, timeout(DURATION)).addAI(defaultLobby, ai);
     }
 
     @Test
@@ -48,7 +48,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.changeOwner(defaultLobby, newOwner);
 
-        verify(syncLobbyService, after(DURATION)).changeOwner(defaultLobby, newOwner);
+        verify(syncLobbyService, timeout(DURATION)).changeOwner(defaultLobby, newOwner);
     }
 
     @Test
@@ -57,7 +57,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.checkUserInLobby();
 
-        verify(syncLobbyService, after(DURATION)).checkUserInLobby();
+        verify(syncLobbyService, timeout(DURATION)).checkUserInLobby();
     }
 
     @Test
@@ -67,7 +67,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.createNewLobby(defaultLobby, pass);
 
-        verify(syncLobbyService, after(DURATION)).createNewLobby(defaultLobby, pass);
+        verify(syncLobbyService, timeout(DURATION)).createNewLobby(defaultLobby, pass);
     }
 
     @Test
@@ -76,7 +76,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.joinLobby(defaultLobby);
 
-        verify(syncLobbyService, after(DURATION)).joinLobby(defaultLobby);
+        verify(syncLobbyService, timeout(DURATION)).joinLobby(defaultLobby);
     }
 
     @Test
@@ -85,7 +85,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.joinRandomLobby();
 
-        verify(syncLobbyService, after(DURATION)).joinRandomLobby();
+        verify(syncLobbyService, timeout(DURATION)).joinRandomLobby();
     }
 
     @Test
@@ -95,7 +95,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.kickUser(defaultLobby, otherUser);
 
-        verify(syncLobbyService, after(DURATION)).kickUser(defaultLobby, otherUser);
+        verify(syncLobbyService, timeout(DURATION)).kickUser(defaultLobby, otherUser);
     }
 
     @Test
@@ -104,7 +104,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.leaveLobby(defaultLobby);
 
-        verify(syncLobbyService, after(DURATION)).leaveLobby(defaultLobby);
+        verify(syncLobbyService, timeout(DURATION)).leaveLobby(defaultLobby);
     }
 
     @Test
@@ -114,7 +114,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.refreshLobbyPresenterFields(lobby);
 
-        verify(syncLobbyService, after(DURATION)).refreshLobbyPresenterFields(lobby);
+        verify(syncLobbyService, timeout(DURATION)).refreshLobbyPresenterFields(lobby);
     }
 
     @Test
@@ -123,7 +123,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.removeFromAllLobbies();
 
-        verify(syncLobbyService, after(DURATION)).removeFromAllLobbies();
+        verify(syncLobbyService, timeout(DURATION)).removeFromAllLobbies();
     }
 
     @Test
@@ -132,7 +132,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.retrieveAllLobbies();
 
-        verify(syncLobbyService, after(DURATION)).retrieveAllLobbies();
+        verify(syncLobbyService, timeout(DURATION)).retrieveAllLobbies();
     }
 
     @Test
@@ -141,7 +141,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.retrieveAllLobbyMembers(defaultLobby);
 
-        verify(syncLobbyService, after(DURATION)).retrieveAllLobbyMembers(defaultLobby);
+        verify(syncLobbyService, timeout(DURATION)).retrieveAllLobbyMembers(defaultLobby);
     }
 
     @Test
@@ -150,7 +150,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.returnToPreGameLobby(defaultLobby);
 
-        verify(syncLobbyService, after(DURATION)).returnToPreGameLobby(defaultLobby);
+        verify(syncLobbyService, timeout(DURATION)).returnToPreGameLobby(defaultLobby);
     }
 
     @Test
@@ -160,7 +160,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.setColour(defaultLobby, colour);
 
-        verify(syncLobbyService, after(DURATION)).setColour(defaultLobby, colour);
+        verify(syncLobbyService, timeout(DURATION)).setColour(defaultLobby, colour);
     }
 
     @Test
@@ -171,7 +171,7 @@ class AsyncLobbyServiceTest {
 
         lobbyService.updateLobbySettings(defaultLobby, 4, true, 120, true, 2);
 
-        verify(syncLobbyService, after(DURATION)).updateLobbySettings(defaultLobby, 4, true, 120, true, 2);
+        verify(syncLobbyService, timeout(DURATION)).updateLobbySettings(defaultLobby, 4, true, 120, true, 2);
     }
 
     @Test
@@ -180,6 +180,6 @@ class AsyncLobbyServiceTest {
 
         lobbyService.userReady(defaultLobby, true);
 
-        verify(syncLobbyService, after(DURATION)).userReady(defaultLobby, true);
+        verify(syncLobbyService, timeout(DURATION)).userReady(defaultLobby, true);
     }
 }

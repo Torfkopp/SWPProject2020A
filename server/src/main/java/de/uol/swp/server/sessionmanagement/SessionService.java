@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.sessions.Session;
+import de.uol.swp.common.user.Computer;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.message.FetchUserContextInternalRequest;
@@ -63,8 +64,14 @@ public class SessionService extends AbstractService {
      */
     @Subscribe
     private void onForwardToUserInternalRequest(ForwardToUserInternalRequest event) {
+        LOG.debug("Received ForwardToUserInternalRequest");
         Optional<Session> session = sessionManagement.getSession(event.getTargetUser());
-        if (session.isEmpty()) LOG.error(new RuntimeException("UserSession not found"));
-        else post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
+        if (event.getTargetUser() instanceof Computer)
+            LOG.debug("Ignoring ForwardToUserInternalRequest because it was sent to a Computer");
+        else if (session.isEmpty()) LOG.error(new RuntimeException("UserSession not found"));
+        else {
+            LOG.debug("Sending FetchUserContextInternalRequest");
+            post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
+        }
     }
 }

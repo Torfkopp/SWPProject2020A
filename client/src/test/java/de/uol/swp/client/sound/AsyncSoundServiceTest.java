@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 
 class AsyncSoundServiceTest {
 
-    private static final long DURATION = 200L;
+    private static final long DURATION = 500L;
     private final SoundService syncSoundService = mock(SoundService.class);
     private AsyncSoundService soundService;
 
@@ -30,7 +30,7 @@ class AsyncSoundServiceTest {
 
         soundService.background();
 
-        verify(syncSoundService, after(DURATION)).background();
+        verify(syncSoundService, timeout(DURATION)).background();
     }
 
     @Test
@@ -39,7 +39,7 @@ class AsyncSoundServiceTest {
 
         soundService.building();
 
-        verify(syncSoundService, after(DURATION)).building();
+        verify(syncSoundService, timeout(DURATION)).building();
     }
 
     @Test
@@ -48,7 +48,7 @@ class AsyncSoundServiceTest {
 
         soundService.button();
 
-        verify(syncSoundService, after(DURATION)).button();
+        verify(syncSoundService, timeout(DURATION)).button();
     }
 
     @Test
@@ -57,7 +57,7 @@ class AsyncSoundServiceTest {
 
         soundService.coins();
 
-        verify(syncSoundService, after(DURATION)).coins();
+        verify(syncSoundService, timeout(DURATION)).coins();
     }
 
     @Test
@@ -66,7 +66,7 @@ class AsyncSoundServiceTest {
 
         soundService.dice();
 
-        verify(syncSoundService, after(DURATION)).dice();
+        verify(syncSoundService, timeout(DURATION)).dice();
     }
 
     @Test
@@ -75,7 +75,7 @@ class AsyncSoundServiceTest {
 
         soundService.popup();
 
-        verify(syncSoundService, after(DURATION)).popup();
+        verify(syncSoundService, timeout(DURATION)).popup();
     }
 
     @Test
@@ -84,6 +84,6 @@ class AsyncSoundServiceTest {
 
         soundService.victory();
 
-        verify(syncSoundService, after(DURATION)).victory();
+        verify(syncSoundService, timeout(DURATION)).victory();
     }
 }

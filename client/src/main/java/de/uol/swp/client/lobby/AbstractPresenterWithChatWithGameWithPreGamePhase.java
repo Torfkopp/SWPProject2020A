@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.jfoenix.utils.JFXUtilities;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
@@ -19,7 +20,6 @@ import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.util.ResourceManager;
-import de.uol.swp.common.util.ThreadManager;
 import de.uol.swp.common.util.Util;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -29,6 +29,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 import java.util.concurrent.TimeUnit;
@@ -132,18 +133,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-06
      */
     protected void closeWindow(boolean kicked) {
-        if (lobbyName != null || !kicked) {
-            lobbyService.leaveLobby(lobbyName);
-        }
+        if (lobbyName != null || !kicked) lobbyService.leaveLobby(lobbyName);
         if (moveTimeTimer != null) moveTimeTimer.cancel();
-        window.hide();
-        ThreadManager.runNow(() -> {
-            sceneService.closeUserTradeWindow(lobbyName);
-            sceneService.closeAcceptTradeWindow(lobbyName);
-            try {
-                clearEventBus();
-            } catch (NullPointerException ignored) {}
+        JFXUtilities.runInFX(() -> {
+            if (membersView.getScene().getWindow() != null) membersView.getScene().getWindow().hide();
+            window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
         });
+        sceneService.closeUserTradeWindow(lobbyName);
+        sceneService.closeAcceptTradeWindow(lobbyName);
+        sceneService.closeRobberTaxWindow(lobbyName);
     }
 
     /**
@@ -276,7 +274,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         Platform.runLater(() -> {
             if (inGame) {
                 lobbyMembers.clear();
-                lobbyMembers.addAll(inGameUserList);
+                lobbyMembers.addAll(userLobbyList);
                 return;
             }
             if (lobbyMembers == null) {
@@ -346,7 +344,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * Handles a ColourChangedMessage found on the EventBus
      * <p>
      * The message gets sent by the server if a user changed their colour.
-     * It tells the gameRendering to adapt those new colours.
+     * It tells the GameRendering to adapt those new colours.
      *
      * @param msg The ColourChangedMessage found on the EventBus
      *
@@ -355,6 +353,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onColourChangedMessage(ColourChangedMessage msg) {
+        if (!Util.equals(lobbyName, msg.getName())) return;
         LOG.debug("Received ColourChangedMessage for {}", msg.getName());
         ActorPlayerMap map = new ActorPlayerMap();
         int i = 0;
@@ -383,9 +382,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
-            Platform.runLater(() -> closeWindow(true));
-        }
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
+        if (!userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) return;
+        LOG.debug("Received KickUserResponse for Lobby {}", rsp.getLobbyName());
+        Platform.runLater(() -> closeWindow(true));
     }
 
     /**
@@ -404,7 +404,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
+        if (!Util.equals(lobbyName, msg.getLobbyName())) return;
+        LOG.debug("Received PlayerWonGameMessage for Lobby {}", msg.getLobbyName());
         gameMap = null;
         gameWon = true;
         victoryPointsOverTimeMap = msg.getVictoryPointMap();
@@ -497,6 +498,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        if (!Util.equals(lobbyName, msg.getName())) return;
         LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             returnToLobby.setVisible(false);
@@ -539,12 +541,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage msg) {
-        if (!msg.getName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getName())) return;
         LOG.debug("Received StartSessionMessage for Lobby {}", lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
-        inGameUserList = msg.getPlayerList();
+        updateUsersList(msg.getPlayerList());
         actorPlayerMap = msg.getActorPlayerMap();
         userColoursMap = msg.getActorColourMap();
         gameRendering.setPlayerColours(userColoursMap.makePlayerColourMap(actorPlayerMap));
@@ -606,7 +608,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onUserReadyMessage(UserReadyMessage msg) {
-        if (!msg.getName().equals(lobbyName)) return;
+        if (!Util.equals(lobbyName, msg.getName())) return;
         LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
     }
@@ -664,7 +666,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
         preGameSettingBox.setMinHeight(0);
-        gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering = new GameRendering(gameMapCanvas, userService, drawHitboxGrid, renderingStyle);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameService.updateInventory(lobbyName);
         window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);

@@ -2,6 +2,7 @@ package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
 import de.uol.swp.common.game.map.management.IIntersection;
@@ -15,7 +16,6 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.specialisedUtil.*;
 import de.uol.swp.common.user.Actor;
 import de.uol.swp.common.user.User;
-
 import de.uol.swp.common.util.Util;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
@@ -37,7 +37,7 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
-    private final Deque<Actor> startUpPlayerOrder = new ArrayDeque<>();
+    private final LinkedList<Actor> startUpPlayerOrder = new LinkedList<>();
     private final ActorSet taxPayers = new ActorSet();
     private final ActorBooleanMap autoRollEnabled;
     private final ActorBooleanMap pauseGameMap = new ActorBooleanMap(); //true if the user wants to change the current pause status of the game
@@ -58,6 +58,7 @@ public class Game {
     private boolean pausedByVoting = false;
     private int round = 1;
     private ActorPair robResourceReceiverVictimPair = null;
+    private Actor robberMover = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -206,6 +207,8 @@ public class Game {
             for (IIntersection i : map.getIntersectionsFromHex(mapPoint)) {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
+                // NotEnoughResourcesExceptions can be ignored here because amount gets
+                // defined above as +1 or +2, which won't take the Inventory into the negative
                 if (i.getOwner() != null) {
                     getInventory(i.getOwner()).increase(hex.getResource(), amount);
                 }
@@ -224,6 +227,29 @@ public class Game {
      */
     public Actor getActivePlayer() {
         return activePlayer;
+    }
+
+    /**
+     * Sets the active player
+     *
+     * @param newActivePlayer The active player who gets set
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    private void setActivePlayer(Actor newActivePlayer) {
+        activePlayer = newActivePlayer;
+    }
+
+    /**
+     * Returns the user corresponding with the given player
+     *
+     * @param player The player whose User is required
+     *
+     * @return The user needed
+     */
+    public Actor getActorFromPlayer(Player player) {
+        return players.getActorFromPlayer(player);
     }
 
     /**
@@ -535,6 +561,30 @@ public class Game {
     }
 
     /**
+     * Gets the user who currently has to move the robber
+     *
+     * @return The user who has to move the robber, null if not applicable
+     *
+     * @author Eric Vuong
+     * @since 2021-07-03
+     */
+    public Actor getRobberMover() {
+        return robberMover;
+    }
+
+    /**
+     * Sets the user who currently has to move the robber
+     *
+     * @param robberMover The user who has to move the robber
+     *
+     * @author Eric Vuong
+     * @since 2021-07-03
+     */
+    public void setRobberMover(Actor robberMover) {
+        this.robberMover = robberMover;
+    }
+
+    /**
      * Gets the current Round the Game is in
      *
      * @author Aldin Dervisi
@@ -621,17 +671,6 @@ public class Game {
      */
     public ActorColourMap getUserColoursMap() {
         return lobby.getUserColourMap();
-    }
-
-    /**
-     * Returns the user corresponding with the given player
-     *
-     * @param player The player whose User is required
-     *
-     * @return The user needed
-     */
-    public Actor getActorFromPlayer(Player player) {
-        return players.getActorFromPlayer(player);
     }
 
     /**
@@ -742,6 +781,34 @@ public class Game {
      */
     public void removeTaxPayer(User user) {
         taxPayers.remove(user);
+    }
+
+    /**
+     * Replace a User who leaves a lobby in Game with an AI
+     *
+     * @param userToReplace     The user who left the lobby and should be replaced
+     * @param userToReplaceWith The AI that replaces the user who left the lobby
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    public void replaceUser(Actor userToReplace, Actor userToReplaceWith) {
+        if (Objects.equals(getActivePlayer(), userToReplace)) setActivePlayer(userToReplaceWith);
+        players.replace(userToReplace, userToReplaceWith);
+        pauseGameMap.remove(userToReplace);
+        pauseGameMap.put(userToReplaceWith, true);
+        StartUpPhaseBuiltStructures build = playersStartUpBuiltMap.remove(userToReplace);
+        playersStartUpBuiltMap.put(userToReplaceWith, build);
+        Map<Integer, Integer> currentVictoryPoints = victoryPointsOverTimeMap.remove(userToReplace);
+        victoryPointsOverTimeMap.put(userToReplaceWith, currentVictoryPoints);
+        if (Objects.equals(robberMover, userToReplace)) robberMover = userToReplaceWith;
+        for (int i = 0; i < startUpPlayerOrder.size(); i++) {
+            Actor user = startUpPlayerOrder.get(i);
+            if (Objects.equals(user, userToReplace)) {
+                startUpPlayerOrder.remove(user);
+                startUpPlayerOrder.add(i, userToReplaceWith);
+            }
+        }
     }
 
     /**

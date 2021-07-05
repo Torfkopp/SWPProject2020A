@@ -15,8 +15,8 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
 import de.uol.swp.server.sessionmanagement.SessionManagement;
+import de.uol.swp.server.usermanagement.store.IUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
-import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class AuthenticationServiceTest {
     final User user = new UserDTO(1, "name", "password", "email@test.de");
     final User user2 = new UserDTO(2, "name2", "password2", "email@test.de2");
     final User user3 = new UserDTO(3, "name3", "password3", "email@test.de3");
-    final UserStore userStore = new MainMemoryBasedUserStore();
+    final IUserStore userStore = new MainMemoryBasedUserStore();
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(userStore);
     final SessionManagement sessionManagement = new SessionManagement();

@@ -265,6 +265,18 @@ public interface ILobby extends Serializable {
     void leaveUser(Actor user);
 
     /**
+     * Replace a User who left a Lobby in Game with an AI
+     *
+     * @param userToReplace     The User who left a lobby in Game and gets replaced with an AI
+     * @param userToReplaceWith The AI who replace a User who left the Lobby
+     * @param oldColour         The colour of the User who left the Lobby
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    void replaceUser(Actor userToReplace, Actor userToReplaceWith, Colour oldColour);
+
+    /**
      * Sets whether the Lobby currently has a password according to the boolean provided
      *
      * @param hasPassword Whether the Lobby has a password or not

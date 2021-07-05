@@ -11,6 +11,7 @@ import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.LogoutRequest;
+import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
@@ -72,6 +73,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             Session session = sessionManagement.getSession(ctx).get();
             Message msg = new ClientDisconnectedMessage();
             msg.setSession(session);
+            LOG.debug("Sending ClientDisconnectedMessage");
             eventBus.post(msg);
             sessionManagement.removeSession(ctx);
         }
@@ -111,7 +113,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2021-03-18
      */
     public void sendPingMessage(MessageContext ctx) {
-        LOG.debug("Send ping message to client {}", ctx);
+        LOG.trace("Send ping message to client {}", ctx);
         sendToClient(ctx, new PingMessage());
     }
 
@@ -192,14 +194,19 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
+        LOG.debug("Received ClientAuthorisedMessage");
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent()) {
-            if (msg.getSession().isPresent()) try {
-                sessionManagement.putSession(ctx.get(), msg.getSession().get());
-                sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
-                sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
-            } catch (SessionManagementException e) {
-                LOG.error(e);
+            if (msg.hasOldSession()) {
+                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
+            } else {
+                if (msg.getSession().isPresent()) try {
+                    sessionManagement.putSession(ctx.get(), msg.getSession().get());
+                    sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
+                    sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+                } catch (SessionManagementException e) {
+                    LOG.error(e);
+                }
             }
         } else {
             LOG.warn("No context for {}", msg);
@@ -223,14 +230,16 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
-        if (msg.getSession().isPresent()) {
-            eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
-            LogoutRequest req = new LogoutRequest();
-            req.setSession(msg.getSession().get());
-            eventBus.post(req);
-            Optional<MessageContext> ctx = getCtx(msg);
-            ctx.ifPresent(sessionManagement::removeSession);
-        }
+        if (msg.getSession().isEmpty()) return;
+        LOG.debug("Received ClientDisconnectedMessage");
+        LOG.debug("Sending RemoveFromLobbiesRequest");
+        eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
+        LogoutRequest req = new LogoutRequest();
+        req.setSession(msg.getSession().get());
+        LOG.debug("Sending LogoutRequest");
+        eventBus.post(req);
+        Optional<MessageContext> ctx = getCtx(msg);
+        ctx.ifPresent(sessionManagement::removeSession);
     }
 
     /**
@@ -267,6 +276,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onFetchUserContextInternalRequest(FetchUserContextInternalRequest req) {
+        LOG.debug("Received FetchUserContextInternalRequest");
         Optional<MessageContext> ctx = sessionManagement.getCtx(req.getUserSession());
         ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
     }
@@ -417,9 +427,8 @@ public class ServerHandler implements ServerHandlerDelegate {
             try {
                 client.writeAndFlush(msg);
             } catch (Exception e) {
-                // UwU what is thrown here?
-                // TODO: Handle exceptions for unreachable clients
-                e.printStackTrace();
+                // It is unknown which exception might be thrown if any
+                LOG.error(e.getMessage());
             }
         }
     }
