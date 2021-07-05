@@ -50,7 +50,7 @@ public class ChangeSettingsPresenter extends AbstractPresenter {
     @FXML
     private void initialize() {
         themeBox.getItems().setAll("Classic", "Cursed", "Dark", "Default");
-        languageBox.getItems().addAll("English", "Deutsch", "Deutsch - kein Unicode", "Deutsch - Sie", " ", "⠃⠇⠊⠝⠙",
+        languageBox.getItems().addAll("English", "Deutsch (Du)", "Deutsch (kein Unicode)", "Deutsch (Sie)", " ", "⠃⠇⠊⠝⠙",
                                       "HEARING-IMPAIRED", "Improved", "lowercase", "No Unicode", "Playing Cards",
                                       "Psэuбф Cчяilliс", "uʍop ǝpᴉsd∩", "UwU", "UWU", "uwu", "Plattdütsk",
                                       "PLATT FÖR OLLE LÜÜ");
