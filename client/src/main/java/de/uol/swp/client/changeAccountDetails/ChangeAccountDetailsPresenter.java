@@ -255,7 +255,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     private void prepareNewUsernameField() {
         UnaryOperator<TextFormatter.Change> stringFilter = (s) ->
-                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
+                s.getControlNewText().length() <= 20 && s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s
+                        .getText().equals("") ? s : null;
         newUsernameField.setTextFormatter(new TextFormatter<>(stringFilter));
 
         changeButton.disableProperty()
