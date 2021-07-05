@@ -17,7 +17,7 @@ import java.util.UUID;
 public class UUIDSession implements Session {
 
     private final String sessionId;
-    private final User user;
+    private User user;
 
     /**
      * Private constructor
@@ -56,6 +56,11 @@ public class UUIDSession implements Session {
     @Override
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public void replaceUser(User user) {
+        this.user = user;
     }
 
     @Override

@@ -32,4 +32,12 @@ public interface Session {
      * @since 2019-08-13
      */
     User getUser();
+
+    /**
+     * Replaces the User from the current Session
+     *
+     * @author Steven Luong
+     * @since 2021-07-05
+     */
+    void replaceUser(User user);
 }
