@@ -8,6 +8,7 @@ import de.uol.swp.common.user.Computer;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.message.FetchUserContextInternalRequest;
+import de.uol.swp.server.message.ReplaceUserSessionInternalRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,5 +74,24 @@ public class SessionService extends AbstractService {
             LOG.debug("Sending FetchUserContextInternalRequest");
             post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
         }
+    }
+
+    /**
+     * Handles a ReplaceUserSessionInternalRequest found on the EventBus
+     * <p>
+     * If a ReplaceUserSessionInternalRequest is found on the EventBus this
+     * method replaces the old User of the current Session with the new User
+     * contained in the ReplaceUserSessionInternalRequest.
+     *
+     * @param req ReplaceUserSessionInternalRequest found on the EventBus
+     *
+     * @author Steven Luong
+     * @see de.uol.swp.server.message.ReplaceUserSessionInternalRequest
+     * @since 2021-07-05
+     */
+    @Subscribe
+    private void onReplaceUserSessionInternalRequest(ReplaceUserSessionInternalRequest req) {
+        LOG.debug("Received ReplaceUserSessionInternalRequest");
+        sessionManagement.replaceUser(req.getCurrentSession(), req.getNewUser());
     }
 }

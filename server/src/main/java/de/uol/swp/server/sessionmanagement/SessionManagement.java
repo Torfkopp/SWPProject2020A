@@ -90,4 +90,12 @@ public class SessionManagement implements ISessionManagement {
     public void removeSession(MessageContext ctx) {
         activeSessions.remove(ctx);
     }
+
+    @Override
+    public void replaceUser(Session session, User user) throws SessionManagementException {
+        if (userSessions.containsKey(session)) {
+            userSessions.replace(session, user);
+            session.replaceUser(user);
+        } else throw new SessionManagementException("Session not found");
+    }
 }

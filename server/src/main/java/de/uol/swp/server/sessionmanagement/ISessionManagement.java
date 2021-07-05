@@ -117,4 +117,15 @@ public interface ISessionManagement {
      * @param ctx MessageContext to remove session from
      */
     void removeSession(MessageContext ctx);
+
+    /**
+     * Replaces the User from the current Session
+     *
+     * @param session The current Session
+     * @param user    The User to replace
+     *
+     * @author Steven Luong
+     * @since 2021-07-05
+     */
+    void replaceUser(Session session, User user);
 }

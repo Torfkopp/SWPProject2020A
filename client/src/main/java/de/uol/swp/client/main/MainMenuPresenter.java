@@ -814,7 +814,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- User {} logged out", username);
         SystemMessageDTO systemMessage = new SystemMessageDTO(new I18nWrapper("mainmenu.user.logout", username));
         Platform.runLater(() -> {
-            if (loginLogoutMsgsOn && users.remove(username)) chatMessages.add(systemMessage);
+            if (loginLogoutMsgsOn) chatMessages.add(systemMessage);
+            users.remove(username);
         });
     }
 

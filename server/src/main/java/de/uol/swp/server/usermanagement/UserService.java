@@ -17,6 +17,7 @@ import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.message.ReplaceUserSessionInternalRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -81,6 +82,8 @@ public class UserService extends AbstractService {
                     post(new UserLoggedOutMessage(req.getOldUsername()));
                     LOG.debug("Sending UserLoggedInMessage for User {}", req.getUser().getUsername());
                     post(new UserLoggedInMessage(req.getUser().getUsername()));
+                    LOG.debug("Sending ReplaceUserSessionInternalRequest");
+                    post(new ReplaceUserSessionInternalRequest(user, req.getSession().get()));
                 }
                 LOG.debug("Sending ChangeAccountDetailsSuccessfulResponse for User {}", req.getUser().getUsername());
             } else {
